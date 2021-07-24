@@ -6,7 +6,7 @@ export default function Home({ stops }) {
   const [selectedLine, setSelectedLine] = useState();
   const lines = [...new Set(stops.map(({ Line }) => Line))];
 
-  const slugify = (station) => encodeURIComponent(station.replaceAll(" ", "-").toLowerCase());
+  const slugify = (station) => encodeURIComponent(station.replace(/ /g, "-").toLowerCase());
 
   return (
     <main>
