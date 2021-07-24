@@ -63,7 +63,7 @@ export default function Stop({ stop }) {
           </a>
         </Link>
       </nav>
-      <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-8 overflow-y-scroll md:space-y-16">
+      <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-8 md:space-y-16">
         <div>
           <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
         </div>

@@ -15,7 +15,7 @@ export default function Home({ stops }) {
   const slugify = (station) => encodeURIComponent(station.replace(/ /g, "-").toLowerCase());
 
   return (
-    <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-4 overflow-y-scroll">
+    <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-4">
       <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">Metrolink stops</h1>
       <div aria-labelledby="lineGroup">
         <label id="lineGroup">Filter by lines</label>
