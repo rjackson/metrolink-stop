@@ -2,34 +2,36 @@ import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import useCountdown from "../hooks/useCountdown";
 import { getStops } from "../lib/tfgm-metrolink";
 
 export default function Stop({ stop }) {
-  const [stopInfo, setStopInfo] = useState();
-  const [error, setError] = useState();
-  const [refreshTrigger, setRefreshTrigger] = useState(false);
-
-  const { name, departures = [], messages = [], lastUpdated = "1970-01-01" } = stopInfo ?? {};
+  const [stopInfo, setStopInfo] = useState({
+    name: stop,
+    departures: [],
+    messages: [],
+    lastUpdated: new Date().toISOString(),
+  });
+  const { name, departures, messages, lastUpdated } = stopInfo ?? {};
   const lastUpdatedDate = new Date(lastUpdated);
+  const updateFrequency = 60;
+
+  const { secondsRemaining, setTarget } = useCountdown(new Date(Date.now()));
 
   //#region Continually refreshing stop data
   useEffect(async () => {
     let mounted = true;
-    if (!stop) {
+    if (!stop || secondsRemaining > 0) {
       return;
     }
+
     try {
       const req = await fetch(`/api/stop/${stop}`);
       const data = await req.json();
 
       if (mounted) {
-        if (req.status == 200) {
-          setStopInfo(data);
-          setError(null);
-        } else {
-          setStopInfo(null);
-          setError(data?.error);
-        }
+        setStopInfo(req.status == 200 ? data : null);
+        setTarget(new Date(Date.now() + updateFrequency * 1000));
       }
     } catch (err) {
       console.log(err);
@@ -38,16 +40,7 @@ export default function Stop({ stop }) {
     return () => {
       mounted = false;
     };
-  }, [stop, refreshTrigger]);
-
-  // Refresh every 30s
-  useEffect(() => {
-    const timeout = setTimeout(() => setRefreshTrigger(!refreshTrigger), 30 * 1000);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [refreshTrigger]);
+  }, [stop, secondsRemaining]);
   //#endregion
 
   return (
@@ -116,7 +109,7 @@ export default function Stop({ stop }) {
           </ul>
         </div>
         <div className="py-4 text-center text-gray-500 dark:text-gray-400">
-          <p>Automatically updating every 30 seconds.</p>
+          <p>Automatically updating in {secondsRemaining}s.</p>
           <p>
             Last update <time dateTime={lastUpdatedDate.toISOString()}>{lastUpdatedDate.toLocaleString()}</time>.
           </p>
