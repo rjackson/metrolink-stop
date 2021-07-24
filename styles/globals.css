@@ -1,0 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+a {
+  @apply inline-block text-indigo-600 border-b-2 border-transparent cursor-pointer hover:text-indigo-800 hover:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200 focus:ring-opacity-50;
+}

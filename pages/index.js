@@ -3,42 +3,55 @@ import Link from "next/link";
 import { useState } from "react";
 
 export default function Home({ stops }) {
-  const [selectedLine, setSelectedLine] = useState();
   const lines = [...new Set(stops.map(({ Line }) => Line))];
+  const [selectedLines, setSelectedLines] = useState(new Map(lines.map((line) => [line, false])));
+  const showAllLines = Array.from(selectedLines.values()).filter((checked) => !!checked).length === 0;
+
+  // These are funky cause map operations mutate, and thus dont trigger a re-render. New maps force rerenders.
+  const selectLine = (line) => setSelectedLines((prev) => new Map([...prev, [line, true]]));
+  const deselectLine = (line) => setSelectedLines((prev) => new Map([...prev, [line, false]]));
+  const selectedStops = showAllLines ? stops : stops.filter(({ Line }) => selectedLines.get(Line));
 
   const slugify = (station) => encodeURIComponent(station.replace(/ /g, "-").toLowerCase());
 
   return (
-    <main>
-      <h1>Choose your stop</h1>
-      <label for="lines">Filter by lines</label>
-      <select name="lines" id="lines" onChange={(e) => setSelectedLine(e.target.value)}>
-        <option value="">All lines</option>
-        {lines.map((line) => (
-          <option value={line} selected={line === selectedLine}>
-            {line}
-          </option>
-        ))}
-      </select>
-      <table>
+    <main className="flex-1 overflow-y-scroll px-6 py-4 flex flex-col max-w-screen-md w-full space-y-4">
+      <h1 className="text-2xl text-center uppercase tracking-wide font-semibold">Metrolink stops</h1>
+      <div aria-labelledby="lineGroup">
+        <label id="lineGroup">Filter by lines</label>
+
+        <div className="flex flex-wrap space-y-2">
+          {lines.map((line) => (
+            <div key={line} className="flex space-x-2  items-center w-full md:w-1/3">
+              <input
+                id={`lines_${line}`}
+                type="checkbox"
+                value={line}
+                checked={selectedLines.get(line)}
+                onChange={(e) => (e.target.checked ? selectLine(e.target.value) : deselectLine(e.target.value))}
+              />
+              <label htmlFor={`lines_${line}`}>{line}</label>
+            </div>
+          ))}
+        </div>
+      </div>
+      <table className="table-auto w-full">
         <thead>
-          <th>Location</th>
-          <th>Line</th>
+          <tr className="text-left">
+            <th className="py-2">Location</th>
+            <th className="py-2">Line</th>
+          </tr>
         </thead>
         <tbody>
-          {stops.map(({ Line, StationLocation }) => (
-            <>
-              {(!selectedLine || selectedLine == Line) && (
-                <tr key={StationLocation}>
-                  <td>
-                    <Link href={`/${slugify(StationLocation)}`}>
-                      <a>{StationLocation}</a>
-                    </Link>
-                  </td>
-                  <td>{Line}</td>
-                </tr>
-              )}
-            </>
+          {selectedStops.map(({ Line, StationLocation }) => (
+            <tr key={StationLocation}>
+              <td className="py-1">
+                <Link href={`/${slugify(StationLocation)}`}>
+                  <a>{StationLocation}</a>
+                </Link>
+              </td>
+              <td className="py-1">{Line}</td>
+            </tr>
           ))}
         </tbody>
       </table>
