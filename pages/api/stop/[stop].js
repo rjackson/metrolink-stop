@@ -3,8 +3,10 @@ import { getStopInfo } from "../../../lib/tfgm-metrolink";
 export default async (req, res) => {
   const { stop } = req.query;
 
-  const stopInfo = await getStopInfo(stop);
-
-  res.statusCode = 200;
-  res.json(stopInfo);
+  try {
+    res.status(200).json(await getStopInfo(stop));
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
 };
