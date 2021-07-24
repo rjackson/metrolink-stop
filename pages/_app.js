@@ -15,7 +15,7 @@ function MyApp({ Component, pageProps }) {
         <footer className="px-6 py-2 text-center">
           <p>💛</p>
           <p>
-            <Link href="">
+            <Link href="https://rjackson.dev">
               <a target="_blank" rel="noreferer">
                 rjackson.dev
               </a>
