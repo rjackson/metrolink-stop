@@ -2,10 +2,9 @@ import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getStops } from "../lib/tfgm-metrolink";
 
-export default function Stop() {
-  const router = useRouter();
-  const { stop } = router.query;
+export default function Stop({ stop }) {
   const [stopInfo, setStopInfo] = useState();
   const [error, setError] = useState();
   const [refreshTrigger, setRefreshTrigger] = useState(false);
@@ -80,17 +79,25 @@ export default function Stop() {
               </tr>
             </thead>
             <tbody>
-              {departures.map(({ destination, type, status, wait }, i) => (
-                <tr key={i}>
-                  <td className="py-1">{destination}</td>
-                  <td className="py-1">{type}</td>
-                  <td className="py-1">{status}</td>
-                  <td>
-                    <span>{wait}</span>
-                    <abbr title="minutes">m</abbr>
+              {departures.length > 1 ? (
+                departures.map(({ destination, type, status, wait }, i) => (
+                  <tr key={i}>
+                    <td className="py-1">{destination}</td>
+                    <td className="py-1">{type}</td>
+                    <td className="py-1">{status}</td>
+                    <td>
+                      <span>{wait}</span>
+                      <abbr title="minutes">m</abbr>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="py-1 text-center">
+                    (No departures currently listed)
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
             <tfoot></tfoot>
           </table>
@@ -113,4 +120,28 @@ export default function Stop() {
       </main>
     </>
   );
+}
+
+const slugify = (stop) => stop?.toLowerCase().replace(/ /g, "-");
+
+export async function getStaticProps({ params: { stop: sluggedStop } }) {
+  const stops = await getStops();
+  const { StationLocation: stop } = stops.filter(
+    ({ StationLocation }) => slugify(StationLocation) === sluggedStop
+  )?.[0];
+
+  return {
+    props: { stop }, // will be passed to the page component as props
+  };
+}
+
+export async function getStaticPaths() {
+  const gottenStops = await getStops();
+  const stops = gottenStops.map(({ StationLocation }) => StationLocation);
+  const paths = stops.map((stop) => ({ params: { stop: slugify(stop) } }));
+
+  return {
+    paths,
+    fallback: false,
+  };
 }
