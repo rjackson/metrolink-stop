@@ -1,16 +1,18 @@
 import "../styles/globals.css";
 import Head from "next/head";
 import Link from "next/link";
+import usePrefersDark from "../hooks/usePrefersDark";
 
 function MyApp({ Component, pageProps }) {
+  const prefersDark = usePrefersDark();
   return (
-    <>
+    <div className={prefersDark ? "dark" : ""}>
       <Head>
         <link rel="shortcut icon" href="/icon.svg" />
         <title>Metrolink stops, doot doot</title>
       </Head>
 
-      <div className="h-screen w-screen flex flex-col text-lg items-center">
+      <div className="flex flex-col items-center w-screen h-screen text-lg text-gray-900 bg-white dark:text-gray-50 dark:bg-gray-900">
         <Component {...pageProps} />
         <footer className="px-6 py-2 text-center">
           <p>💛</p>
@@ -35,7 +37,7 @@ function MyApp({ Component, pageProps }) {
           </p>
         </footer>
       </div>
-    </>
+    </div>
   );
 }
 

@@ -15,14 +15,14 @@ export default function Home({ stops }) {
   const slugify = (station) => encodeURIComponent(station.replace(/ /g, "-").toLowerCase());
 
   return (
-    <main className="flex-1 overflow-y-scroll px-6 py-4 flex flex-col max-w-screen-md w-full space-y-4">
-      <h1 className="text-2xl text-center uppercase tracking-wide font-semibold">Metrolink stops</h1>
+    <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-4 overflow-y-scroll">
+      <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">Metrolink stops</h1>
       <div aria-labelledby="lineGroup">
         <label id="lineGroup">Filter by lines</label>
 
         <div className="flex flex-wrap space-y-2">
           {lines.map((line) => (
-            <div key={line} className="flex space-x-2  items-center w-full md:w-1/3">
+            <div key={line} className="flex items-center w-full space-x-2 md:w-1/3">
               <input
                 id={`lines_${line}`}
                 type="checkbox"
@@ -35,7 +35,7 @@ export default function Home({ stops }) {
           ))}
         </div>
       </div>
-      <table className="table-auto w-full">
+      <table className="w-full table-auto">
         <thead>
           <tr className="text-left">
             <th className="py-2">Location</th>
@@ -47,7 +47,9 @@ export default function Home({ stops }) {
             <tr key={StationLocation}>
               <td className="py-1">
                 <Link href={`/${slugify(StationLocation)}`}>
-                  <a>{StationLocation}</a>
+                  <a>
+                    {StationLocation}
+                  </a>
                 </Link>
               </td>
               <td className="py-1">{Line}</td>

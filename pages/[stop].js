@@ -63,19 +63,21 @@ export default function Stop({ stop }) {
           </a>
         </Link>
       </nav>
-      <main className="flex-1 overflow-y-scroll px-6 py-4 flex flex-col space-y-8 md:space-y-16 max-w-screen-md w-full">
+      <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-8 overflow-y-scroll md:space-y-16">
         <div>
-          <h1 className="text-2xl text-center uppercase tracking-wide font-semibold">{name}</h1>
+          <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
         </div>
         <div className="space-y-2 md:space-y-6">
-          <h2 className="text-center uppercase tracking-wide font-semibold text-gray-800">Departures</h2>
+          <h2 className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300">
+            Departures
+          </h2>
           <table className="w-full table-auto">
             <thead className="text-left">
               <tr>
-                <th className="py-2 font-normal text-gray-600">Destination</th>
-                <th className="py-2 font-normal text-gray-600">Type</th>
-                <th className="py-2 font-normal text-gray-600">Status</th>
-                <th className="py-2 font-normal text-gray-600">Wait</th>
+                <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Destination</th>
+                <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Type</th>
+                <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Status</th>
+                <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Wait</th>
               </tr>
             </thead>
             <tbody>
@@ -103,7 +105,9 @@ export default function Stop({ stop }) {
           </table>
         </div>
         <div className="space-y-2 md:space-y-6">
-          <h2 className="text-center uppercase tracking-wide font-semibold text-gray-800">Message board</h2>
+          <h2 className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300">
+            Message board
+          </h2>
 
           <ul className="md:text-center">
             {messages.map((message, i) => (
@@ -111,7 +115,7 @@ export default function Stop({ stop }) {
             ))}
           </ul>
         </div>
-        <div className="text-center text-gray-500 py-4">
+        <div className="py-4 text-center text-gray-500 dark:text-gray-400">
           <p>Automatically updating every 30 seconds.</p>
           <p>
             Last update <time dateTime={lastUpdatedDate.toISOString()}>{lastUpdatedDate.toLocaleString()}</time>.
