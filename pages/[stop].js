@@ -6,6 +6,7 @@ import useCountdown from "../hooks/useCountdown";
 import { getStops } from "../lib/tfgm-metrolink";
 
 export default function Stop({ stop }) {
+  /** @type [(import("../lib/tfgm-metrolink").StopInfo), Function] */
   const [stopInfo, setStopInfo] = useState({
     name: stop,
     departures: [],

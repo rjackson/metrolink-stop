@@ -3,6 +3,16 @@ import { useEffect, useState } from "react";
 export default function Debug() {
   const [metrolinksDump, setMetrolinksDump] = useState([]);
   const uniqueMessages = [...new Set(metrolinksDump.map(({ MessageBoard }) => MessageBoard))];
+  const uniqueDestinations = [
+    ...new Set(
+      metrolinksDump.flatMap(({ Dest0, Dest1, Dest2, Dest3 }) => [
+        Dest0,
+        Dest1,
+        Dest2,
+        Dest3,
+      ])
+    ),
+  ];
   const uniqueStatuses = [
     ...new Set(
       metrolinksDump.flatMap(({ Status0, Status1, Status2, Status3 }) => [Status0, Status1, Status2, Status3])
@@ -67,6 +77,14 @@ export default function Debug() {
         <ul>
           {uniqueCarriages.map((carriage) => (
             <li>{carriage}</li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique destinations</h2>
+        <ul>
+          {uniqueDestinations.map((destination) => (
+            <li>{destination}</li>
           ))}
         </ul>
       </div>
