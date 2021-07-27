@@ -17,8 +17,8 @@ export default function Home({ stops }) {
   return (
     <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-4">
       <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">Metrolink stops</h1>
-      <div aria-labelledby="lineGroup">
-        <label id="lineGroup">Filter by lines</label>
+      <details>
+        <summary>Filter by lines</summary>
 
         <div className="flex flex-wrap space-y-2">
           {lines.map((line) => (
@@ -34,7 +34,7 @@ export default function Home({ stops }) {
             </div>
           ))}
         </div>
-      </div>
+      </details>
       <table className="w-full table-auto">
         <thead>
           <tr className="text-left">
@@ -47,9 +47,7 @@ export default function Home({ stops }) {
             <tr key={StationLocation}>
               <td className="py-1">
                 <Link href={`/${slugify(StationLocation)}`}>
-                  <a>
-                    {StationLocation}
-                  </a>
+                  <a>{StationLocation}</a>
                 </Link>
               </td>
               <td className="py-1">{Line}</td>
