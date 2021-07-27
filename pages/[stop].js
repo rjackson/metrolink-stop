@@ -65,23 +65,25 @@ export default function Stop({ stop }) {
           <h2 className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300">
             Departures
           </h2>
-          <table className="w-full table-auto">
-            <thead className="text-left">
+          <table className="w-full text-center table-fixed">
+            <thead>
               <tr>
-                <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Destination</th>
-                <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Type</th>
-                <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Status</th>
-                <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Wait</th>
+                <th className="w-1/4 py-2 font-normal text-left text-gray-600 sm:w-1/2 dark:text-gray-400">
+                  Destination
+                </th>
+                <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Type</th>
+                <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Status</th>
+                <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Wait</th>
               </tr>
             </thead>
             <tbody>
               {departures.length > 1 ? (
                 departures.map(({ destination, type, status, wait }, i) => (
                   <tr key={i}>
-                    <td className="py-1">{destination}</td>
+                    <td className="py-1 text-left truncate">{destination}</td>
                     <td className="py-1">{type}</td>
                     <td className="py-1">{status}</td>
-                    <td>
+                    <td className="tabular-nums">
                       <span>{wait}</span>
                       <abbr title="minutes">m</abbr>
                     </td>
@@ -103,14 +105,16 @@ export default function Stop({ stop }) {
             Message board
           </h2>
 
-          <ul className="md:text-center">
+          <ul className="space-y-2 md:text-center">
             {messages.map((message, i) => (
               <li key={i}>{message}</li>
             ))}
           </ul>
         </div>
         <div className="py-4 text-center text-gray-500 dark:text-gray-400">
-          <p>Automatically updating in {secondsRemaining}s.</p>
+          <p>
+            Automatically updating in <span className="tabular-nums">{secondsRemaining}</span>s.
+          </p>
           <p>
             Last update <time dateTime={lastUpdatedDate.toISOString()}>{lastUpdatedDate.toLocaleString()}</time>.
           </p>
