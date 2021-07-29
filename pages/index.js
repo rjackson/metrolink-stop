@@ -38,8 +38,8 @@ export default function Home({ stops }) {
       <table className="w-full table-auto">
         <thead>
           <tr className="text-left">
-            <th className="py-2">Location</th>
-            <th className="py-2">Line</th>
+            <th scope="col" className="py-2">Location</th>
+            <th scope="col" className="py-2">Line</th>
           </tr>
         </thead>
         <tbody>

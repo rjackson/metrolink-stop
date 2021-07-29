@@ -62,10 +62,10 @@ export default function Stop({ stop }) {
           <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
         </div>
         <div className="space-y-2 md:space-y-6">
-          <h2 className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300">
+          <h2 id="departures" className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300">
             Departures
           </h2>
-          <table className="w-full text-center table-fixed">
+          <table className="w-full text-center table-fixed" aria-describedby="departures" aria-live="polite">
             <thead>
               <tr>
                 <th className="w-1/4 py-2 font-normal text-left text-gray-600 sm:w-1/2 dark:text-gray-400">
@@ -79,7 +79,7 @@ export default function Stop({ stop }) {
             <tbody>
               {departures.length > 1 ? (
                 departures.map(({ destination, type, status, wait }, i) => (
-                  <tr key={i}>
+                  <tr key={i} aria-atomic="true">
                     <td className="py-1 text-left truncate">{destination}</td>
                     <td className="py-1">{type}</td>
                     <td className="py-1">{status}</td>
