@@ -69,7 +69,7 @@ export default function Stop({ stop: fullStopName }) {
                 <th className="w-1/4 py-2 font-normal text-left text-gray-600 sm:w-1/2 dark:text-gray-400">
                   Destination
                 </th>
-                <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Type</th>
+                <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Carriages</th>
                 <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Status</th>
                 <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Wait</th>
               </tr>
@@ -78,12 +78,16 @@ export default function Stop({ stop: fullStopName }) {
               {departures.length > 1 ? (
                 departures.map(({ destination, type, status, wait }, i) => (
                   <tr key={i} aria-atomic="true">
-                    <td className="py-1 text-left truncate">{destination}</td>
+                    <th scope="row" className="py-1 font-normal text-left truncate">
+                      {destination}
+                    </th>
                     <td className="py-1">{type}</td>
                     <td className="py-1">{status}</td>
                     <td className="tabular-nums">
-                      <span>{wait}</span>
-                      <abbr title="minutes">m</abbr>
+                      <time datetime="PT{wait}M" aria-label={`${wait} minutes`}>
+                        <span>{wait}</span>
+                        <abbr title="minutes">m</abbr>
+                      </time>
                     </td>
                   </tr>
                 ))
@@ -111,7 +115,11 @@ export default function Stop({ stop: fullStopName }) {
         </div>
         <div className="py-4 text-center text-gray-500 dark:text-gray-400">
           <p>
-            Last update <time dateTime={lastUpdatedDate.toISOString()}>{lastUpdatedDate.toLocaleString()}</time>.
+            Last update{" "}
+            <time dateTime={lastUpdatedDate.toISOString()}>
+              {lastUpdatedDate.toLocaleTimeString("en-GB", { timeStyle: "long" })}
+            </time>
+            .
           </p>
         </div>
       </main>

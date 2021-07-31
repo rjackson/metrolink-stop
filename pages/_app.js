@@ -15,13 +15,13 @@ function MyApp({ Component, pageProps }) {
       <div className="flex flex-col items-center w-screen h-screen text-lg text-gray-900 bg-white dark:text-gray-50 dark:bg-gray-900">
         <Component {...pageProps} />
         <footer className="px-6 py-2 text-center">
-          <p>💛</p>
+          <p aria-hidden>💛</p>
           <p>
             <Link href="https://rjackson.dev">
-              <a target="_blank" rel="noreferer">
+              <a target="_blank" rel="noreferer" aria-label="RJackson.dev">
                 rjackson.dev
               </a>
-            </Link>{" "}
+            </Link>
           </p>
           <p>
             Contains{" "}
