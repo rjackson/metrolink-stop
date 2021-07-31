@@ -1,43 +1,44 @@
 import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import useCountdown from "../hooks/useCountdown";
+import { useEffect, useMemo, useState } from "react";
+import useAutoRefresh from "../hooks/useAutoRefresh";
 import { getStops } from "../lib/tfgm-metrolink";
 
 export default function Stop({ stop: fullStopName }) {
   /** @type [(import("../lib/tfgm-metrolink").StopInfo), Function] */
+  const [firstLoadComplete, setFirstLoadComplete] = useState(false);
+  const firstRenderDate = useMemo(() => new Date(), []);
   const [stopInfo, setStopInfo] = useState({
     name: fullStopName,
     departures: [],
     messages: [],
-    lastUpdated: new Date().toISOString(),
+    lastUpdated: firstRenderDate.toISOString(),
   });
   const { name, departures, messages, lastUpdated } = stopInfo ?? {};
   const lastUpdatedDate = new Date(lastUpdated);
 
-  useEffect(async () => {
-    let mounted = true;
-    if (!fullStopName) {
-      return;
-    }
-
+  const loadStopInfo = async () => {
     try {
       const req = await fetch(`/api/stop/${fullStopName}`);
       const data = await req.json();
 
-      if (mounted) {
-        setStopInfo(req.status == 200 ? data : null);
-        setTarget(new Date(Date.now() + updateFrequency * 1000));
-      }
+      setStopInfo(req.status == 200 ? data : null);
     } catch (err) {
       console.log(err);
     }
+  };
 
-    return () => {
-      mounted = false;
-    };
-  }, [fullStopName]);
+  const { stop, start, refreshInterval, setRefreshInterval, lastRefresh, refreshingAt, secondsRemaining } =
+    useAutoRefresh(loadStopInfo, 30);
+  const refreshIntervalMinutes = parseInt(refreshInterval / 60); // maybe do something smarter in the future
+
+  // This looks a bit silly, but its guards against aria-live announcing our very first load of content. Every refresh thereafter will be announced.
+  useEffect(() => {
+    if (lastUpdatedDate !== firstRenderDate && !firstLoadComplete) {
+      setFirstLoadComplete(true);
+    }
+  }, []);
 
   return (
     <>
@@ -63,7 +64,7 @@ export default function Stop({ stop: fullStopName }) {
           >
             Departures
           </h2>
-          <table className="w-full text-center table-fixed" aria-describedby="departures" aria-live="polite">
+          <table className="w-full text-center table-fixed" aria-describedby="departures">
             <thead>
               <tr>
                 <th className="w-1/4 py-2 font-normal text-left text-gray-600 sm:w-1/2 dark:text-gray-400">
@@ -77,14 +78,14 @@ export default function Stop({ stop: fullStopName }) {
             <tbody>
               {departures.length > 1 ? (
                 departures.map(({ destination, type, status, wait }, i) => (
-                  <tr key={i} aria-atomic="true">
+                  <tr key={i} aria-live={firstLoadComplete ? "polite" : "off"} aria-atomic>
                     <th scope="row" className="py-1 font-normal text-left truncate">
                       {destination}
                     </th>
                     <td className="py-1">{type}</td>
                     <td className="py-1">{status}</td>
                     <td className="tabular-nums">
-                      <time datetime="PT{wait}M" aria-label={`${wait} minutes`}>
+                      <time dateTime="PT{wait}M" aria-label={`${wait} minutes`}>
                         <span>{wait}</span>
                         <abbr title="minutes">m</abbr>
                       </time>
@@ -121,6 +122,43 @@ export default function Stop({ stop: fullStopName }) {
             </time>
             .
           </p>
+          <div aria-live="polite">
+            {refreshingAt !== null ? (
+              <p>
+                Automatically refreshing every{" "}
+                {refreshIntervalMinutes === 0 ? (
+                  <time dateTime="PT{refreshInterval}S" aria-label={`${refreshInterval} seconds`}>
+                    {refreshInterval}
+                    <abbr title="seconds">s</abbr>
+                  </time>
+                ) : (
+                  <time dateTime="PT{refreshIntervalMinutes}M" aria-label={`${refreshIntervalMinutes} minutes`}>
+                    {refreshIntervalMinutes}
+                    <abbr title="minutes">m</abbr>
+                  </time>
+                )}
+                .{" "}
+                <button
+                  className="inline-block text-indigo-600 border-b-2 border-transparent cursor-pointer dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 hover:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
+                  onClick={() => stop()}
+                >
+                  Disable automatic refresh.
+                </button>
+              </p>
+            ) : (
+              <p>
+                <button
+                  className="inline-block text-indigo-600 border-b-2 border-transparent cursor-pointer dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 hover:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
+                  onClick={() => {
+                    setRefreshInterval(1 * 60);
+                    start();
+                  }}
+                >
+                  Enable automatic refresh (5 minutes)
+                </button>
+              </p>
+            )}
+          </div>
         </div>
       </main>
     </>
