@@ -5,29 +5,25 @@ import { useEffect, useState } from "react";
 import useCountdown from "../hooks/useCountdown";
 import { getStops } from "../lib/tfgm-metrolink";
 
-export default function Stop({ stop }) {
+export default function Stop({ stop: fullStopName }) {
   /** @type [(import("../lib/tfgm-metrolink").StopInfo), Function] */
   const [stopInfo, setStopInfo] = useState({
-    name: stop,
+    name: fullStopName,
     departures: [],
     messages: [],
     lastUpdated: new Date().toISOString(),
   });
   const { name, departures, messages, lastUpdated } = stopInfo ?? {};
   const lastUpdatedDate = new Date(lastUpdated);
-  const updateFrequency = 60;
 
-  const { secondsRemaining, setTarget } = useCountdown(new Date(Date.now()));
-
-  //#region Continually refreshing stop data
   useEffect(async () => {
     let mounted = true;
-    if (!stop || secondsRemaining > 0) {
+    if (!fullStopName) {
       return;
     }
 
     try {
-      const req = await fetch(`/api/stop/${stop}`);
+      const req = await fetch(`/api/stop/${fullStopName}`);
       const data = await req.json();
 
       if (mounted) {
@@ -41,8 +37,7 @@ export default function Stop({ stop }) {
     return () => {
       mounted = false;
     };
-  }, [stop, secondsRemaining]);
-  //#endregion
+  }, [fullStopName]);
 
   return (
     <>
@@ -62,7 +57,10 @@ export default function Stop({ stop }) {
           <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
         </div>
         <div className="space-y-2 md:space-y-6">
-          <h2 id="departures" className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300">
+          <h2
+            id="departures"
+            className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300"
+          >
             Departures
           </h2>
           <table className="w-full text-center table-fixed" aria-describedby="departures" aria-live="polite">
@@ -112,9 +110,6 @@ export default function Stop({ stop }) {
           </ul>
         </div>
         <div className="py-4 text-center text-gray-500 dark:text-gray-400">
-          <p>
-            Automatically updating in <span className="tabular-nums">{secondsRemaining}</span>s.
-          </p>
           <p>
             Last update <time dateTime={lastUpdatedDate.toISOString()}>{lastUpdatedDate.toLocaleString()}</time>.
           </p>
