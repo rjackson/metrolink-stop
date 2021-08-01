@@ -66,10 +66,10 @@ export default function Stop({ stop: fullStopName }) {
                 <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Wait</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody aria-live="polite" aria-atomic>
               {departures.length > 1 ? (
                 departures.map(({ destination, type, status, wait }, i) => (
-                  <tr key={i} aria-live="polite" aria-atomic>
+                  <tr key={i}>
                     <th scope="row" className="py-1 font-normal text-left truncate">
                       {destination}
                     </th>
