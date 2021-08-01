@@ -36,14 +36,6 @@ export default function Stop({ stop: fullStopName }) {
       <Head>
         <title>{name} stop info</title>
       </Head>
-      <nav className="px-6 py-2">
-        {/* (a stop chooser at some point in the future) */}
-        <Link href="/">
-          <a>
-            <span aria-hidden>👈</span> Back to list of stops
-          </a>
-        </Link>
-      </nav>
       <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-8 md:space-y-16">
         <div>
           <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
@@ -156,6 +148,14 @@ export default function Stop({ stop: fullStopName }) {
           </p>
         </section>
       </main>
+      <nav className="px-6 py-2">
+        {/* (a stop chooser at some point in the future) */}
+        <Link href="/">
+          <a>
+            <span aria-hidden>👈</span> Back to list of stops
+          </a>
+        </Link>
+      </nav>
     </>
   );
 }
