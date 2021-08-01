@@ -7,13 +7,11 @@ import { getStops } from "../lib/tfgm-metrolink";
 
 export default function Stop({ stop: fullStopName }) {
   /** @type [(import("../lib/tfgm-metrolink").StopInfo), Function] */
-  const [firstLoadComplete, setFirstLoadComplete] = useState(false);
-  const firstRenderDate = useMemo(() => new Date(), []);
   const [stopInfo, setStopInfo] = useState({
     name: fullStopName,
     departures: [],
     messages: [],
-    lastUpdated: firstRenderDate.toISOString(),
+    lastUpdated: new Date().toISOString(),
   });
   const { name, departures, messages, lastUpdated } = stopInfo ?? {};
   const lastUpdatedDate = new Date(lastUpdated);
@@ -32,13 +30,6 @@ export default function Stop({ stop: fullStopName }) {
   const { stop, start, refreshInterval, setRefreshInterval, lastRefresh, refreshingAt, secondsRemaining } =
     useAutoRefresh(loadStopInfo, 60);
   const refreshIntervalMinutes = parseInt(refreshInterval / 60); // maybe do something smarter in the future
-
-  // This looks a bit silly, but its guards against aria-live announcing our very first load of content. Every refresh thereafter will be announced.
-  useEffect(() => {
-    if (lastUpdatedDate !== firstRenderDate && !firstLoadComplete) {
-      setFirstLoadComplete(true);
-    }
-  }, []);
 
   return (
     <>
@@ -78,7 +69,7 @@ export default function Stop({ stop: fullStopName }) {
             <tbody>
               {departures.length > 1 ? (
                 departures.map(({ destination, type, status, wait }, i) => (
-                  <tr key={i} aria-live={firstLoadComplete ? "polite" : "off"} aria-atomic>
+                  <tr key={i} aria-live="polite" aria-atomic>
                     <th scope="row" className="py-1 font-normal text-left truncate">
                       {destination}
                     </th>
