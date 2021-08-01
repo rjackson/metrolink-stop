@@ -48,7 +48,7 @@ export default function Stop({ stop: fullStopName }) {
         <div>
           <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
         </div>
-        <div className="space-y-2 md:space-y-6">
+        <section className="space-y-2 md:space-y-6" aria-labelledby="departures">
           <h2
             id="departures"
             className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300"
@@ -93,9 +93,12 @@ export default function Stop({ stop: fullStopName }) {
             </tbody>
             <tfoot></tfoot>
           </table>
-        </div>
-        <div className="space-y-2 md:space-y-6">
-          <h2 className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300">
+        </section>
+        <section className="space-y-2 md:space-y-6" aria-labelledby="messageboard">
+          <h2
+            id="messageboard"
+            className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300"
+          >
             Message board
           </h2>
 
@@ -104,8 +107,11 @@ export default function Stop({ stop: fullStopName }) {
               <li key={i}>{message}</li>
             ))}
           </ul>
-        </div>
-        <div className="py-4 text-center text-gray-500 dark:text-gray-400">
+        </section>
+        <section className="py-4 text-center text-gray-500 dark:text-gray-400" aria-labelledby="metadata">
+          <h2 id="metadata" className="sr-only">
+            Metadata
+          </h2>
           <p>
             Last update{" "}
             <time dateTime={lastUpdatedDate.toISOString()}>
@@ -113,9 +119,9 @@ export default function Stop({ stop: fullStopName }) {
             </time>
             .
           </p>
-          <div aria-live="polite">
+          <p aria-live="polite">
             {refreshingAt !== null ? (
-              <p>
+              <>
                 Automatically refreshing every{" "}
                 {refreshIntervalMinutes === 0 ? (
                   <time dateTime="PT{refreshInterval}S" aria-label={`${refreshInterval} seconds`}>
@@ -135,22 +141,20 @@ export default function Stop({ stop: fullStopName }) {
                 >
                   Disable automatic refresh.
                 </button>
-              </p>
+              </>
             ) : (
-              <p>
-                <button
-                  className="inline-block text-indigo-600 border-b-2 border-transparent cursor-pointer dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 hover:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
-                  onClick={() => {
-                    setRefreshInterval(1 * 60);
-                    start();
-                  }}
-                >
-                  Enable automatic refresh (5 minutes)
-                </button>
-              </p>
+              <button
+                className="inline-block text-indigo-600 border-b-2 border-transparent cursor-pointer dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 hover:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
+                onClick={() => {
+                  setRefreshInterval(1 * 60);
+                  start();
+                }}
+              >
+                Enable automatic refresh (5 minutes)
+              </button>
             )}
-          </div>
-        </div>
+          </p>
+        </section>
       </main>
     </>
   );
