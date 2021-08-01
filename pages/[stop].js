@@ -30,7 +30,7 @@ export default function Stop({ stop: fullStopName }) {
   };
 
   const { stop, start, refreshInterval, setRefreshInterval, lastRefresh, refreshingAt, secondsRemaining } =
-    useAutoRefresh(loadStopInfo, 30);
+    useAutoRefresh(loadStopInfo, 60);
   const refreshIntervalMinutes = parseInt(refreshInterval / 60); // maybe do something smarter in the future
 
   // This looks a bit silly, but its guards against aria-live announcing our very first load of content. Every refresh thereafter will be announced.
