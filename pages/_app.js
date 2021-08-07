@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }) {
         <title>Metrolink stops, doot doot</title>
       </Head>
 
-      <div className="flex flex-col items-center w-screen h-screen text-lg text-gray-900 bg-white dark:text-gray-50 dark:bg-gray-900">
+      <div className="flex flex-col items-center w-screen h-screen overflow-auto text-lg text-gray-900 bg-gray-50 dark:text-gray-50 dark:bg-gray-900">
         <Component {...pageProps} />
         <footer className="px-6 py-2 text-center">
           <p aria-hidden>💛</p>

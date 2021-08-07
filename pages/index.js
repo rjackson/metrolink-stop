@@ -1,67 +1,58 @@
 import { getStops } from "../lib/tfgm-metrolink";
 import Link from "next/link";
 import { useState } from "react";
+import Fuse from "fuse.js";
 
+/**
+ * @param {Object} props
+ * @param {{StationLocation: string, Line: string}[]} props.stops
+ */
 export default function Home({ stops }) {
-  const lines = [...new Set(stops.map(({ Line }) => Line))];
-  const [selectedLines, setSelectedLines] = useState(new Map(lines.map((line) => [line, false])));
-  const showAllLines = Array.from(selectedLines.values()).filter((checked) => !!checked).length === 0;
-
   // These are funky cause map operations mutate, and thus dont trigger a re-render. New maps force rerenders.
-  const selectLine = (line) => setSelectedLines((prev) => new Map([...prev, [line, true]]));
-  const deselectLine = (line) => setSelectedLines((prev) => new Map([...prev, [line, false]]));
-  const selectedStops = showAllLines ? stops : stops.filter(({ Line }) => selectedLines.get(Line));
-
   const slugify = (station) => encodeURIComponent(station.replace(/ /g, "-").toLowerCase());
+  const [searchTerm, setSearchTerm] = useState("");
+  const fuse = new Fuse(stops, { keys: ["StationLocation", "Line"], includeScore: true });
+  const results = fuse.search(searchTerm);
+  const stopResults = !!searchTerm ? results.map(({ item }) => item) : stops;
 
   return (
     <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-4">
       <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">Metrolink stops</h1>
-      <details>
-        <summary>Filter by lines</summary>
 
-        <div className="flex flex-wrap space-y-2">
-          {lines.map((line) => (
-            <div key={line} className="flex items-center w-full space-x-2 md:w-1/3">
-              <input
-                id={`lines_${line}`}
-                type="checkbox"
-                value={line}
-                checked={selectedLines.get(line)}
-                onChange={(e) => (e.target.checked ? selectLine(e.target.value) : deselectLine(e.target.value))}
-              />
-              <label htmlFor={`lines_${line}`}>{line}</label>
-            </div>
-          ))}
+      <form onSubmit={(e) => e.preventDefault()}>
+        <div role="search" className="flex flex-col items-start space-y-2 md:items-center">
+          <label htmlFor="search">Search</label>
+          <input
+            type="text"
+            name="search"
+            id="search"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full px-2 py-1 bg-white border-gray-300 rounded-md shadow-sm md:max-w-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+          />
         </div>
-      </details>
-      <table className="w-full table-auto">
-        <thead>
-          <tr className="text-left">
-            <th scope="col" className="py-2">Location</th>
-            <th scope="col" className="py-2">Line</th>
-          </tr>
-        </thead>
-        <tbody>
-          {selectedStops.map(({ Line, StationLocation }) => (
-            <tr key={StationLocation}>
-              <td className="py-1">
-                <Link href={`/${slugify(StationLocation)}`}>
-                  <a>{StationLocation}</a>
-                </Link>
-              </td>
-              <td className="py-1">{Line}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      </form>
+
+      <ul className="px-4 py-4 space-y-2 bg-white rounded-md shadow md:text-center">
+        {stopResults.map(({ StationLocation }) => (
+          <li key={StationLocation}>
+            <Link href={`/${slugify(StationLocation)}`}>
+              <a>{StationLocation}</a>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }
 
 export async function getStaticProps(context) {
   const stops = await getStops();
+
+  // Sort alphabetically by default
+  const sortedStops = stops.sort((a, b) => a.StationLocation.localeCompare(b.StationLocation));
+
   return {
-    props: { stops }, // will be passed to the page component as props
+    props: { stops: sortedStops }, // will be passed to the page component as props
   };
 }

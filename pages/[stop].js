@@ -36,7 +36,7 @@ export default function Stop({ stop: fullStopName }) {
       <Head>
         <title>{name} stop info</title>
       </Head>
-      <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-8 md:space-y-16">
+      <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-8 md:space-y-10">
         <div>
           <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
         </div>
@@ -47,44 +47,42 @@ export default function Stop({ stop: fullStopName }) {
           >
             Departures
           </h2>
-          <table className="w-full text-center table-fixed" aria-describedby="departures">
-            <thead>
-              <tr>
-                <th className="w-1/4 py-2 font-normal text-left text-gray-600 sm:w-1/2 dark:text-gray-400">
-                  Destination
-                </th>
-                <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Carriages</th>
-                <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Status</th>
-                <th className="w-1/4 py-2 font-normal text-gray-600 sm:w-1/6 dark:text-gray-400">Wait</th>
-              </tr>
-            </thead>
-            <tbody aria-live="polite" aria-atomic>
-              {departures.length > 1 ? (
-                departures.map(({ destination, type, status, wait }, i) => (
-                  <tr key={i}>
-                    <th scope="row" className="py-1 font-normal text-left truncate">
-                      {destination}
-                    </th>
-                    <td className="py-1">{type}</td>
-                    <td className="py-1">{status}</td>
-                    <td className="tabular-nums">
-                      <time dateTime="PT{wait}M" aria-label={`${wait} minutes`}>
-                        <span>{wait}</span>
-                        <abbr title="minutes">m</abbr>
-                      </time>
+          <div className="px-4 py-2 bg-white rounded-md shadow">
+            <table className="w-full text-center table-fixed" aria-describedby="departures">
+              <thead>
+                <tr>
+                  <th className="py-2 font-normal text-left text-gray-600 dark:text-gray-400">Destination</th>
+                  <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Wait</th>
+                  <th className="py-2 font-normal text-right text-gray-600 dark:text-gray-400">Carriages</th>
+                </tr>
+              </thead>
+              <tbody aria-live="polite" aria-atomic>
+                {departures.length > 1 ? (
+                  departures.map(({ destination, type, status, wait }, i) => (
+                    <tr key={i}>
+                      <th scope="row" className="py-1 font-normal text-left truncate">
+                        {destination}
+                      </th>
+                      <td className="tabular-nums">
+                        <time dateTime="PT{wait}M" aria-label={`${wait} minutes`}>
+                          <span>{wait}</span>
+                          <abbr title="minutes">m</abbr>
+                        </time>
+                      </td>
+                      <td className="py-1 text-right">{type}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="4" className="py-1 text-center">
+                      (No departures currently listed)
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan="4" className="py-1 text-center">
-                    (No departures currently listed)
-                  </td>
-                </tr>
-              )}
-            </tbody>
-            <tfoot></tfoot>
-          </table>
+                )}
+              </tbody>
+              <tfoot></tfoot>
+            </table>
+          </div>
         </section>
         <section className="space-y-2 md:space-y-6" aria-labelledby="messageboard">
           <h2
@@ -94,7 +92,7 @@ export default function Stop({ stop: fullStopName }) {
             Message board
           </h2>
 
-          <ul className="space-y-2 md:text-center">
+          <ul className="px-4 py-4 space-y-2 bg-white rounded-md shadow md:text-center">
             {messages.map((message, i) => (
               <li key={i}>{message}</li>
             ))}
