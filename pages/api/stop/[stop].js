@@ -1,6 +1,6 @@
 import { getStopInfo } from "../../../lib/tfgm-metrolink";
 
-export default async (req, res) => {
+const Stop = async (req, res) => {
   const { stop } = req.query;
 
   try {
@@ -10,3 +10,5 @@ export default async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+export default Stop;

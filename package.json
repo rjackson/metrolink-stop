@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "fuse.js": "^6.4.6",
@@ -16,6 +17,8 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.3.1",
+    "eslint": "^7.32.0",
+    "eslint-config-next": "^11.0.1",
     "postcss": "^8.3.6",
     "tailwindcss": "^2.2.7"
   }

@@ -4,14 +4,7 @@ export default function Debug() {
   const [metrolinksDump, setMetrolinksDump] = useState([]);
   const uniqueMessages = [...new Set(metrolinksDump.map(({ MessageBoard }) => MessageBoard))];
   const uniqueDestinations = [
-    ...new Set(
-      metrolinksDump.flatMap(({ Dest0, Dest1, Dest2, Dest3 }) => [
-        Dest0,
-        Dest1,
-        Dest2,
-        Dest3,
-      ])
-    ),
+    ...new Set(metrolinksDump.flatMap(({ Dest0, Dest1, Dest2, Dest3 }) => [Dest0, Dest1, Dest2, Dest3])),
   ];
   const uniqueStatuses = [
     ...new Set(
@@ -41,13 +34,14 @@ export default function Debug() {
     }
   };
 
-  useEffect(async () => {
+  useEffect(() => {
     let mounted = true;
 
-    const dump = await fetchDump();
-    if (mounted) {
-      setMetrolinksDump(dump);
-    }
+    fetchDump().then((dump) => {
+      if (mounted) {
+        setMetrolinksDump(dump);
+      }
+    });
 
     return () => {
       mounted = false;
@@ -60,7 +54,7 @@ export default function Debug() {
         <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique messages</h2>
         <ul>
           {uniqueMessages.map((message) => (
-            <li>{message}</li>
+            <li key={message}>{message}</li>
           ))}
         </ul>
       </div>
@@ -68,7 +62,7 @@ export default function Debug() {
         <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique statuses</h2>
         <ul>
           {uniqueStatuses.map((status) => (
-            <li>{status}</li>
+            <li key={status}>{status}</li>
           ))}
         </ul>
       </div>
@@ -76,7 +70,7 @@ export default function Debug() {
         <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique carriages</h2>
         <ul>
           {uniqueCarriages.map((carriage) => (
-            <li>{carriage}</li>
+            <li key={carriage}>{carriage}</li>
           ))}
         </ul>
       </div>
@@ -84,7 +78,7 @@ export default function Debug() {
         <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique destinations</h2>
         <ul>
           {uniqueDestinations.map((destination) => (
-            <li>{destination}</li>
+            <li key={destination}>{destination}</li>
           ))}
         </ul>
       </div>
