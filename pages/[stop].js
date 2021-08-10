@@ -47,7 +47,7 @@ export default function Stop({ stop: fullStopName }) {
           >
             Departures
           </h2>
-          <div className="px-4 py-2 bg-white rounded-md shadow">
+          <div className="px-4 py-2 bg-white rounded-md shadow dark:bg-gray-800 dark:border dark:border-gray-700">
             <table className="w-full text-center table-fixed" aria-describedby="departures">
               <thead>
                 <tr>
@@ -92,7 +92,7 @@ export default function Stop({ stop: fullStopName }) {
             Message board
           </h2>
 
-          <ul className="px-4 py-4 space-y-2 bg-white rounded-md shadow md:text-center">
+          <ul className="px-4 py-4 space-y-2 bg-white rounded-md shadow md:text-center dark:bg-gray-800 dark:border dark:border-gray-700">
             {messages.map((message, i) => (
               <li key={i}>{message}</li>
             ))}

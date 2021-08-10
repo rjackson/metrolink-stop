@@ -28,12 +28,12 @@ export default function Home({ stops }) {
             id="search"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-2 py-1 bg-white border-gray-300 rounded-md shadow-sm md:max-w-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            className="w-full px-2 py-1 bg-white border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border dark:border-gray-700 md:max-w-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
           />
         </div>
       </form>
 
-      <ul className="px-4 py-4 space-y-2 bg-white rounded-md shadow md:text-center">
+      <ul className="px-4 py-4 space-y-2 bg-white rounded-md shadow dark:bg-gray-800 dark:border dark:border-gray-700 md:text-center">
         {stopResults.map(({ StationLocation }) => (
           <li key={StationLocation}>
             <Link href={`/${slugify(StationLocation)}`}>
