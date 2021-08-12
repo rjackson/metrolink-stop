@@ -149,6 +149,7 @@ export default function Stop({ stop: fullStopName }) {
       <nav className="px-6 py-2">
         {/* (a stop chooser at some point in the future) */}
         <Link href="/">
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a>
             <span aria-hidden>👈</span> Back to list of stops
           </a>

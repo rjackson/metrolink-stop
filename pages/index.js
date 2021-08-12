@@ -37,6 +37,7 @@ export default function Home({ stops }) {
         {stopResults.map(({ StationLocation }) => (
           <li key={StationLocation}>
             <Link href={`/${slugify(StationLocation)}`}>
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a>{StationLocation}</a>
             </Link>
           </li>

@@ -18,6 +18,7 @@ function MyApp({ Component, pageProps }) {
           <p aria-hidden>💛</p>
           <p>
             <Link href="https://rjackson.dev">
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a target="_blank" rel="noreferer" aria-label="RJackson.dev">
                 rjackson.dev
               </a>
@@ -26,6 +27,7 @@ function MyApp({ Component, pageProps }) {
           <p>
             Contains{" "}
             <Link href="https://tfgm.com/">
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a target="_blank" rel="noreferrer">
                 <abbr className="md:hidden" title="Transport for Greater Manchester">
                   TfGM
