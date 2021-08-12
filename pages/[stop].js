@@ -1,7 +1,7 @@
 import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import useAutoRefresh from "../hooks/useAutoRefresh";
 import { getStops } from "../lib/tfgm-metrolink";
 
@@ -16,7 +16,7 @@ export default function Stop({ stop: fullStopName }) {
   const { name, departures, messages, lastUpdated } = stopInfo ?? {};
   const lastUpdatedDate = new Date(lastUpdated);
 
-  const loadStopInfo = async () => {
+  const loadStopInfo = useCallback(async () => {
     try {
       const req = await fetch(`/api/stop/${fullStopName}`);
       const data = await req.json();
@@ -25,7 +25,7 @@ export default function Stop({ stop: fullStopName }) {
     } catch (err) {
       console.log(err);
     }
-  };
+  }, [fullStopName]);
 
   const { stop, start, refreshInterval, setRefreshInterval, lastRefresh, refreshingAt, secondsRemaining } =
     useAutoRefresh(loadStopInfo, 60);

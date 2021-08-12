@@ -18,22 +18,24 @@ export default function useAutoRefresh(onRefresh, initialRefreshInterval, invoke
   const refreshingAt = countingFrom === null ? null : new Date(refreshingAtTime);
   const [secondsRemaining, setSecondsRemaining] = useState((refreshingAtTime - Date.now()) / 1000);
 
-  const tick = () => {
+  const tick = useCallback(() => {
     const now = new Date();
 
     if (countingFrom === null) {
       return;
     }
 
-    if (secondsRemaining <= 0) {
-      setLastRefresh(now);
-      setCountingFrom(now);
-      setSecondsRemaining(parseInt((now.getTime() + refreshInterval * 1000 - now.getTime()) / 1000));
-      onRefresh();
-    }
+    setSecondsRemaining((oldSeconds) => {
+      if (oldSeconds <= 0) {
+        setLastRefresh(now);
+        setCountingFrom(now);
+        onRefresh();
+        return refreshInterval;
+      }
 
-    setSecondsRemaining(parseInt((countingFrom.getTime() + refreshInterval * 1000 - now.getTime()) / 1000));
-  };
+      return parseInt((countingFrom.getTime() + refreshInterval * 1000 - now.getTime()) / 1000);
+    });
+  }, [countingFrom, onRefresh, refreshInterval]);
 
   useEffect(() => {
     if (invokeImmediately && !immediatelyInvoked) {
@@ -46,7 +48,7 @@ export default function useAutoRefresh(onRefresh, initialRefreshInterval, invoke
     return () => {
       clearInterval(timer);
     };
-  }, [tick]);
+  }, [invokeImmediately, immediatelyInvoked, tick, onRefresh]);
 
   const stop = () => setCountingFrom(null);
   const start = () => setCountingFrom(new Date());
