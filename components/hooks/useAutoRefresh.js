@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 /**
  * An accessible auto-refresh hook, with runtime-configurable refresh refreshInterval, and the ability to stop or start (not

@@ -2,7 +2,7 @@ import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
 import Link from "next/link";
 import { useCallback, useState } from "react";
-import useAutoRefresh from "../hooks/useAutoRefresh";
+import useAutoRefresh from "../components/hooks/useAutoRefresh";
 import { getStops } from "../lib/tfgm-metrolink";
 
 export default function Stop({ stop: fullStopName }) {
