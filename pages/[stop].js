@@ -37,8 +37,21 @@ export default function Stop({ stop: fullStopName }) {
         <title>{name} stop info</title>
       </Head>
       <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-8 md:space-y-10">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
+        <div className="flex flex-col items-center sm:flex-row">
+          <div className="flex-1">
+            <Link href="/">
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+              <a>
+                <span aria-hidden>👈</span>{" "}
+                Back
+                <span className="sr-only">to list of stops</span>
+              </a>
+            </Link>
+          </div>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
+          </div>
+          <div className="flex-1">&nbsp;</div>
         </div>
         <section className="space-y-2 md:space-y-6" aria-labelledby="departures">
           <h2
