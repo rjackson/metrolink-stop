@@ -1,7 +1,7 @@
-import { useRouter } from "next/dist/client/router";
 import Head from "next/head";
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import useAutoRefresh from "../components/hooks/useAutoRefresh";
 import { getStops } from "../lib/tfgm-metrolink";
 
@@ -30,6 +30,12 @@ export default function Stop({ stop: fullStopName }) {
   const { stop, start, refreshInterval, setRefreshInterval, lastRefresh, refreshingAt, secondsRemaining } =
     useAutoRefresh(loadStopInfo, 60);
   const refreshIntervalMinutes = parseInt(refreshInterval / 60); // maybe do something smarter in the future
+  const { track } = useVisitedStopsUpdate();
+
+  useEffect(() => {
+    track(fullStopName);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -42,8 +48,7 @@ export default function Stop({ stop: fullStopName }) {
             <Link href="/">
               {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a>
-                <span aria-hidden>👈</span>{" "}
-                Back
+                <span aria-hidden>👈</span> Back
                 <span className="sr-only">to list of stops</span>
               </a>
             </Link>
