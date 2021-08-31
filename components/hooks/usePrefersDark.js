@@ -11,14 +11,16 @@ export default function usePrefersDark() {
 
     const prefersDarkMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
+    const onMatchChange = ({ matches }) => setPrefersDark(matches)
+
     // Initiate on first client side run
     setPrefersDark(prefersDarkMediaQuery.matches);
 
     // And catch if it ever changes
-    prefersDarkMediaQuery.addEventListener("change", ({ matches }) => setPrefersDark(matches));
+    prefersDarkMediaQuery.addEventListener("change", onMatchChange );
 
     return () => {
-      prefersDarkMediaQuery.removeEventListener();
+      prefersDarkMediaQuery.removeEventListener("change", onMatchChange);
     };
   }, []);
 
