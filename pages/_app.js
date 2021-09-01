@@ -3,9 +3,12 @@ import Head from "next/head";
 import Link from "next/link";
 import usePrefersDark from "../components/hooks/usePrefersDark";
 import { VisitedStopsProvider } from "../components/context/VisitedStops";
+import { useRouter } from "next/dist/client/router";
 
 function MyApp({ Component, pageProps }) {
   const prefersDark = usePrefersDark();
+  const router = useRouter();
+
   return (
     <VisitedStopsProvider>
       <div className={prefersDark ? "dark" : ""}>
@@ -15,7 +18,7 @@ function MyApp({ Component, pageProps }) {
         </Head>
 
         <div className="flex flex-col items-center w-screen h-screen overflow-auto text-lg text-gray-900 bg-gray-50 dark:text-gray-50 dark:bg-gray-900">
-          <Component {...pageProps} />
+          <Component {...pageProps} key={router.asPath} />
           <footer className="px-6 py-2 text-center">
             <p aria-hidden>💛</p>
             <p>

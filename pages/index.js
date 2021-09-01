@@ -1,4 +1,4 @@
-import { getStops } from "../lib/tfgm-metrolink";
+import { getStops, slugify } from "../lib/tfgm-metrolink";
 import Link from "next/link";
 import { useState } from "react";
 import Fuse from "fuse.js";
@@ -11,7 +11,6 @@ import Button from "../components/Button";
  */
 export default function Home({ stops }) {
   // These are funky cause map operations mutate, and thus dont trigger a re-render. New maps force rerenders.
-  const slugify = (station) => encodeURIComponent(station.replace(/ /g, "-").toLowerCase());
   const [searchTerm, setSearchTerm] = useState("");
   const fuse = new Fuse(stops, { keys: ["StationLocation", "Line"], includeScore: true });
   const results = fuse.search(searchTerm);

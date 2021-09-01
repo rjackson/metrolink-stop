@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import MetrolinkDestination from "../components/MetrolinkDestination";
 
 export default function Debug() {
   const [metrolinksDump, setMetrolinksDump] = useState([]);
@@ -21,6 +22,8 @@ export default function Debug() {
       ])
     ),
   ];
+
+  const allStopNames = [...new Set(metrolinksDump.map(({ StationLocation }) => StationLocation))];
 
   const fetchDump = async () => {
     try {
@@ -78,6 +81,16 @@ export default function Debug() {
         <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique destinations</h2>
         <ul>
           {uniqueDestinations.map((destination) => (
+            <li key={destination}>
+              <MetrolinkDestination destination={destination} />
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold tracking-wide text-center uppercase">All stops</h2>
+        <ul>
+          {allStopNames.map((destination) => (
             <li key={destination}>{destination}</li>
           ))}
         </ul>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import useAutoRefresh from "../components/hooks/useAutoRefresh";
+import MetrolinkDestination from "../components/MetrolinkDestination";
 import { getStops } from "../lib/tfgm-metrolink";
 
 export default function Stop({ stop: fullStopName }) {
@@ -79,7 +80,7 @@ export default function Stop({ stop: fullStopName }) {
                   departures.map(({ destination, type, status, wait }, i) => (
                     <tr key={i}>
                       <th scope="row" className="py-1 font-normal text-left truncate">
-                        {destination}
+                        <MetrolinkDestination destination={destination} />
                       </th>
                       <td className="tabular-nums">
                         <time dateTime="PT{wait}M" aria-label={`${wait} minutes`}>
