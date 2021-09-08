@@ -1,30 +1,29 @@
-import { useCallback, useState } from "react";
-import useAutoRefresh from "./useAutoRefresh";
+import useSWR from "swr";
 
+/**
+ * @param {Object} UseMetrolinkStopResponse
+ * @property {null|(import("../lib/tfgm-metrolink").StopInfo)} stopInfo
+ * @property {bool} isLoading
+ * @property {bool} isError
+ * @property {Error} error
+ */
+
+/**
+ *
+ * @param {string} stopName The exact name of a Metrolink stop, as stored in the StationLocation attribute
+ * @returns {UseMetrolinkStopResponse}
+ */
 const useMetrolinkStop = (stopName) => {
-  /** @type [(import("../lib/tfgm-metrolink").StopInfo), Function] */
-  const [stopInfo, setStopInfo] = useState({
-    name: stopName,
-    departures: [],
-    messages: [],
-    lastUpdated: new Date().toISOString(),
+  const { data, error } = useSWR(`/api/stop/${encodeURIComponent(stopName)}`, {
+    // Auto refresh every minute
+    refreshInterval: 60 * 1000,
+
+    // Don't automatically revaluate on focus within 30s of a previous validation (keep request count down,
+    // given data only has minute granularity)
+    focusThrottleInterval: 30 * 1000,
   });
-  const loadStopInfo = useCallback(async () => {
-    try {
-      const req = await fetch(`/api/stop/${stopName}`);
-      const data = await req.json();
 
-      setStopInfo(req.status == 200 ? data : null);
-    } catch (err) {
-      console.log(err);
-    }
-  }, [stopName]);
-
-  const { stop, start, refreshInterval, setRefreshInterval, lastRefresh, refreshingAt, secondsRemaining } =
-    useAutoRefresh(loadStopInfo, 60);
-  const refreshIntervalMinutes = parseInt(refreshInterval / 60); // maybe do something smarter in the future
-
-  return { ...stopInfo, stop, start, refreshInterval, setRefreshInterval, lastRefresh, refreshingAt, secondsRemaining };
+  return { stopInfo: data, isLoading: !error && !data, isError: error, error };
 };
 
 export default useMetrolinkStop;

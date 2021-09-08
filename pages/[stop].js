@@ -5,27 +5,20 @@ import { useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import useMetrolinkStop from "../components/hooks/useMetrolinkStop";
 import MetrolinkDestination from "../components/MetrolinkDestination";
 import { getStops } from "../lib/tfgm-metrolink";
+import { BarLoader } from "react-spinners";
+import colors from "tailwindcss/colors";
 
-export default function Stop({ stop: fullStopName }) {
+export default function Stop({ stop: stopName }) {
   const {
-    name,
-    departures,
-    messages,
-    lastUpdated,
-    stop,
-    start,
-    refreshInterval,
-    setRefreshInterval,
-    lastRefresh,
-    refreshingAt,
-    secondsRemaining,
-  } = useMetrolinkStop(fullStopName);
+    stopInfo: { name = stopName, departures = [], messages = [], lastUpdated = new Date().toISOString() } = {},
+    isLoading,
+    isError,
+  } = useMetrolinkStop(stopName);
   const lastUpdatedDate = new Date(lastUpdated);
-  const refreshIntervalMinutes = parseInt(refreshInterval / 60); // maybe do something smarter in the future
 
   const { track } = useVisitedStopsUpdate();
   useEffect(() => {
-    track(fullStopName);
+    track(stopName);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -57,41 +50,49 @@ export default function Stop({ stop: fullStopName }) {
           >
             Departures
           </h2>
-          <div className="px-4 py-2 bg-white rounded-md shadow dark:bg-gray-800 dark:border dark:border-gray-700">
-            <table className="w-full text-center table-fixed" aria-describedby="departures">
-              <thead>
-                <tr>
-                  <th className="py-2 font-normal text-left text-gray-600 dark:text-gray-400">Destination</th>
-                  <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Wait</th>
-                  <th className="py-2 font-normal text-right text-gray-600 dark:text-gray-400">Carriages</th>
-                </tr>
-              </thead>
-              <tbody aria-live="polite" aria-atomic>
-                {departures.length > 1 ? (
-                  departures.map(({ destination, type, status, wait }, i) => (
-                    <tr key={i}>
-                      <th scope="row" className="py-1 font-normal text-left truncate">
-                        <MetrolinkDestination destination={destination} />
-                      </th>
-                      <td className="tabular-nums">
-                        <time dateTime="PT{wait}M" aria-label={`${wait} minutes`}>
-                          <span>{wait}</span>
-                          <abbr title="minutes">m</abbr>
-                        </time>
-                      </td>
-                      <td className="py-1 text-right">{type}</td>
-                    </tr>
-                  ))
-                ) : (
+          <div className="px-4 py-4 bg-white rounded-md shadow dark:bg-gray-800 dark:border dark:border-gray-700">
+            {isError && <p className="italic text-center text-gray-700">Failed to load departure information</p>}
+            {isLoading && (
+              <div className="flex justify-center">
+                <BarLoader color={colors.gray[500]} loading={isLoading} size={150} css={{ display: "block" }} />
+              </div>
+            )}
+            {!isLoading && !isError && (
+              <table className="w-full text-center table-fixed" aria-describedby="departures">
+                <thead>
                   <tr>
-                    <td colSpan="4" className="py-1 text-center">
-                      (No departures currently listed)
-                    </td>
+                    <th className="py-2 font-normal text-left text-gray-600 dark:text-gray-400">Destination</th>
+                    <th className="py-2 font-normal text-gray-600 dark:text-gray-400">Wait</th>
+                    <th className="py-2 font-normal text-right text-gray-600 dark:text-gray-400">Carriages</th>
                   </tr>
-                )}
-              </tbody>
-              <tfoot></tfoot>
-            </table>
+                </thead>
+                <tbody aria-live="polite" aria-atomic>
+                  {departures.length > 1 ? (
+                    departures.map(({ destination, type, status, wait }, i) => (
+                      <tr key={i}>
+                        <th scope="row" className="py-1 font-normal text-left truncate">
+                          <MetrolinkDestination destination={destination} />
+                        </th>
+                        <td className="tabular-nums">
+                          <time dateTime="PT{wait}M" aria-label={`${wait} minutes`}>
+                            <span>{wait}</span>
+                            <abbr title="minutes">m</abbr>
+                          </time>
+                        </td>
+                        <td className="py-1 text-right">{type}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="4" className="py-1 text-center">
+                        (No departures currently listed)
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+                <tfoot></tfoot>
+              </table>
+            )}
           </div>
         </section>
         <section className="space-y-2 md:space-y-6" aria-labelledby="messageboard">
@@ -101,12 +102,21 @@ export default function Stop({ stop: fullStopName }) {
           >
             Message board
           </h2>
-
-          <ul className="px-4 py-4 space-y-2 bg-white rounded-md shadow md:text-center dark:bg-gray-800 dark:border dark:border-gray-700">
-            {messages.map((message, i) => (
-              <li key={i}>{message}</li>
-            ))}
-          </ul>
+          <div className="px-4 py-4 bg-white rounded-md shadow md:text-center dark:bg-gray-800 dark:border dark:border-gray-700">
+            {isError && <p className="italic text-gray-700">Failed to load message board information</p>}
+            {isLoading && (
+              <div className="flex justify-center">
+                <BarLoader color={colors.gray[500]} loading={isLoading} size={150} css={{ display: "block" }} />
+              </div>
+            )}
+            {!isLoading && !isError && (
+              <ul className="space-y-2 ">
+                {messages.map((message, i) => (
+                  <li key={i}>{message}</li>
+                ))}
+              </ul>
+            )}
+          </div>
         </section>
         <section className="py-4 text-center text-gray-500 dark:text-gray-400" aria-labelledby="metadata">
           <h2 id="metadata" className="sr-only">
@@ -118,41 +128,6 @@ export default function Stop({ stop: fullStopName }) {
               {lastUpdatedDate.toLocaleTimeString("en-GB", { timeStyle: "long" })}
             </time>
             .
-          </p>
-          <p aria-live="polite">
-            {refreshingAt !== null ? (
-              <>
-                Automatically refreshing every{" "}
-                {refreshIntervalMinutes === 0 ? (
-                  <time dateTime="PT{refreshInterval}S" aria-label={`${refreshInterval} seconds`}>
-                    {refreshInterval}
-                    <abbr title="seconds">s</abbr>
-                  </time>
-                ) : (
-                  <time dateTime="PT{refreshIntervalMinutes}M" aria-label={`${refreshIntervalMinutes} minutes`}>
-                    {refreshIntervalMinutes}
-                    <abbr title="minutes">m</abbr>
-                  </time>
-                )}
-                .{" "}
-                <button
-                  className="inline-block text-indigo-600 border-b-2 border-transparent cursor-pointer dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 hover:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
-                  onClick={() => stop()}
-                >
-                  Disable automatic refresh.
-                </button>
-              </>
-            ) : (
-              <button
-                className="inline-block text-indigo-600 border-b-2 border-transparent cursor-pointer dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 hover:border-indigo-500 focus:outline-none focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
-                onClick={() => {
-                  setRefreshInterval(1 * 60);
-                  start();
-                }}
-              >
-                Enable automatic refresh (5 minutes)
-              </button>
-            )}
           </p>
         </section>
       </main>
