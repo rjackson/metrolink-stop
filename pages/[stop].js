@@ -1,38 +1,29 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useVisitedStopsUpdate } from "../components/context/VisitedStops";
-import useAutoRefresh from "../components/hooks/useAutoRefresh";
+import useMetrolinkStop from "../components/hooks/useMetrolinkStop";
 import MetrolinkDestination from "../components/MetrolinkDestination";
 import { getStops } from "../lib/tfgm-metrolink";
 
 export default function Stop({ stop: fullStopName }) {
-  /** @type [(import("../lib/tfgm-metrolink").StopInfo), Function] */
-  const [stopInfo, setStopInfo] = useState({
-    name: fullStopName,
-    departures: [],
-    messages: [],
-    lastUpdated: new Date().toISOString(),
-  });
-  const { name, departures, messages, lastUpdated } = stopInfo ?? {};
+  const {
+    name,
+    departures,
+    messages,
+    lastUpdated,
+    stop,
+    start,
+    refreshInterval,
+    setRefreshInterval,
+    lastRefresh,
+    refreshingAt,
+    secondsRemaining,
+  } = useMetrolinkStop(fullStopName);
   const lastUpdatedDate = new Date(lastUpdated);
-
-  const loadStopInfo = useCallback(async () => {
-    try {
-      const req = await fetch(`/api/stop/${fullStopName}`);
-      const data = await req.json();
-
-      setStopInfo(req.status == 200 ? data : null);
-    } catch (err) {
-      console.log(err);
-    }
-  }, [fullStopName]);
-
-  const { stop, start, refreshInterval, setRefreshInterval, lastRefresh, refreshingAt, secondsRemaining } =
-    useAutoRefresh(loadStopInfo, 60);
   const refreshIntervalMinutes = parseInt(refreshInterval / 60); // maybe do something smarter in the future
-  const { track } = useVisitedStopsUpdate();
 
+  const { track } = useVisitedStopsUpdate();
   useEffect(() => {
     track(fullStopName);
     // eslint-disable-next-line react-hooks/exhaustive-deps
