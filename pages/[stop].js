@@ -5,8 +5,7 @@ import { useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import useMetrolinkStop from "../components/hooks/useMetrolinkStop";
 import MetrolinkDestination from "../components/MetrolinkDestination";
 import { getStops } from "../lib/tfgm-metrolink";
-import { BarLoader } from "react-spinners";
-import colors from "tailwindcss/colors";
+import LoadingWrapper from "../components/LoadingWrapper";
 
 export default function Stop({ stop: stopName }) {
   const {
@@ -51,13 +50,11 @@ export default function Stop({ stop: stopName }) {
             Departures
           </h2>
           <div className="px-4 py-4 bg-white rounded-md shadow dark:bg-gray-800 dark:border dark:border-gray-700">
-            {isError && <p className="italic text-center text-gray-700">Failed to load departure information</p>}
-            {isLoading && (
-              <div className="flex justify-center">
-                <BarLoader color={colors.gray[500]} loading={isLoading} size={150} css={{ display: "block" }} />
-              </div>
-            )}
-            {!isLoading && !isError && (
+            <LoadingWrapper
+              isLoading={isLoading}
+              isError={isError}
+              errorMessage={"Failed to load departure information"}
+            >
               <table className="w-full text-center table-fixed" aria-describedby="departures">
                 <thead>
                   <tr>
@@ -92,7 +89,7 @@ export default function Stop({ stop: stopName }) {
                 </tbody>
                 <tfoot></tfoot>
               </table>
-            )}
+            </LoadingWrapper>
           </div>
         </section>
         <section className="space-y-2 md:space-y-6" aria-labelledby="messageboard">
@@ -103,19 +100,17 @@ export default function Stop({ stop: stopName }) {
             Message board
           </h2>
           <div className="px-4 py-4 bg-white rounded-md shadow md:text-center dark:bg-gray-800 dark:border dark:border-gray-700">
-            {isError && <p className="italic text-gray-700">Failed to load message board information</p>}
-            {isLoading && (
-              <div className="flex justify-center">
-                <BarLoader color={colors.gray[500]} loading={isLoading} size={150} css={{ display: "block" }} />
-              </div>
-            )}
-            {!isLoading && !isError && (
+            <LoadingWrapper
+              isLoading={isLoading}
+              isError={isError}
+              errorMessage={"Failed to load message board information"}
+            >
               <ul className="space-y-2 ">
                 {messages.map((message, i) => (
                   <li key={i}>{message}</li>
                 ))}
               </ul>
-            )}
+            </LoadingWrapper>
           </div>
         </section>
         <section className="py-4 text-center text-gray-500 dark:text-gray-400" aria-labelledby="metadata">

@@ -22,7 +22,6 @@ const useMetrolinkStop = (stopName) => {
     // given data only has minute granularity)
     focusThrottleInterval: 30 * 1000,
   });
-
   return { stopInfo: data, isLoading: !error && !data, isError: error, error };
 };
 
