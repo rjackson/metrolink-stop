@@ -1,4 +1,4 @@
-import { useSet } from "react-use";
+import { useLocalStorage, useSet } from "react-use";
 
 const { createContext, useContext, useState, useCallback, useEffect } = require("react");
 
@@ -6,7 +6,21 @@ const VisitedStopsStateContext = createContext();
 const VisitedStopsUpdateContext = createContext();
 
 export function VisitedStopsProvider({ capacity = 10, children }) {
-  const [set, { add, has, remove, toggle, reset }] = useSet(new Set());
+  const [storedSet, setStoredSet] = useLocalStorage("visited-stops", []);
+  const [set, { add, has, remove, toggle, reset }] = useSet(new Set([]));
+
+  // Load persisted stops on mount
+  useEffect(() => {
+    if (Symbol.iterator in Object(storedSet)) {
+      storedSet.forEach((v) => add(v));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Persist any changes to the set
+  useEffect(() => {
+    setStoredSet([...set]);
+  }, [set, setStoredSet]);
 
   // Yea, not actually clearing extra ones from the set. It'll never be big enough to be a memory concern.
   const recentStops = Array.from(set).reverse().slice(0, capacity);
