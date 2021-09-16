@@ -64,7 +64,7 @@ export default function Stop({ stop: stopName }) {
                   </tr>
                 </thead>
                 <tbody aria-live="polite" aria-atomic>
-                  {departures.length > 1 ? (
+                  {departures.length > 0 ? (
                     departures.map(({ destination, type, status, wait }, i) => (
                       <tr key={i}>
                         <th scope="row" className="py-1 font-normal text-left truncate">
@@ -99,17 +99,24 @@ export default function Stop({ stop: stopName }) {
           >
             Message board
           </h2>
-          <div className="px-4 py-4 bg-white rounded-md shadow md:text-center dark:bg-gray-800 dark:border dark:border-gray-700">
+          <div
+            className="px-4 py-4 bg-white rounded-md shadow md:text-center dark:bg-gray-800 dark:border dark:border-gray-700"
+            aria-live="polite"
+          >
             <LoadingWrapper
               isLoading={isLoading}
               isError={isError}
               errorMessage={"Failed to load message board information"}
             >
-              <ul className="space-y-2 ">
-                {messages.map((message, i) => (
-                  <li key={i}>{message}</li>
-                ))}
-              </ul>
+              {messages.length > 0 ? (
+                <ul className="space-y-2 ">
+                  {messages.map((message, i) => (
+                    <li key={i}>{message}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="italic text-center text-gray-700">No messages</p>
+              )}
             </LoadingWrapper>
           </div>
         </section>
