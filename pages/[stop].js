@@ -7,7 +7,7 @@ import MetrolinkDestination from "../components/MetrolinkDestination";
 import { getStops } from "../lib/tfgm-metrolink";
 import LoadingWrapper from "../components/LoadingWrapper";
 
-export default function Stop({ stop: stopName }) {
+export default function Stop({ stop: stopName, allStops }) {
   const {
     stopInfo: { name = stopName, departures = [], messages = [], lastUpdated = new Date().toISOString() } = {},
     isLoading,
@@ -68,7 +68,7 @@ export default function Stop({ stop: stopName }) {
                     departures.map(({ destination, type, status, wait }, i) => (
                       <tr key={i}>
                         <th scope="row" className="py-1 font-normal text-left truncate">
-                          <MetrolinkDestination destination={destination} />
+                          <MetrolinkDestination destination={destination} allStops={allStops} />
                         </th>
                         <td className="tabular-nums">
                           <time dateTime="PT{wait}M" aria-label={`${wait} minutes`}>
@@ -155,7 +155,7 @@ export async function getStaticProps({ params: { stop: sluggedStop } }) {
   )?.[0];
 
   return {
-    props: { stop }, // will be passed to the page component as props
+    props: { stop, allStops: stops }, // will be passed to the page component as props
   };
 }
 

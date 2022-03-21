@@ -10,7 +10,6 @@ import Button from "../components/Button";
  * @param {{StationLocation: string, Line: string}[]} props.stops
  */
 export default function Home({ stops }) {
-  // These are funky cause map operations mutate, and thus dont trigger a re-render. New maps force rerenders.
   const [searchTerm, setSearchTerm] = useState("");
   const fuse = new Fuse(stops, { keys: ["StationLocation", "Line"], includeScore: true });
   const results = fuse.search(searchTerm);

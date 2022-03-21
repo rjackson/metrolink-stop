@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Fragment } from "react";
 import { slugify } from "../lib/tfgm-metrolink";
-import stops from "../public/stops.json";
 
 const customMappings = {
   MCUK: "MediaCityUK",
@@ -9,12 +8,12 @@ const customMappings = {
   Ashton: "Ashton-Under-Lyne",
 };
 
-const doStuffToDestination = (destination) => {
+const doStuffToDestination = (destination, stopNames) => {
   const middleDestination = customMappings?.[destination] || destination;
 
   return (
     <Fragment key={destination}>
-      {stops.includes(middleDestination) ? (
+      {stopNames.includes(middleDestination) ? (
         <Link href={`/${slugify(middleDestination)}`}>
           {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a>{destination}</a>
@@ -26,10 +25,14 @@ const doStuffToDestination = (destination) => {
   );
 };
 
-export default function MetrolinkDestination({ destination }) {
+export default function MetrolinkDestination({ destination, allStops }) {
+  const stopNames = allStops.map(({ StationLocation }) => StationLocation);
+
   const finalDestination = destination
     .split(" via ")
-    .map(doStuffToDestination)
+    .map((destination) => {
+      return doStuffToDestination(destination, stopNames);
+    })
     .reduce((prev, curr) => (prev === null ? [curr] : [prev, <span key="via"> via </span>, curr]));
 
   return <>{finalDestination}</>;
