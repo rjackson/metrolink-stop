@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "(cd ./data/lines; bash prepare.sh; NODE_OPTIONS='--experimental-json-modules' node process.mjs)",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -26,6 +27,7 @@
     "eslint-config-next": "^11.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-jsx-a11y": "^6.4.1",
+    "gtfs": "^3.2.4",
     "postcss": "^8.3.6",
     "tailwindcss": "^2.2.7"
   }
