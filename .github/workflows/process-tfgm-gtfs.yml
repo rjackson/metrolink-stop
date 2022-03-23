@@ -1,0 +1,38 @@
+name: process-tfgm-gtfs
+on:
+  schedule:
+    - cron: 0 0 * * *
+  workflow_dispatch: {}
+  push:
+    paths:
+      - .github/workflows/process-tfgm-gtfs.yml
+env:
+  GIT_TERMINAL_PROMPT: 0
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install system dependencies
+        run: |
+          curl -L -o xsv.tar.gz https://github.com/BurntSushi/xsv/releases/download/0.13.0/xsv-0.13.0-x86_64-unknown-linux-musl.tar.gz
+          sudo tar xf xsv.tar.gz -C /usr/local/bin
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - run: npm install
+      - name: Process TfGM GTFS
+        run: npm run regenerate-tfgm-gtfs
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v9
+        id: verify-changed-files
+        with:
+          files: data/**/*.json
+      - name: Commit changes
+        if: contains(steps.verify-changed-files.outputs.changed_files, 'data/')
+        run: |
+          git config --global user.name 'Metrolink Stop (automated)'
+          git config --global user.email 'metrolink-stop@rjackson.me'
+          git add "${{ steps.verify-changed-files.outputs.changed_files }}"
+          git commit -m "Regenerate data from TfGM GTFS"
+          git push
