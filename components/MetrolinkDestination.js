@@ -25,7 +25,7 @@ const doStuffToDestination = (destination, stopNames) => {
   );
 };
 
-export default function MetrolinkDestination({ destination, allStops }) {
+export default function MetrolinkDestination({ destination, allStops = [] }) {
   const stopNames = allStops.map(({ StationLocation }) => StationLocation);
 
   const finalDestination = destination

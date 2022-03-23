@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import MetrolinkDestination from "../components/MetrolinkDestination";
+import { getStops } from "../lib/tfgm-metrolink";
 
-export default function Debug() {
+export default function Debug({ allStops }) {
   const [metrolinksDump, setMetrolinksDump] = useState([]);
   const uniqueMessages = [...new Set(metrolinksDump.map(({ MessageBoard }) => MessageBoard))];
   const uniqueDestinations = [
@@ -82,7 +83,7 @@ export default function Debug() {
         <ul>
           {uniqueDestinations.map((destination) => (
             <li key={destination}>
-              <MetrolinkDestination destination={destination} />
+              <MetrolinkDestination destination={destination} allStops={allStops} />
             </li>
           ))}
         </ul>
@@ -91,7 +92,9 @@ export default function Debug() {
         <h2 className="text-xl font-semibold tracking-wide text-center uppercase">All stops</h2>
         <ul>
           {allStopNames.map((destination) => (
-            <li key={destination}>{destination}</li>
+            <li key={destination}>
+              <MetrolinkDestination destination={destination} allStops={allStops} />
+            </li>
           ))}
         </ul>
       </div>
@@ -108,4 +111,12 @@ export default function Debug() {
       </div>
     </main>
   );
+}
+
+export async function getStaticProps() {
+  const allStops = await getStops();
+
+  return {
+    props: { allStops }, // will be passed to the page component as props
+  };
 }
