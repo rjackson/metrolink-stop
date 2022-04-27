@@ -1,3 +1,4 @@
+import { Anchor } from "@rjackson/rjds";
 import Link from "next/link";
 import { Fragment } from "react";
 import { slugify } from "../lib/tfgm-metrolink";
@@ -14,9 +15,8 @@ const doStuffToDestination = (destination, stopNames) => {
   return (
     <Fragment key={destination}>
       {stopNames.includes(middleDestination) ? (
-        <Link href={`/${slugify(middleDestination)}`}>
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a>{destination}</a>
+        <Link href={`/${slugify(middleDestination)}`} passHref>
+          <Anchor>{destination}</Anchor>
         </Link>
       ) : (
         <span>{destination}</span>

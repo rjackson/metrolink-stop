@@ -20,6 +20,7 @@
     "swr": "^1.0.0"
   },
   "devDependencies": {
+    "@rjackson/rjds": "^0.1.0",
     "@simbathesailor/babel-plugin-use-what-changed": "^2.1.0",
     "@simbathesailor/use-what-changed": "^2.0.0",
     "autoprefixer": "^10.3.1",

@@ -6,6 +6,7 @@ import useMetrolinkStop from "../components/hooks/useMetrolinkStop";
 import MetrolinkDestination from "../components/MetrolinkDestination";
 import { getStops } from "../lib/tfgm-metrolink";
 import LoadingWrapper from "../components/LoadingWrapper";
+import { Anchor, H2, H3, Panel, Section } from "@rjackson/rjds";
 
 export default function Stop({ stop: stopName, allStops }) {
   const {
@@ -26,30 +27,26 @@ export default function Stop({ stop: stopName, allStops }) {
       <Head>
         <title>{name} stop info</title>
       </Head>
-      <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-8 md:space-y-10">
-        <div className="flex flex-col items-center sm:flex-row">
+      <div className="space-y-6 md:space-y-10">
+        <div className="flex flex-col items-center md:flex-row">
           <div className="flex-1">
-            <Link href="/">
+            <Link href="/" passHref>
               {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-              <a>
+              <Anchor>
                 <span aria-hidden>👈</span> Back
                 <span className="sr-only">to list of stops</span>
-              </a>
+              </Anchor>
             </Link>
           </div>
           <div>
-            <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">{name}</h1>
+            <H2>{name}</H2>
           </div>
-          <div className="flex-1">&nbsp;</div>
+          <div className="flex-1 hidden md:block">&nbsp;</div>
         </div>
-        <section className="space-y-2 md:space-y-6" aria-labelledby="departures">
-          <h2
-            id="departures"
-            className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300"
-          >
-            Departures
-          </h2>
-          <div className="px-4 py-4 bg-white rounded-md shadow dark:bg-gray-800 dark:border dark:border-gray-700">
+
+        <Section as="main" className="space-y-2 md:space-y-6" aria-labelledby="departures">
+          <H3 id="departures">Departures</H3>
+          <Panel>
             <LoadingWrapper
               isLoading={isLoading}
               isError={isError}
@@ -90,26 +87,24 @@ export default function Stop({ stop: stopName, allStops }) {
                 <tfoot></tfoot>
               </table>
             </LoadingWrapper>
-          </div>
-        </section>
-        <section className="space-y-2 md:space-y-6" aria-labelledby="messageboard">
-          <h2
+          </Panel>
+        </Section>
+
+        <Section className="space-y-2 md:space-y-6" aria-labelledby="messageboard">
+          <H3
             id="messageboard"
             className="font-semibold tracking-wide text-center text-gray-800 uppercase dark:text-gray-300"
           >
             Message board
-          </h2>
-          <div
-            className="px-4 py-4 bg-white rounded-md shadow md:text-center dark:bg-gray-800 dark:border dark:border-gray-700"
-            aria-live="polite"
-          >
+          </H3>
+          <Panel aria-live="polite">
             <LoadingWrapper
               isLoading={isLoading}
               isError={isError}
               errorMessage={"Failed to load message board information"}
             >
               {messages.length > 0 ? (
-                <ul className="space-y-2 ">
+                <ul className="space-y-2">
                   {messages.map((message, i) => (
                     <li key={i}>{message}</li>
                   ))}
@@ -118,12 +113,13 @@ export default function Stop({ stop: stopName, allStops }) {
                 <p className="italic text-center text-gray-700">No messages</p>
               )}
             </LoadingWrapper>
-          </div>
-        </section>
-        <section className="py-4 text-center text-gray-500 dark:text-gray-400" aria-labelledby="metadata">
-          <h2 id="metadata" className="sr-only">
+          </Panel>
+        </Section>
+
+        <Section className="py-4 text-center text-gray-500 dark:text-gray-400" aria-labelledby="metadata">
+          <H3 id="metadata" className="sr-only">
             Metadata
-          </h2>
+          </H3>
           <p>
             Last update{" "}
             <time dateTime={lastUpdatedDate.toISOString()}>
@@ -131,15 +127,14 @@ export default function Stop({ stop: stopName, allStops }) {
             </time>
             .
           </p>
-        </section>
-      </main>
+        </Section>
+      </div>
       <nav className="px-6 py-2">
         {/* (a stop chooser at some point in the future) */}
-        <Link href="/">
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a>
+        <Link href="/" passHref>
+          <Anchor>
             <span aria-hidden>👈</span> Back to list of stops
-          </a>
+          </Anchor>
         </Link>
       </nav>
     </>

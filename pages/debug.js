@@ -1,3 +1,4 @@
+import { H2, Panel, Section } from "@rjackson/rjds";
 import { useEffect, useState } from "react";
 import MetrolinkDestination from "../components/MetrolinkDestination";
 import { getStops } from "../lib/tfgm-metrolink";
@@ -52,64 +53,75 @@ export default function Debug({ allStops }) {
     };
   }, []);
   return (
-    <main className="flex flex-col flex-1 w-full max-w-screen-md px-6 py-4 space-y-4">
-      <h1 className="text-2xl font-semibold tracking-wide text-center uppercase">Debug</h1>
-      <div>
-        <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique messages</h2>
-        <ul>
-          {uniqueMessages.map((message) => (
-            <li key={message}>{message}</li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique statuses</h2>
-        <ul>
-          {uniqueStatuses.map((status) => (
-            <li key={status}>{status}</li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique carriages</h2>
-        <ul>
-          {uniqueCarriages.map((carriage) => (
-            <li key={carriage}>{carriage}</li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Unique destinations</h2>
-        <ul>
-          {uniqueDestinations.map((destination) => (
-            <li key={destination}>
-              <MetrolinkDestination destination={destination} allStops={allStops} />
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <h2 className="text-xl font-semibold tracking-wide text-center uppercase">All stops</h2>
-        <ul>
-          {allStopNames.map((destination) => (
-            <li key={destination}>
-              <MetrolinkDestination destination={destination} allStops={allStops} />
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <h2 className="text-xl font-semibold tracking-wide text-center uppercase">Dump</h2>
-        <button
-          onClick={async (e) => {
-            setMetrolinksDump(await fetchDump());
-          }}
-        >
-          Refresh
-        </button>
-        <pre>{JSON.stringify(metrolinksDump, 0, 2)}</pre>
-      </div>
-    </main>
+    <>
+      <Section>
+        <Panel>
+          <H2>Unique messages</H2>
+          <ul>
+            {uniqueMessages.map((message) => (
+              <li key={message}>{message}</li>
+            ))}
+          </ul>
+        </Panel>
+      </Section>
+      <Section>
+        <Panel>
+          <H2>Unique statuses</H2>
+          <ul>
+            {uniqueStatuses.map((status) => (
+              <li key={status}>{status}</li>
+            ))}
+          </ul>
+        </Panel>
+      </Section>
+      <Section>
+        <Panel>
+          <H2>Unique carriages</H2>
+          <ul>
+            {uniqueCarriages.map((carriage) => (
+              <li key={carriage}>{carriage}</li>
+            ))}
+          </ul>
+        </Panel>
+      </Section>
+      <Section>
+        <Panel>
+          <H2>Unique destinations</H2>
+          <ul>
+            {uniqueDestinations.map((destination) => (
+              <li key={destination}>
+                <MetrolinkDestination destination={destination} allStops={allStops} />
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      </Section>
+      <Section>
+        <Panel>
+          <H2>All stops</H2>
+          <ul>
+            {allStopNames.map((destination) => (
+              <li key={destination}>
+                <MetrolinkDestination destination={destination} allStops={allStops} />
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      </Section>
+      <Section>
+        <Panel>
+          <H2>Dump</H2>
+          <button
+            onClick={async (e) => {
+              setMetrolinksDump(await fetchDump());
+            }}
+          >
+            Refresh
+          </button>
+          <pre>{JSON.stringify(metrolinksDump, 0, 2)}</pre>
+        </Panel>
+      </Section>
+    </>
   );
 }
 
