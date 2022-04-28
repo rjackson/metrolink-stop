@@ -7,6 +7,7 @@ import MetrolinkDestination from "../components/MetrolinkDestination";
 import { getStops } from "../lib/tfgm-metrolink";
 import LoadingWrapper from "../components/LoadingWrapper";
 import { Anchor, H2, H3, Panel, Section } from "@rjackson/rjds";
+import slugify from "../utils/slugify";
 
 export default function Stop({ stop: stopName, allStops }) {
   const {
@@ -141,7 +142,7 @@ export default function Stop({ stop: stopName, allStops }) {
   );
 }
 
-const slugify = (stop) => stop?.toLowerCase().replace(/ /g, "-");
+// const slugify = (stop) => stop?.toLowerCase().replace(/ /g, "-");
 
 export async function getStaticProps({ params: { stop: sluggedStop } }) {
   const stops = await getStops();

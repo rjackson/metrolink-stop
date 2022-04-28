@@ -1,10 +1,11 @@
-import { getStops, slugify } from "../lib/tfgm-metrolink";
+import { getStops } from "../lib/tfgm-metrolink";
 import Link from "next/link";
 import { useState } from "react";
 import Fuse from "fuse.js";
 import { useVisitedStopsState, useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import Button from "../components/Button";
-import { Anchor, H2, H3, Panel, Section, UnorderedList } from "@rjackson/rjds";
+import { Anchor, H3, Panel, Section } from "@rjackson/rjds";
+import slugify from "../utils/slugify";
 
 /**
  * @param {Object} props

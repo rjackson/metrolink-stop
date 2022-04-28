@@ -1,7 +1,7 @@
 import { Anchor } from "@rjackson/rjds";
 import Link from "next/link";
 import { Fragment } from "react";
-import { slugify } from "../lib/tfgm-metrolink";
+import slugify from "../utils/slugify";
 
 const customMappings = {
   MCUK: "MediaCityUK",

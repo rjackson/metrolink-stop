@@ -22,6 +22,7 @@
     "swr": "^1.0.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^12.1.5",
     "@simbathesailor/babel-plugin-use-what-changed": "^2.1.0",
     "@simbathesailor/use-what-changed": "^2.0.0",
     "autoprefixer": "^10.4.5",
