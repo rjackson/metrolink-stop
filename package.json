@@ -23,8 +23,6 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^12.1.5",
-    "@simbathesailor/babel-plugin-use-what-changed": "^2.1.0",
-    "@simbathesailor/use-what-changed": "^2.0.0",
     "autoprefixer": "^10.4.5",
     "eslint": "^7.32.0",
     "eslint-config-next": "^11.0.1",
