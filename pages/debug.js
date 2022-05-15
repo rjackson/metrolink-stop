@@ -112,7 +112,7 @@ export default function Debug({ allStops }) {
         <Panel>
           <H2>Dump</H2>
           <button
-            onClick={async (e) => {
+            onClick={async () => {
               setMetrolinksDump(await fetchDump());
             }}
           >

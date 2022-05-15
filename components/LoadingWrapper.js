@@ -19,7 +19,6 @@ const LoadingWrapper = ({
   isLoading,
   isError,
   errorMessage = "Could not load content",
-  className = "",
   children,
   errorContent = <DefaultErrorContent errorMessage={errorMessage} />,
   loadingContent = <DefaultLoadingContent />,

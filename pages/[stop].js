@@ -63,7 +63,7 @@ export default function Stop({ stop: stopName, allStops }) {
                 </thead>
                 <tbody aria-live="polite" aria-atomic>
                   {departures.length > 0 ? (
-                    departures.map(({ destination, type, status, wait }, i) => (
+                    departures.map(({ destination, type, wait }, i) => (
                       <tr key={i}>
                         <th scope="row" className="py-1 font-normal text-left truncate">
                           <MetrolinkDestination destination={destination} allStops={allStops} />

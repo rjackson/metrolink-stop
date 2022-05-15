@@ -1,13 +1,13 @@
 import { useLocalStorage, useSet } from "react-use";
 
-const { createContext, useContext, useState, useCallback, useEffect } = require("react");
+const { createContext, useContext, useCallback, useEffect } = require("react");
 
 const VisitedStopsStateContext = createContext();
 const VisitedStopsUpdateContext = createContext();
 
 export function VisitedStopsProvider({ capacity = 10, children }) {
   const [storedSet, setStoredSet] = useLocalStorage("visited-stops", []);
-  const [set, { add, has, remove, toggle, reset }] = useSet(new Set([]));
+  const [set, { add, has, remove, reset }] = useSet(new Set([]));
 
   // Load persisted stops on mount
   useEffect(() => {

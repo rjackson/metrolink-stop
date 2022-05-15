@@ -15,7 +15,7 @@ export default function Home({ stops }) {
   const [searchTerm, setSearchTerm] = useState("");
   const fuse = new Fuse(stops, { keys: ["StationLocation", "Line"], includeScore: true });
   const results = fuse.search(searchTerm);
-  const stopResults = !!searchTerm ? results.map(({ item }) => item) : stops;
+  const stopResults = searchTerm ? results.map(({ item }) => item) : stops;
 
   const { recentStops } = useVisitedStopsState();
   const { reset } = useVisitedStopsUpdate();
@@ -84,7 +84,7 @@ export default function Home({ stops }) {
   );
 }
 
-export async function getStaticProps(context) {
+export async function getStaticProps() {
   const stops = await getStops();
 
   // Sort alphabetically by default
