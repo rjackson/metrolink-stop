@@ -9,9 +9,12 @@
     "start": "next start",
     "lint": "next lint"
   },
-  "pre-commit": [ "lint" ],
+  "pre-commit": [
+    "lint"
+  ],
   "dependencies": {
     "@rjackson/rjds": "^0.2.0",
+    "fathom-client": "^3.4.1",
     "fuse.js": "^6.4.6",
     "next": "^12.1.5",
     "odata": "^1.3.1",

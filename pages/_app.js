@@ -5,11 +5,14 @@ import { VisitedStopsProvider } from "../components/context/VisitedStops";
 import { useRouter } from "next/dist/client/router";
 import { SWRConfig } from "swr";
 import MainLayout from "../components/layouts/MainLayout";
+import useFathom from "../components/hooks/useFathom";
 
 function MyApp({ Component, pageProps }) {
   const prefersDark = usePrefersDark();
   const router = useRouter();
   const getLayout = Component.getLayout || ((page) => <MainLayout>{page}</MainLayout>);
+
+  useFathom();
 
   const fetcher = async (url) => {
     const res = await fetch(url);
