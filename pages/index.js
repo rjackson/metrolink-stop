@@ -3,8 +3,7 @@ import Link from "next/link";
 import { useState } from "react";
 import Fuse from "fuse.js";
 import { useVisitedStopsState, useVisitedStopsUpdate } from "../components/context/VisitedStops";
-import Button from "../components/Button";
-import { Anchor, H3, Panel, Section } from "@rjackson/rjds";
+import { Anchor, Button, H3, Input, Panel, Section } from "@rjackson/rjds";
 import slugify from "../utils/slugify";
 
 /**
@@ -28,7 +27,7 @@ export default function Home({ stops }) {
             <div>
               <H3 id="recently-visited">Recently visited</H3>
             </div>
-            <Button onClick={reset}>
+            <Button onClick={reset} className="bg-white ">
               Clear <span className="sr-only">recently visited</span>
             </Button>
           </div>
@@ -46,39 +45,36 @@ export default function Home({ stops }) {
         </Section>
       )}
 
-      <Section aria-labelledby="all-stops">
+      <Section aria-labelledby="all-stops" className="space-y-4">
         <H3 id="all-stops" className={`${recentStops.length == 0 ? "sr-only" : ""}`}>
           All stops
         </H3>
-        <div className="space-y-4">
+        <Panel className="space-y-6">
           <form onSubmit={(e) => e.preventDefault()}>
-            <div role="search" className="flex flex-col items-start space-y-2 md:items-center">
+            <div role="search" className="flex flex-col space-y-2 md:items-center md:max-w-sm md:mx-auto">
               <label htmlFor="search">Search</label>
-              <input
+              <Input
                 type="text"
                 name="search"
                 id="search"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-2 py-1 bg-white border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border dark:border-gray-700 md:max-w-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                className=""
                 autoComplete="off"
               />
             </div>
           </form>
-
-          <Panel>
-            <ul className="space-y-2 md:text-center">
-              {stopResults.map(({ StationLocation }) => (
-                <li key={StationLocation}>
-                  <Link href={`/${slugify(StationLocation)}`} passHref>
-                    {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                    <Anchor>{StationLocation}</Anchor>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Panel>
-        </div>
+          <ul className="space-y-2 md:text-center">
+            {stopResults.map(({ StationLocation }) => (
+              <li key={StationLocation}>
+                <Link href={`/${slugify(StationLocation)}`} passHref>
+                  {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
+                  <Anchor>{StationLocation}</Anchor>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Panel>
       </Section>
     </div>
   );
