@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import useMetrolinkStop from "../components/hooks/useMetrolinkStop";
 import MetrolinkDestination from "../components/MetrolinkDestination";
@@ -11,11 +11,17 @@ import slugify from "../utils/slugify";
 
 export default function Stop({ stop: stopName, allStops }) {
   const {
-    stopInfo: { name = stopName, departures = [], messages = [], lastUpdated = new Date().toISOString() } = {},
+    stopInfo: { name = stopName, departures = [], messages = [], lastUpdated = "" } = {},
     isLoading,
     isError,
   } = useMetrolinkStop(stopName);
-  const lastUpdatedDate = new Date(lastUpdated);
+  
+  const [lastUpdatedDateTimeLabel, setLastUpdatedDateTimeLabel] = useState(lastUpdated);
+
+  useEffect(() => {
+    const lastUpdatedDate = new Date(lastUpdated);
+    setLastUpdatedDateTimeLabel(lastUpdatedDate.toLocaleTimeString("en-GB", { timeStyle: "long" }));
+  }, [lastUpdated]);
 
   const { track } = useVisitedStopsUpdate();
   useEffect(() => {
@@ -122,11 +128,7 @@ export default function Stop({ stop: stopName, allStops }) {
             Metadata
           </H3>
           <p>
-            Last update{" "}
-            <time dateTime={lastUpdatedDate.toISOString()}>
-              {lastUpdatedDate.toLocaleTimeString("en-GB", { timeStyle: "long" })}
-            </time>
-            .
+            Last update <time dateTime={lastUpdated}>{lastUpdatedDateTimeLabel}</time>.
           </p>
         </Section>
       </div>
