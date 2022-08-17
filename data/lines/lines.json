@@ -391,11 +391,11 @@
       }
     ]
   },
-  "METLGREE:I:2022-07-16": {
-    "route_id": "METLGREE:I:2022-07-16",
+  "METLGREE:I:2022-08-20": {
+    "route_id": "METLGREE:I:2022-08-20",
     "route_short_name": "Green Line",
     "direction": "Inbound",
-    "trip_id": "METLGREE:001MF1MF:I:10:2022-07-16",
+    "trip_id": "METLGREE:001MF1MF:I:10:2022-08-20",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -549,11 +549,11 @@
       }
     ]
   },
-  "METLGREE:O:2022-07-16": {
-    "route_id": "METLGREE:O:2022-07-16",
+  "METLGREE:O:2022-08-20": {
+    "route_id": "METLGREE:O:2022-08-20",
     "route_short_name": "Green Line",
     "direction": "Outbound",
-    "trip_id": "METLGREE:001MF1MF:O:10:2022-07-16",
+    "trip_id": "METLGREE:001MF1MF:O:10:2022-08-20",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -1819,11 +1819,11 @@
       }
     ]
   },
-  "METLRED:I:2022-07-16": {
-    "route_id": "METLRED:I:2022-07-16",
+  "METLRED:I:2022-08-17": {
+    "route_id": "METLRED:I:2022-08-17",
     "route_short_name": "Red Line",
     "direction": "Inbound",
-    "trip_id": "METLRED:007BH7MF:I:10:2022-07-16",
+    "trip_id": "METLRED:007BH7MF:I:10:2022-08-17",
     "stops": [
       {
         "stop_name": "The Trafford Centre (Manchester Metrolink)",
