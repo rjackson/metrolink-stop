@@ -1,9 +1,9 @@
 {
-  "METLBLUE:I:CURRENT": {
-    "route_id": "METLBLUE:I:CURRENT",
+  "METLBLUE:I:2022-08-17": {
+    "route_id": "METLBLUE:I:2022-08-17",
     "route_short_name": "Blue Line",
     "direction": "Inbound",
-    "trip_id": "METLBLUE:003BH7MF:I:10:CURRENT",
+    "trip_id": "METLBLUE:003BH7MF:I:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Ashton-Under-Lyne (Manchester Metrolink)",
@@ -145,11 +145,11 @@
       }
     ]
   },
-  "METLBLUE:O:CURRENT": {
-    "route_id": "METLBLUE:O:CURRENT",
+  "METLBLUE:O:2022-08-17": {
+    "route_id": "METLBLUE:O:2022-08-17",
     "route_short_name": "Blue Line",
     "direction": "Outbound",
-    "trip_id": "METLBLUE:003BH7MF:O:10:CURRENT",
+    "trip_id": "METLBLUE:003BH7MF:O:10:2022-08-17",
     "stops": [
       {
         "stop_name": "MediaCityUK (Manchester Metrolink)",
@@ -391,11 +391,11 @@
       }
     ]
   },
-  "METLGREE:I:2022-08-20": {
-    "route_id": "METLGREE:I:2022-08-20",
+  "METLGREE:I:CURRENT": {
+    "route_id": "METLGREE:I:CURRENT",
     "route_short_name": "Green Line",
     "direction": "Inbound",
-    "trip_id": "METLGREE:001MF1MF:I:10:2022-08-20",
+    "trip_id": "METLGREE:001MF1MF:I:10:CURRENT",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -549,11 +549,11 @@
       }
     ]
   },
-  "METLGREE:O:2022-08-20": {
-    "route_id": "METLGREE:O:2022-08-20",
+  "METLGREE:O:CURRENT": {
+    "route_id": "METLGREE:O:CURRENT",
     "route_short_name": "Green Line",
     "direction": "Outbound",
-    "trip_id": "METLGREE:001MF1MF:O:10:2022-08-20",
+    "trip_id": "METLGREE:001MF1MF:O:10:CURRENT",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -707,11 +707,11 @@
       }
     ]
   },
-  "METLML3:I:CURRENT": {
-    "route_id": "METLML3:I:CURRENT",
+  "METLML3:I:2022-08-17": {
+    "route_id": "METLML3:I:2022-08-17",
     "route_short_name": "Green Line Replacement Bus",
     "direction": "Inbound",
-    "trip_id": "METLML3:ML3MFMBR:I:10:CURRENT",
+    "trip_id": "METLML3:ML3MFMBR:I:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Victoria (Manchester Metrolink)",
@@ -781,11 +781,11 @@
       }
     ]
   },
-  "METLML3:O:CURRENT": {
-    "route_id": "METLML3:O:CURRENT",
+  "METLML3:O:2022-08-17": {
+    "route_id": "METLML3:O:2022-08-17",
     "route_short_name": "Green Line Replacement Bus",
     "direction": "Outbound",
-    "trip_id": "METLML3:ML3MFMBR:O:10:CURRENT",
+    "trip_id": "METLML3:ML3MFMBR:O:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -855,11 +855,11 @@
       }
     ]
   },
-  "METLNAVY:O:CURRENT": {
-    "route_id": "METLNAVY:O:CURRENT",
+  "METLNAVY:O:2022-08-17": {
+    "route_id": "METLNAVY:O:2022-08-17",
     "route_short_name": "Navy Line",
     "direction": "Outbound",
-    "trip_id": "METLNAVY:006BH7MF:O:10:CURRENT",
+    "trip_id": "METLNAVY:006BH7MF:O:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Victoria (Manchester Metrolink)",
@@ -1013,11 +1013,11 @@
       }
     ]
   },
-  "METLNAVY:I:CURRENT": {
-    "route_id": "METLNAVY:I:CURRENT",
+  "METLNAVY:I:2022-08-17": {
+    "route_id": "METLNAVY:I:2022-08-17",
     "route_short_name": "Navy Line",
     "direction": "Inbound",
-    "trip_id": "METLNAVY:006BH7MF:I:10:CURRENT",
+    "trip_id": "METLNAVY:006BH7MF:I:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Manchester Airport (Manchester Metrolink)",
@@ -1171,11 +1171,11 @@
       }
     ]
   },
-  "METLPINK:I:2022-08-20": {
-    "route_id": "METLPINK:I:2022-08-20",
+  "METLPINK:I:CURRENT": {
+    "route_id": "METLPINK:I:CURRENT",
     "route_short_name": "Pink Line",
     "direction": "Inbound",
-    "trip_id": "METLPINK:005BH5SU:I:11:2022-08-20",
+    "trip_id": "METLPINK:005BH5SU:I:11:CURRENT",
     "stops": [
       {
         "stop_name": "East Didsbury (Manchester Metrolink)",
@@ -1377,11 +1377,11 @@
       }
     ]
   },
-  "METLPINK:O:2022-08-20": {
-    "route_id": "METLPINK:O:2022-08-20",
+  "METLPINK:O:CURRENT": {
+    "route_id": "METLPINK:O:CURRENT",
     "route_short_name": "Pink Line",
     "direction": "Outbound",
-    "trip_id": "METLPINK:005BH5SU:O:10:2022-08-20",
+    "trip_id": "METLPINK:005BH5SU:O:10:CURRENT",
     "stops": [
       {
         "stop_name": "Rochdale Town Centre (Manchester Metrolink)",
@@ -1583,11 +1583,11 @@
       }
     ]
   },
-  "METLPURP:I:2022-08-20": {
-    "route_id": "METLPURP:I:2022-08-20",
+  "METLPURP:I:CURRENT": {
+    "route_id": "METLPURP:I:CURRENT",
     "route_short_name": "Purple Line",
     "direction": "Inbound",
-    "trip_id": "METLPURP:002BH7SU:I:10:2022-08-20",
+    "trip_id": "METLPURP:002BH7SU:I:10:CURRENT",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -1675,11 +1675,11 @@
       }
     ]
   },
-  "METLPURP:O:2022-08-20": {
-    "route_id": "METLPURP:O:2022-08-20",
+  "METLPURP:O:CURRENT": {
+    "route_id": "METLPURP:O:CURRENT",
     "route_short_name": "Purple Line",
     "direction": "Outbound",
-    "trip_id": "METLPURP:002BH7SU:O:10:2022-08-20",
+    "trip_id": "METLPURP:002BH7SU:O:10:CURRENT",
     "stops": [
       {
         "stop_name": "Piccadilly (Manchester Metrolink)",
@@ -1767,11 +1767,11 @@
       }
     ]
   },
-  "METLML4:I:CURRENT": {
-    "route_id": "METLML4:I:CURRENT",
+  "METLML4:I:2022-08-17": {
+    "route_id": "METLML4:I:2022-08-17",
     "route_short_name": "Purple Line Bus Replaement",
     "direction": "Inbound",
-    "trip_id": "METLML4:ML4MFMBR:I:10:CURRENT",
+    "trip_id": "METLML4:ML4MFMBR:I:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -1793,11 +1793,11 @@
       }
     ]
   },
-  "METLML4:O:CURRENT": {
-    "route_id": "METLML4:O:CURRENT",
+  "METLML4:O:2022-08-17": {
+    "route_id": "METLML4:O:2022-08-17",
     "route_short_name": "Purple Line Bus Replaement",
     "direction": "Outbound",
-    "trip_id": "METLML4:ML4MFMBR:O:10:CURRENT",
+    "trip_id": "METLML4:ML4MFMBR:O:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Timperley (Manchester Metrolink)",
@@ -1819,11 +1819,11 @@
       }
     ]
   },
-  "METLRED:I:CURRENT": {
-    "route_id": "METLRED:I:CURRENT",
+  "METLRED:I:2022-08-17": {
+    "route_id": "METLRED:I:2022-08-17",
     "route_short_name": "Red Line",
     "direction": "Inbound",
-    "trip_id": "METLRED:007BH7MF:I:10:CURRENT",
+    "trip_id": "METLRED:007BH7MF:I:10:2022-08-17",
     "stops": [
       {
         "stop_name": "The Trafford Centre (Manchester Metrolink)",
@@ -1875,11 +1875,11 @@
       }
     ]
   },
-  "METLRED:O:CURRENT": {
-    "route_id": "METLRED:O:CURRENT",
+  "METLRED:O:2022-08-17": {
+    "route_id": "METLRED:O:2022-08-17",
     "route_short_name": "Red Line",
     "direction": "Outbound",
-    "trip_id": "METLRED:007BH7MF:O:10:CURRENT",
+    "trip_id": "METLRED:007BH7MF:O:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Cornbrook (Manchester Metrolink)",
@@ -1931,11 +1931,11 @@
       }
     ]
   },
-  "METLYELL:O:2022-08-20": {
-    "route_id": "METLYELL:O:2022-08-20",
+  "METLYELL:O:CURRENT": {
+    "route_id": "METLYELL:O:CURRENT",
     "route_short_name": "Yellow Line",
     "direction": "Outbound",
-    "trip_id": "METLYELL:004BH7SU:O:10:2022-08-20",
+    "trip_id": "METLYELL:004BH7SU:O:10:CURRENT",
     "stops": [
       {
         "stop_name": "Piccadilly (Manchester Metrolink)",
@@ -2029,11 +2029,11 @@
       }
     ]
   },
-  "METLYELL:I:2022-08-20": {
-    "route_id": "METLYELL:I:2022-08-20",
+  "METLYELL:I:CURRENT": {
+    "route_id": "METLYELL:I:CURRENT",
     "route_short_name": "Yellow Line",
     "direction": "Inbound",
-    "trip_id": "METLYELL:004BH7SU:I:10:2022-08-20",
+    "trip_id": "METLYELL:004BH7SU:I:10:CURRENT",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -2127,11 +2127,11 @@
       }
     ]
   },
-  "METLML2:I:CURRENT": {
-    "route_id": "METLML2:I:CURRENT",
+  "METLML2:I:2022-08-17": {
+    "route_id": "METLML2:I:2022-08-17",
     "route_short_name": "Yellow Line Replacement Bus",
     "direction": "Inbound",
-    "trip_id": "METLML2:ML2MFMBR:I:10:CURRENT",
+    "trip_id": "METLML2:ML2MFMBR:I:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -2201,11 +2201,11 @@
       }
     ]
   },
-  "METLML2:O:CURRENT": {
-    "route_id": "METLML2:O:CURRENT",
+  "METLML2:O:2022-08-17": {
+    "route_id": "METLML2:O:2022-08-17",
     "route_short_name": "Yellow Line Replacement Bus",
     "direction": "Outbound",
-    "trip_id": "METLML2:ML2MFMBR:O:10:CURRENT",
+    "trip_id": "METLML2:ML2MFMBR:O:10:2022-08-17",
     "stops": [
       {
         "stop_name": "Victoria (Manchester Metrolink)",
