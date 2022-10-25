@@ -1,9 +1,9 @@
 {
-  "METLBLUE:I:CURRENT": {
-    "route_id": "METLBLUE:I:CURRENT",
+  "METLBLUE:I:2022-10-23": {
+    "route_id": "METLBLUE:I:2022-10-23",
     "route_short_name": "Blue Line",
     "direction": "Inbound",
-    "trip_id": "METLBLUE:003SU7SU:I:10:CURRENT",
+    "trip_id": "METLBLUE:003SU7SU:I:10:2022-10-23",
     "stops": [
       {
         "stop_name": "Ashton-Under-Lyne (Manchester Metrolink)",
@@ -175,11 +175,11 @@
       }
     ]
   },
-  "METLBLUE:O:CURRENT": {
-    "route_id": "METLBLUE:O:CURRENT",
+  "METLBLUE:O:2022-10-23": {
+    "route_id": "METLBLUE:O:2022-10-23",
     "route_short_name": "Blue Line",
     "direction": "Outbound",
-    "trip_id": "METLBLUE:003SU7SU:O:10:CURRENT",
+    "trip_id": "METLBLUE:003SU7SU:O:10:2022-10-23",
     "stops": [
       {
         "stop_name": "Eccles (Manchester Metrolink)",
@@ -351,11 +351,11 @@
       }
     ]
   },
-  "METLML1:I:CURRENT": {
-    "route_id": "METLML1:I:CURRENT",
+  "METLML1:I:2022-10-23": {
+    "route_id": "METLML1:I:2022-10-23",
     "route_short_name": "Blue Line Bus Replacement",
     "direction": "Inbound",
-    "trip_id": "METLML1:ML1BHMBR:I:1:CURRENT",
+    "trip_id": "METLML1:ML1BHMBR:I:1:2022-10-23",
     "stops": [
       {
         "stop_name": "MediaCityUK (Manchester Metrolink)",
@@ -401,11 +401,11 @@
       }
     ]
   },
-  "METLML1:O:CURRENT": {
-    "route_id": "METLML1:O:CURRENT",
+  "METLML1:O:2022-10-23": {
+    "route_id": "METLML1:O:2022-10-23",
     "route_short_name": "Blue Line Bus Replacement",
     "direction": "Outbound",
-    "trip_id": "METLML1:ML1BHMBR:O:1:CURRENT",
+    "trip_id": "METLML1:ML1BHMBR:O:1:2022-10-23",
     "stops": [
       {
         "stop_name": "Eccles (Manchester Metrolink)",
@@ -451,11 +451,11 @@
       }
     ]
   },
-  "METLGREE:O:2022-10-24": {
-    "route_id": "METLGREE:O:2022-10-24",
+  "METLGREE:O:CURRENT": {
+    "route_id": "METLGREE:O:CURRENT",
     "route_short_name": "Green Line",
     "direction": "Outbound",
-    "trip_id": "METLGREE:001MF1MF:O:100:2022-10-24",
+    "trip_id": "METLGREE:001MF1MF:O:100:CURRENT",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -609,11 +609,11 @@
       }
     ]
   },
-  "METLGREE:I:2022-10-24": {
-    "route_id": "METLGREE:I:2022-10-24",
+  "METLGREE:I:CURRENT": {
+    "route_id": "METLGREE:I:CURRENT",
     "route_short_name": "Green Line",
     "direction": "Inbound",
-    "trip_id": "METLGREE:001MF1MF:I:100:2022-10-24",
+    "trip_id": "METLGREE:001MF1MF:I:100:CURRENT",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -1679,11 +1679,11 @@
       }
     ]
   },
-  "METLRED:I:CURRENT": {
-    "route_id": "METLRED:I:CURRENT",
+  "METLRED:I:2022-10-23": {
+    "route_id": "METLRED:I:2022-10-23",
     "route_short_name": "Red Line",
     "direction": "Inbound",
-    "trip_id": "METLRED:007BH7SA:I:1:CURRENT",
+    "trip_id": "METLRED:007BH7SA:I:1:2022-10-23",
     "stops": [
       {
         "stop_name": "The Trafford Centre (Manchester Metrolink)",
@@ -1791,11 +1791,11 @@
       }
     ]
   },
-  "METLYELL:O:2022-10-24": {
-    "route_id": "METLYELL:O:2022-10-24",
+  "METLYELL:O:CURRENT": {
+    "route_id": "METLYELL:O:CURRENT",
     "route_short_name": "Yellow Line",
     "direction": "Outbound",
-    "trip_id": "METLYELL:004MF11MF:O:10:2022-10-24",
+    "trip_id": "METLYELL:004MF11MF:O:10:CURRENT",
     "stops": [
       {
         "stop_name": "Ashton-Under-Lyne (Manchester Metrolink)",
@@ -1913,11 +1913,11 @@
       }
     ]
   },
-  "METLYELL:I:2022-10-24": {
-    "route_id": "METLYELL:I:2022-10-24",
+  "METLYELL:I:CURRENT": {
+    "route_id": "METLYELL:I:CURRENT",
     "route_short_name": "Yellow Line",
     "direction": "Inbound",
-    "trip_id": "METLYELL:004MF11MF:I:10:2022-10-24",
+    "trip_id": "METLYELL:004MF11MF:I:10:CURRENT",
     "stops": [
       {
         "stop_name": "Crumpsall (Manchester Metrolink)",
