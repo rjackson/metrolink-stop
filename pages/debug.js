@@ -6,6 +6,7 @@ import { getStops } from "../lib/tfgm-metrolink";
 export default function Debug({ allStops }) {
   const [metrolinksDump, setMetrolinksDump] = useState([]);
   const uniqueMessages = [...new Set(metrolinksDump.map(({ MessageBoard }) => MessageBoard))];
+  const uniqueDirections = [...new Set(metrolinksDump.map(({ Direction }) => Direction))];
   const uniqueDestinations = [
     ...new Set(metrolinksDump.flatMap(({ Dest0, Dest1, Dest2, Dest3 }) => [Dest0, Dest1, Dest2, Dest3])),
   ];
@@ -59,7 +60,17 @@ export default function Debug({ allStops }) {
           <H2>Unique messages</H2>
           <ul>
             {uniqueMessages.map((message) => (
-              <li key={message}>{message}</li>
+              <li key={message}>{message || "(empty)"}</li>
+            ))}
+          </ul>
+        </Panel>
+      </Section>
+      <Section>
+        <Panel>
+          <H2>Unique directions</H2>
+          <ul>
+            {uniqueDirections.map((direction) => (
+              <li key={direction}>{direction || "(empty)"}</li>
             ))}
           </ul>
         </Panel>
@@ -69,7 +80,7 @@ export default function Debug({ allStops }) {
           <H2>Unique statuses</H2>
           <ul>
             {uniqueStatuses.map((status) => (
-              <li key={status}>{status}</li>
+              <li key={status}>{status || "(empty)"}</li>
             ))}
           </ul>
         </Panel>
@@ -79,7 +90,7 @@ export default function Debug({ allStops }) {
           <H2>Unique carriages</H2>
           <ul>
             {uniqueCarriages.map((carriage) => (
-              <li key={carriage}>{carriage}</li>
+              <li key={carriage}>{carriage || "(empty)"}</li>
             ))}
           </ul>
         </Panel>
