@@ -1,9 +1,9 @@
 {
-  "METLBLUE:O:2022-11-06": {
-    "route_id": "METLBLUE:O:2022-11-06",
+  "METLBLUE:O:2022-11-20": {
+    "route_id": "METLBLUE:O:2022-11-20",
     "route_short_name": "Blue Line",
     "direction": "Outbound",
-    "trip_id": "METLBLUE:003MF7MF:O:10:2022-11-06",
+    "trip_id": "METLBLUE:003BH1BH:O:10:2022-11-20",
     "stops": [
       {
         "stop_name": "Eccles (Manchester Metrolink)",
@@ -85,11 +85,11 @@
       }
     ]
   },
-  "METLBLUE:I:2022-11-06": {
-    "route_id": "METLBLUE:I:2022-11-06",
+  "METLBLUE:I:2022-11-20": {
+    "route_id": "METLBLUE:I:2022-11-20",
     "route_short_name": "Blue Line",
     "direction": "Inbound",
-    "trip_id": "METLBLUE:003MF7MF:I:10:2022-11-06",
+    "trip_id": "METLBLUE:003BH1BH:I:10:2022-11-20",
     "stops": [
       {
         "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
@@ -235,11 +235,11 @@
       }
     ]
   },
-  "METLGREE:O:2022-11-06": {
-    "route_id": "METLGREE:O:2022-11-06",
+  "METLGREE:O:2022-11-20": {
+    "route_id": "METLGREE:O:2022-11-20",
     "route_short_name": "Green Line",
     "direction": "Outbound",
-    "trip_id": "METLGREE:001MF1MF:O:100:2022-11-06",
+    "trip_id": "METLGREE:001MF1MF:O:100:2022-11-20",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -393,169 +393,169 @@
       }
     ]
   },
-  "METLGREE:I:2022-11-06": {
-    "route_id": "METLGREE:I:2022-11-06",
+  "METLGREE:I:2022-11-20": {
+    "route_id": "METLGREE:I:2022-11-20",
     "route_short_name": "Green Line",
     "direction": "Inbound",
-    "trip_id": "METLGREE:001MF1MF:I:100:2022-11-06",
+    "trip_id": "METLGREE:001MF1MF:I:100:2022-11-20",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
-        "arrival_timestamp": 53940,
+        "arrival_timestamp": 49980,
         "seconds_since_previous_stop": null,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Navigation Road (Manchester Metrolink)",
-        "arrival_timestamp": 54120,
+        "arrival_timestamp": 50160,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Timperley (Manchester Metrolink)",
-        "arrival_timestamp": 54240,
+        "arrival_timestamp": 50280,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Brooklands (Manchester Metrolink)",
-        "arrival_timestamp": 54360,
+        "arrival_timestamp": 50400,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Sale (Manchester Metrolink)",
-        "arrival_timestamp": 54480,
+        "arrival_timestamp": 50520,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "Dane Road (Manchester Metrolink)",
-        "arrival_timestamp": 54540,
+        "arrival_timestamp": 50580,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Stretford (Manchester Metrolink)",
-        "arrival_timestamp": 54660,
+        "arrival_timestamp": 50700,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Old Trafford (Manchester Metrolink)",
-        "arrival_timestamp": 54840,
+        "arrival_timestamp": 50880,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Trafford Bar (Manchester Metrolink)",
-        "arrival_timestamp": 54960,
+        "arrival_timestamp": 51000,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Cornbrook (Manchester Metrolink)",
-        "arrival_timestamp": 55140,
+        "arrival_timestamp": 51180,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
-        "arrival_timestamp": 55380,
+        "arrival_timestamp": 51420,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "St Peter's Square (Manchester Metrolink)",
-        "arrival_timestamp": 55560,
+        "arrival_timestamp": 51600,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Market Street (Manchester Metrolink)",
-        "arrival_timestamp": 55740,
+        "arrival_timestamp": 51780,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Shudehill (Manchester Metrolink)",
-        "arrival_timestamp": 55860,
+        "arrival_timestamp": 51900,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Victoria (Manchester Metrolink)",
-        "arrival_timestamp": 56040,
+        "arrival_timestamp": 52080,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Queens Road (Manchester Metrolink)",
-        "arrival_timestamp": 56280,
+        "arrival_timestamp": 52320,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Abraham Moss (Manchester Metrolink)",
-        "arrival_timestamp": 56460,
+        "arrival_timestamp": 52500,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Crumpsall (Manchester Metrolink)",
-        "arrival_timestamp": 56580,
+        "arrival_timestamp": 52620,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Bowker Vale (Manchester Metrolink)",
-        "arrival_timestamp": 56700,
+        "arrival_timestamp": 52740,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Heaton Park (Manchester Metrolink)",
-        "arrival_timestamp": 56820,
+        "arrival_timestamp": 52860,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Prestwich (Manchester Metrolink)",
-        "arrival_timestamp": 56940,
+        "arrival_timestamp": 52980,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Besses o'th'barn (Manchester Metrolink)",
-        "arrival_timestamp": 57060,
+        "arrival_timestamp": 53100,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Whitefield (Manchester Metrolink)",
-        "arrival_timestamp": 57240,
+        "arrival_timestamp": 53280,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Radcliffe (Manchester Metrolink)",
-        "arrival_timestamp": 57420,
+        "arrival_timestamp": 53460,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 360
       },
       {
         "stop_name": "Bury (Manchester Metrolink)",
-        "arrival_timestamp": 57780,
+        "arrival_timestamp": 53820,
         "seconds_since_previous_stop": 360,
         "seconds_to_next_stop": null
       }
     ]
   },
-  "METLNAVY:O:2022-11-06": {
-    "route_id": "METLNAVY:O:2022-11-06",
+  "METLNAVY:O:2022-11-20": {
+    "route_id": "METLNAVY:O:2022-11-20",
     "route_short_name": "Navy Line",
     "direction": "Outbound",
-    "trip_id": "METLNAVY:006MF7MF:O:10:2022-11-06",
+    "trip_id": "METLNAVY:006MF7MF:O:10:2022-11-20",
     "stops": [
       {
         "stop_name": "Victoria (Manchester Metrolink)",
@@ -709,11 +709,11 @@
       }
     ]
   },
-  "METLNAVY:I:2022-11-06": {
-    "route_id": "METLNAVY:I:2022-11-06",
+  "METLNAVY:I:2022-11-20": {
+    "route_id": "METLNAVY:I:2022-11-20",
     "route_short_name": "Navy Line",
     "direction": "Inbound",
-    "trip_id": "METLNAVY:006MF7MF:I:10:2022-11-06",
+    "trip_id": "METLNAVY:006MF7MF:I:10:2022-11-20",
     "stops": [
       {
         "stop_name": "Manchester Airport (Manchester Metrolink)",
@@ -867,725 +867,547 @@
       }
     ]
   },
-  "METLPINK:I:CURRENT": {
-    "route_id": "METLPINK:I:CURRENT",
+  "METLPINK:I:2022-11-20": {
+    "route_id": "METLPINK:I:2022-11-20",
     "route_short_name": "Pink Line",
     "direction": "Inbound",
-    "trip_id": "METLPINK:005SU7MF:I:20:CURRENT",
+    "trip_id": "METLPINK:005BH1BH:I:100:2022-11-20",
     "stops": [
       {
         "stop_name": "East Didsbury (Manchester Metrolink)",
-        "arrival_timestamp": 24660,
+        "arrival_timestamp": 53280,
         "seconds_since_previous_stop": null,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Didsbury Village (Manchester Metrolink)",
-        "arrival_timestamp": 24780,
+        "arrival_timestamp": 53400,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "West Didsbury (Manchester Metrolink)",
-        "arrival_timestamp": 24900,
+        "arrival_timestamp": 53520,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "Burton Road (Manchester Metrolink)",
-        "arrival_timestamp": 24960,
+        "arrival_timestamp": 53580,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Withington (Manchester Metrolink)",
-        "arrival_timestamp": 25080,
+        "arrival_timestamp": 53700,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "St Werburgh's Road (Manchester Metrolink)",
-        "arrival_timestamp": 25200,
+        "arrival_timestamp": 53820,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Chorlton (Manchester Metrolink)",
-        "arrival_timestamp": 25320,
+        "arrival_timestamp": 53940,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "Firswood Station (Manchester Metrolink)",
-        "arrival_timestamp": 25380,
+        "arrival_timestamp": 54000,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Trafford Bar (Manchester Metrolink)",
-        "arrival_timestamp": 25560,
+        "arrival_timestamp": 54180,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Cornbrook (Manchester Metrolink)",
-        "arrival_timestamp": 25740,
+        "arrival_timestamp": 54360,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
-        "arrival_timestamp": 25980,
+        "arrival_timestamp": 54600,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "St Peter's Square (Manchester Metrolink)",
-        "arrival_timestamp": 26160,
+        "arrival_timestamp": 54780,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Market Street (Manchester Metrolink)",
-        "arrival_timestamp": 26340,
+        "arrival_timestamp": 54960,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Shudehill (Manchester Metrolink)",
-        "arrival_timestamp": 26460,
+        "arrival_timestamp": 55080,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Victoria (Manchester Metrolink)",
-        "arrival_timestamp": 26640,
+        "arrival_timestamp": 55260,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 300
       },
       {
         "stop_name": "Monsall (Manchester Metrolink)",
-        "arrival_timestamp": 26940,
+        "arrival_timestamp": 55560,
         "seconds_since_previous_stop": 300,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Central Park (Manchester Metrolink)",
-        "arrival_timestamp": 27060,
+        "arrival_timestamp": 55680,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Newton Heath & Moston (Manchester Metrolink)",
-        "arrival_timestamp": 27240,
+        "arrival_timestamp": 55860,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Failsworth (Manchester Metrolink)",
-        "arrival_timestamp": 27360,
+        "arrival_timestamp": 55980,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Hollinwood (Manchester Metrolink)",
-        "arrival_timestamp": 27480,
+        "arrival_timestamp": 56100,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "South Chadderton (Manchester Metrolink)",
-        "arrival_timestamp": 27600,
+        "arrival_timestamp": 56220,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Freehold (Manchester Metrolink)",
-        "arrival_timestamp": 27720,
+        "arrival_timestamp": 56340,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Westwood (Manchester Metrolink)",
-        "arrival_timestamp": 27900,
+        "arrival_timestamp": 56520,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Oldham King Street (Manchester Metrolink)",
-        "arrival_timestamp": 28020,
+        "arrival_timestamp": 56640,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "Oldham Central (Manchester Metrolink)",
-        "arrival_timestamp": 28080,
+        "arrival_timestamp": 56700,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Oldham Mumps (Manchester Metrolink)",
-        "arrival_timestamp": 28200,
+        "arrival_timestamp": 56820,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Derker (Manchester Metrolink)",
-        "arrival_timestamp": 28320,
+        "arrival_timestamp": 56940,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Shaw and Crompton (Manchester Metrolink)",
-        "arrival_timestamp": 28560,
+        "arrival_timestamp": 57180,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Newhey (Manchester Metrolink)",
-        "arrival_timestamp": 28800,
+        "arrival_timestamp": 57420,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Milnrow (Manchester Metrolink)",
-        "arrival_timestamp": 28920,
+        "arrival_timestamp": 57540,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "Kingsway Business Park (Manchester Metrolink)",
-        "arrival_timestamp": 28980,
+        "arrival_timestamp": 57600,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Newbold (Manchester Metrolink)",
-        "arrival_timestamp": 29100,
+        "arrival_timestamp": 57720,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Rochdale Railway Station (Manchester Metrolink)",
-        "arrival_timestamp": 29340,
+        "arrival_timestamp": 57960,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Rochdale Town Centre (Manchester Metrolink)",
-        "arrival_timestamp": 29520,
+        "arrival_timestamp": 58140,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": null
       }
     ]
   },
-  "METLPINK:O:CURRENT": {
-    "route_id": "METLPINK:O:CURRENT",
+  "METLPINK:O:2022-11-20": {
+    "route_id": "METLPINK:O:2022-11-20",
     "route_short_name": "Pink Line",
     "direction": "Outbound",
-    "trip_id": "METLPINK:005SU7MF:O:10:CURRENT",
+    "trip_id": "METLPINK:005BH1BH:O:100:2022-11-20",
     "stops": [
       {
         "stop_name": "Rochdale Town Centre (Manchester Metrolink)",
-        "arrival_timestamp": 25800,
+        "arrival_timestamp": 52980,
         "seconds_since_previous_stop": null,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Rochdale Railway Station (Manchester Metrolink)",
-        "arrival_timestamp": 25980,
+        "arrival_timestamp": 53160,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Newbold (Manchester Metrolink)",
-        "arrival_timestamp": 26220,
+        "arrival_timestamp": 53400,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "Kingsway Business Park (Manchester Metrolink)",
-        "arrival_timestamp": 26280,
+        "arrival_timestamp": 53460,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Milnrow (Manchester Metrolink)",
-        "arrival_timestamp": 26400,
+        "arrival_timestamp": 53580,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Newhey (Manchester Metrolink)",
-        "arrival_timestamp": 26520,
+        "arrival_timestamp": 53700,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Shaw and Crompton (Manchester Metrolink)",
-        "arrival_timestamp": 26760,
+        "arrival_timestamp": 53940,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Derker (Manchester Metrolink)",
-        "arrival_timestamp": 27000,
+        "arrival_timestamp": 54180,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Oldham Mumps (Manchester Metrolink)",
-        "arrival_timestamp": 27120,
+        "arrival_timestamp": 54300,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Oldham Central (Manchester Metrolink)",
-        "arrival_timestamp": 27240,
+        "arrival_timestamp": 54420,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "Oldham King Street (Manchester Metrolink)",
-        "arrival_timestamp": 27300,
+        "arrival_timestamp": 54480,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Westwood (Manchester Metrolink)",
-        "arrival_timestamp": 27420,
+        "arrival_timestamp": 54600,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Freehold (Manchester Metrolink)",
-        "arrival_timestamp": 27600,
+        "arrival_timestamp": 54780,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "South Chadderton (Manchester Metrolink)",
-        "arrival_timestamp": 27720,
+        "arrival_timestamp": 54900,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Hollinwood (Manchester Metrolink)",
-        "arrival_timestamp": 27840,
+        "arrival_timestamp": 55020,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Failsworth (Manchester Metrolink)",
-        "arrival_timestamp": 27960,
+        "arrival_timestamp": 55140,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Newton Heath & Moston (Manchester Metrolink)",
-        "arrival_timestamp": 28140,
+        "arrival_timestamp": 55320,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Central Park (Manchester Metrolink)",
-        "arrival_timestamp": 28260,
+        "arrival_timestamp": 55440,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Monsall (Manchester Metrolink)",
-        "arrival_timestamp": 28380,
+        "arrival_timestamp": 55560,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 360
       },
       {
         "stop_name": "Victoria (Manchester Metrolink)",
-        "arrival_timestamp": 28740,
+        "arrival_timestamp": 55920,
         "seconds_since_previous_stop": 360,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Shudehill (Manchester Metrolink)",
-        "arrival_timestamp": 28860,
+        "arrival_timestamp": 56040,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Market Street (Manchester Metrolink)",
-        "arrival_timestamp": 28980,
+        "arrival_timestamp": 56160,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "St Peter's Square (Manchester Metrolink)",
-        "arrival_timestamp": 29160,
+        "arrival_timestamp": 56340,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
-        "arrival_timestamp": 29340,
+        "arrival_timestamp": 56520,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Cornbrook (Manchester Metrolink)",
-        "arrival_timestamp": 29520,
+        "arrival_timestamp": 56700,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Trafford Bar (Manchester Metrolink)",
-        "arrival_timestamp": 29640,
+        "arrival_timestamp": 56820,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Firswood Station (Manchester Metrolink)",
-        "arrival_timestamp": 29820,
+        "arrival_timestamp": 57000,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "Chorlton (Manchester Metrolink)",
-        "arrival_timestamp": 29880,
+        "arrival_timestamp": 57060,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "St Werburgh's Road (Manchester Metrolink)",
-        "arrival_timestamp": 30000,
+        "arrival_timestamp": 57180,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Withington (Manchester Metrolink)",
-        "arrival_timestamp": 30120,
+        "arrival_timestamp": 57300,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "Burton Road (Manchester Metrolink)",
-        "arrival_timestamp": 30180,
+        "arrival_timestamp": 57360,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "West Didsbury (Manchester Metrolink)",
-        "arrival_timestamp": 30240,
+        "arrival_timestamp": 57420,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Didsbury Village (Manchester Metrolink)",
-        "arrival_timestamp": 30420,
+        "arrival_timestamp": 57600,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "East Didsbury (Manchester Metrolink)",
-        "arrival_timestamp": 30540,
+        "arrival_timestamp": 57720,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": null
       }
     ]
   },
-  "METLPURP:I:2022-11-06": {
-    "route_id": "METLPURP:I:2022-11-06",
-    "route_short_name": "Purple Line",
-    "direction": "Inbound",
-    "trip_id": "METLPURP:002SU7SU:I:10:2022-11-06",
-    "stops": [
-      {
-        "stop_name": "Altrincham (Manchester Metrolink)",
-        "arrival_timestamp": 29160,
-        "seconds_since_previous_stop": null,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "Navigation Road (Manchester Metrolink)",
-        "arrival_timestamp": 29340,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Timperley (Manchester Metrolink)",
-        "arrival_timestamp": 29460,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Brooklands (Manchester Metrolink)",
-        "arrival_timestamp": 29580,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Sale (Manchester Metrolink)",
-        "arrival_timestamp": 29700,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": 60
-      },
-      {
-        "stop_name": "Dane Road (Manchester Metrolink)",
-        "arrival_timestamp": 29760,
-        "seconds_since_previous_stop": 60,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Stretford (Manchester Metrolink)",
-        "arrival_timestamp": 29880,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "Old Trafford (Manchester Metrolink)",
-        "arrival_timestamp": 30060,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Trafford Bar (Manchester Metrolink)",
-        "arrival_timestamp": 30180,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "Cornbrook (Manchester Metrolink)",
-        "arrival_timestamp": 30360,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 240
-      },
-      {
-        "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
-        "arrival_timestamp": 30600,
-        "seconds_since_previous_stop": 240,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "St Peter's Square (Manchester Metrolink)",
-        "arrival_timestamp": 30780,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "Exchange Square (Manchester Metrolink)",
-        "arrival_timestamp": 30960,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": null
-      }
-    ]
-  },
-  "METLPURP:O:2022-11-06": {
-    "route_id": "METLPURP:O:2022-11-06",
-    "route_short_name": "Purple Line",
-    "direction": "Outbound",
-    "trip_id": "METLPURP:002SU7SU:O:10:2022-11-06",
-    "stops": [
-      {
-        "stop_name": "St Peter's Square (Manchester Metrolink)",
-        "arrival_timestamp": 29280,
-        "seconds_since_previous_stop": null,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
-        "arrival_timestamp": 29460,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "Cornbrook (Manchester Metrolink)",
-        "arrival_timestamp": 29640,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Trafford Bar (Manchester Metrolink)",
-        "arrival_timestamp": 29760,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "Old Trafford (Manchester Metrolink)",
-        "arrival_timestamp": 29940,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Stretford (Manchester Metrolink)",
-        "arrival_timestamp": 30060,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "Dane Road (Manchester Metrolink)",
-        "arrival_timestamp": 30240,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 60
-      },
-      {
-        "stop_name": "Sale (Manchester Metrolink)",
-        "arrival_timestamp": 30300,
-        "seconds_since_previous_stop": 60,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Brooklands (Manchester Metrolink)",
-        "arrival_timestamp": 30420,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Timperley (Manchester Metrolink)",
-        "arrival_timestamp": 30540,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": 180
-      },
-      {
-        "stop_name": "Navigation Road (Manchester Metrolink)",
-        "arrival_timestamp": 30720,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 120
-      },
-      {
-        "stop_name": "Altrincham (Manchester Metrolink)",
-        "arrival_timestamp": 30840,
-        "seconds_since_previous_stop": 120,
-        "seconds_to_next_stop": null
-      }
-    ]
-  },
-  "METLRED:I:2022-11-06": {
-    "route_id": "METLRED:I:2022-11-06",
+  "METLRED:I:2022-11-20": {
+    "route_id": "METLRED:I:2022-11-20",
     "route_short_name": "Red Line",
     "direction": "Inbound",
-    "trip_id": "METLRED:007SU7MF:I:10:2022-11-06",
+    "trip_id": "METLRED:007BH7MF:I:1:2022-11-20",
     "stops": [
       {
         "stop_name": "The Trafford Centre (Manchester Metrolink)",
-        "arrival_timestamp": 31680,
+        "arrival_timestamp": 660,
         "seconds_since_previous_stop": null,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Barton Dock Road (Manchester Metrolink)",
-        "arrival_timestamp": 31800,
+        "arrival_timestamp": 780,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Parkway (Manchester Metrolink)",
-        "arrival_timestamp": 32040,
+        "arrival_timestamp": 1020,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Village (Manchester Metrolink)",
-        "arrival_timestamp": 32160,
+        "arrival_timestamp": 1140,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Imperial War Museum (Manchester Metrolink)",
-        "arrival_timestamp": 32340,
+        "arrival_timestamp": 1320,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Wharfside (Manchester Metrolink)",
-        "arrival_timestamp": 32460,
+        "arrival_timestamp": 1440,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Pomona (Manchester Metrolink)",
-        "arrival_timestamp": 32580,
+        "arrival_timestamp": 1560,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Cornbrook (Manchester Metrolink)",
-        "arrival_timestamp": 32760,
+        "arrival_timestamp": 1740,
         "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 240
-      },
-      {
-        "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
-        "arrival_timestamp": 33000,
-        "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": null
       }
     ]
   },
-  "METLRED:O:2022-11-06": {
-    "route_id": "METLRED:O:2022-11-06",
+  "METLRED:O:2022-11-20": {
+    "route_id": "METLRED:O:2022-11-20",
     "route_short_name": "Red Line",
     "direction": "Outbound",
-    "trip_id": "METLRED:007SU7MF:O:10:2022-11-06",
+    "trip_id": "METLRED:007MF7MF:O:10:2022-11-20",
     "stops": [
       {
-        "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
-        "arrival_timestamp": 29640,
+        "stop_name": "Cornbrook (Manchester Metrolink)",
+        "arrival_timestamp": 26340,
         "seconds_since_previous_stop": null,
         "seconds_to_next_stop": 180
       },
       {
-        "stop_name": "Cornbrook (Manchester Metrolink)",
-        "arrival_timestamp": 29820,
-        "seconds_since_previous_stop": 180,
-        "seconds_to_next_stop": 180
-      },
-      {
         "stop_name": "Pomona (Manchester Metrolink)",
-        "arrival_timestamp": 30000,
+        "arrival_timestamp": 26520,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Wharfside (Manchester Metrolink)",
-        "arrival_timestamp": 30120,
+        "arrival_timestamp": 26640,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Imperial War Museum (Manchester Metrolink)",
-        "arrival_timestamp": 30240,
+        "arrival_timestamp": 26760,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Village (Manchester Metrolink)",
-        "arrival_timestamp": 30420,
+        "arrival_timestamp": 26940,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Parkway (Manchester Metrolink)",
-        "arrival_timestamp": 30540,
+        "arrival_timestamp": 27060,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Barton Dock Road (Manchester Metrolink)",
-        "arrival_timestamp": 30780,
+        "arrival_timestamp": 27300,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 60
       },
       {
         "stop_name": "The Trafford Centre (Manchester Metrolink)",
-        "arrival_timestamp": 30840,
+        "arrival_timestamp": 27360,
         "seconds_since_previous_stop": 60,
         "seconds_to_next_stop": null
       }
     ]
   },
-  "METLYELL:I:2022-11-06": {
-    "route_id": "METLYELL:I:2022-11-06",
+  "METLYELL:I:CURRENT": {
+    "route_id": "METLYELL:I:CURRENT",
     "route_short_name": "Yellow Line",
     "direction": "Inbound",
-    "trip_id": "METLYELL:004MF11MF:I:10:2022-11-06",
+    "trip_id": "METLYELL:004MF11MF:I:10:CURRENT",
     "stops": [
       {
         "stop_name": "Crumpsall (Manchester Metrolink)",
@@ -1703,11 +1525,11 @@
       }
     ]
   },
-  "METLYELL:O:2022-11-06": {
-    "route_id": "METLYELL:O:2022-11-06",
+  "METLYELL:O:CURRENT": {
+    "route_id": "METLYELL:O:CURRENT",
     "route_short_name": "Yellow Line",
     "direction": "Outbound",
-    "trip_id": "METLYELL:004MF11MF:O:10:2022-11-06",
+    "trip_id": "METLYELL:004MF11MF:O:10:CURRENT",
     "stops": [
       {
         "stop_name": "Ashton-Under-Lyne (Manchester Metrolink)",
