@@ -1,17 +1,25 @@
 import { useLocalStorage, useSet } from "react-use";
+import { createContext, useContext, useCallback, useEffect, PropsWithChildren } from "react";
 
-const { createContext, useContext, useCallback, useEffect } = require("react");
+type VisitedStopsStateContextType = {
+  recentStops: string[];
+};
 
-const VisitedStopsStateContext = createContext();
-const VisitedStopsUpdateContext = createContext();
+type VisitedStopsUpdateContextType = {
+  track: (stopName: string) => void;
+  reset: () => void;
+};
 
-export function VisitedStopsProvider({ capacity = 10, children }) {
-  const [storedSet, setStoredSet] = useLocalStorage("visited-stops", []);
-  const [set, { add, has, remove, reset }] = useSet(new Set([]));
+const VisitedStopsStateContext = createContext<VisitedStopsStateContextType | null>(null);
+const VisitedStopsUpdateContext = createContext<VisitedStopsUpdateContextType | null>(null);
+
+export function VisitedStopsProvider({ capacity = 10, children }: PropsWithChildren<{ capacity: number }>) {
+  const [storedSet, setStoredSet] = useLocalStorage<string[]>("visited-stops", []);
+  const [set, { add, has, remove, reset }] = useSet<string>(new Set([]));
 
   // Load persisted stops on mount
   useEffect(() => {
-    if (Symbol.iterator in Object(storedSet)) {
+    if (storedSet instanceof Set) {
       storedSet.forEach((v) => add(v));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -26,7 +34,7 @@ export function VisitedStopsProvider({ capacity = 10, children }) {
   const recentStops = Array.from(set).reverse().slice(0, capacity);
 
   const track = useCallback(
-    (stopName) => {
+    (stopName: string) => {
       // Re-insert, so insertion order matches visited order
       if (has(stopName)) {
         remove(stopName);
@@ -54,7 +62,7 @@ export function VisitedStopsProvider({ capacity = 10, children }) {
 export function useVisitedStopsState() {
   const state = useContext(VisitedStopsStateContext);
 
-  if (state === undefined) {
+  if (state === null) {
     throw new Error(`useVisitedStopsState must be used within a VisitedStopsProvider`);
   }
 
@@ -64,7 +72,7 @@ export function useVisitedStopsState() {
 export function useVisitedStopsUpdate() {
   const updateFns = useContext(VisitedStopsUpdateContext);
 
-  if (updateFns === undefined) {
+  if (updateFns === null) {
     throw new Error(`useVisitedStopsUpdate must be used within a VisitedStopsProvider`);
   }
 

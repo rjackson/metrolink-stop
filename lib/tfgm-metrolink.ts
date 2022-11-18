@@ -11,11 +11,11 @@ const tfgmO = () => {
   });
 };
 
-type Destination = 'See Tram Front' | 'Not in Service' | string
-type Carriages = "Single" | "Double"
-type Status = "Due" | "Departing" | "Arrived"
+export type Destination = 'See Tram Front' | 'Not in Service' | string
+export type Carriages = "Single" | "Double"
+export type Status = "Due" | "Departing" | "Arrived"
 
-type TfgmMetrolink = {
+export type TfgmMetrolink = {
   Id: number;
   Line: string;
   TLAREF: string;
@@ -47,7 +47,7 @@ export async function getAll(): Promise<TfgmMetrolink[]> {
   return await tfgmO().get("Metrolinks").query();
 }
 
-type StopsEntry = {
+export type StopsEntry = {
   StationLocation: string;
   Line: string
 }
