@@ -4,18 +4,24 @@ import { useEffect, useState } from "react";
 import { useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import useMetrolinkStop from "../components/hooks/useMetrolinkStop";
 import MetrolinkDestination from "../components/MetrolinkDestination";
-import { getStops } from "../lib/tfgm-metrolink";
+import { getStops, StopsEntry } from "../lib/tfgm-metrolink";
 import LoadingWrapper from "../components/LoadingWrapper";
 import { Anchor, H2, H3, Panel, Section } from "@rjackson/rjds";
 import slugify from "../utils/slugify";
+import { GetStaticPaths, GetStaticProps } from "next";
+import { ParsedUrlQuery } from "querystring";
 
-export default function Stop({ stop: stopName, allStops }) {
+type Props = {
+  stop: string;
+  allStops: StopsEntry[];
+};
+export default function Stop({ stop: stopName, allStops }: Props) {
   const {
     stopInfo: { name = stopName, departures = [], messages = [], lastUpdated = "" } = {},
     isLoading,
     isError,
   } = useMetrolinkStop(stopName);
-  
+
   const [lastUpdatedDateTimeLabel, setLastUpdatedDateTimeLabel] = useState(lastUpdated);
 
   useEffect(() => {
@@ -85,7 +91,7 @@ export default function Stop({ stop: stopName, allStops }) {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4" className="py-1 text-center">
+                      <td colSpan={4} className="py-1 text-center">
                         (No departures currently listed)
                       </td>
                     </tr>
@@ -146,7 +152,9 @@ export default function Stop({ stop: stopName, allStops }) {
 
 // const slugify = (stop) => stop?.toLowerCase().replace(/ /g, "-");
 
-export async function getStaticProps({ params: { stop: sluggedStop } }) {
+export const getStaticProps: GetStaticProps = async (context) => {
+  const { stop: sluggedStop } = context.params as ParsedUrlQuery & { slug: string };
+
   const stops = await getStops();
   const { StationLocation: stop } = stops.filter(
     ({ StationLocation }) => slugify(StationLocation) === sluggedStop
@@ -155,9 +163,9 @@ export async function getStaticProps({ params: { stop: sluggedStop } }) {
   return {
     props: { stop, allStops: stops }, // will be passed to the page component as props
   };
-}
+};
 
-export async function getStaticPaths() {
+export const getStaticPaths: GetStaticPaths = async () => {
   const gottenStops = await getStops();
   const stops = gottenStops.map(({ StationLocation }) => StationLocation);
   const paths = stops.map((stop) => ({ params: { stop: slugify(stop) } }));
@@ -166,4 +174,4 @@ export async function getStaticPaths() {
     paths,
     fallback: false,
   };
-}
+};

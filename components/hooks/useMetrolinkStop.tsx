@@ -1,20 +1,11 @@
 import useSWR from "swr";
+import { StopInfo } from "../../lib/tfgm-metrolink";
 
 /**
- * @param {Object} UseMetrolinkStopResponse
- * @property {null|(import("../lib/tfgm-metrolink").StopInfo)} stopInfo
- * @property {bool} isLoading
- * @property {bool} isError
- * @property {Error} error
- */
-
-/**
- *
  * @param {string} stopName The exact name of a Metrolink stop, as stored in the StationLocation attribute
- * @returns {UseMetrolinkStopResponse}
  */
-const useMetrolinkStop = (stopName) => {
-  const { data, error } = useSWR(`/api/stop/${encodeURIComponent(stopName)}`, {
+const useMetrolinkStop = (stopName: string) => {
+  const { data, error } = useSWR<StopInfo>(`/api/stop/${encodeURIComponent(stopName)}`, {
     // Auto refresh every minute
     refreshInterval: 60 * 1000,
 

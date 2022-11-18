@@ -73,14 +73,14 @@ export async function getStops(): Promise<StopsEntry[]> {
   }, []);
 }
 
-type Departure = {
+export type Departure = {
   destination: Destination
   type: Carriages
   status: Status
   wait: number
 }
 
-type StopInfo = {
+export type StopInfo = {
   name: string
   departures: Departure[]
   messages: string[]
