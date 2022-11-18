@@ -13,7 +13,7 @@ type VisitedStopsUpdateContextType = {
 const VisitedStopsStateContext = createContext<VisitedStopsStateContextType | null>(null);
 const VisitedStopsUpdateContext = createContext<VisitedStopsUpdateContextType | null>(null);
 
-export function VisitedStopsProvider({ capacity = 10, children }: PropsWithChildren<{ capacity: number }>) {
+export function VisitedStopsProvider({ capacity = 10, children }: PropsWithChildren<{ capacity?: number }>) {
   const [storedSet, setStoredSet] = useLocalStorage<string[]>("visited-stops", []);
   const [set, { add, has, remove, reset }] = useSet<string>(new Set([]));
 

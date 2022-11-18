@@ -1,9 +1,13 @@
 import { H2, Panel, Section } from "@rjackson/rjds";
+import { GetStaticProps } from "next";
 import { useEffect, useState } from "react";
 import MetrolinkDestination from "../components/MetrolinkDestination";
-import { getStops } from "../lib/tfgm-metrolink";
+import { getStops, StopsEntry } from "../lib/tfgm-metrolink";
 
-export default function Debug({ allStops }) {
+type Props = {
+  allStops: StopsEntry[];
+};
+export default function Debug({ allStops }: Props) {
   const [metrolinksDump, setMetrolinksDump] = useState([]);
   const uniqueMessages = [...new Set(metrolinksDump.map(({ MessageBoard }) => MessageBoard))];
   const uniqueDirections = [...new Set(metrolinksDump.map(({ Direction }) => Direction))];
@@ -129,17 +133,17 @@ export default function Debug({ allStops }) {
           >
             Refresh
           </button>
-          <pre>{JSON.stringify(metrolinksDump, 0, 2)}</pre>
+          <pre>{JSON.stringify(metrolinksDump, null, 2)}</pre>
         </Panel>
       </Section>
     </>
   );
 }
 
-export async function getStaticProps() {
+export const getStaticProps: GetStaticProps = async () => {
   const allStops = await getStops();
 
   return {
     props: { allStops }, // will be passed to the page component as props
   };
-}
+};
