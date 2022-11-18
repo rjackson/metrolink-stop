@@ -7,6 +7,8 @@ const customMappings: { [name: string]: string } = {
   MCUK: "MediaCityUK",
   "Ashton-under-Lyne": "Ashton-Under-Lyne",
   Ashton: "Ashton-Under-Lyne",
+  Deansgate: "Deansgate - Castlefield",
+  "Deansgate Castlefield": "Deansgate - Castlefield",
 };
 
 type DestinationProps = {
