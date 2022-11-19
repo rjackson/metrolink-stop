@@ -1655,63 +1655,63 @@
       }
     ]
   },
-  "METLRED:I:2022-11-30": {
-    "route_id": "METLRED:I:2022-11-30",
+  "METLRED:I:2022-12-01": {
+    "route_id": "METLRED:I:2022-12-01",
     "route_short_name": "Red Line",
     "direction": "Inbound",
-    "trip_id": "METLRED:007MF7MF:I:10:2022-11-30",
+    "trip_id": "METLRED:007BH7MF:I:1:2022-12-01",
     "stops": [
       {
         "stop_name": "The Trafford Centre (Manchester Metrolink)",
-        "arrival_timestamp": 28020,
+        "arrival_timestamp": 660,
         "seconds_since_previous_stop": null,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Barton Dock Road (Manchester Metrolink)",
-        "arrival_timestamp": 28140,
+        "arrival_timestamp": 780,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Parkway (Manchester Metrolink)",
-        "arrival_timestamp": 28380,
+        "arrival_timestamp": 1020,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Village (Manchester Metrolink)",
-        "arrival_timestamp": 28500,
+        "arrival_timestamp": 1140,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Imperial War Museum (Manchester Metrolink)",
-        "arrival_timestamp": 28680,
+        "arrival_timestamp": 1320,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Wharfside (Manchester Metrolink)",
-        "arrival_timestamp": 28800,
+        "arrival_timestamp": 1440,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 120
       },
       {
         "stop_name": "Pomona (Manchester Metrolink)",
-        "arrival_timestamp": 28920,
+        "arrival_timestamp": 1560,
         "seconds_since_previous_stop": 120,
         "seconds_to_next_stop": 180
       },
       {
         "stop_name": "Cornbrook (Manchester Metrolink)",
-        "arrival_timestamp": 29100,
+        "arrival_timestamp": 1740,
         "seconds_since_previous_stop": 180,
         "seconds_to_next_stop": 240
       },
       {
         "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
-        "arrival_timestamp": 29340,
+        "arrival_timestamp": 1980,
         "seconds_since_previous_stop": 240,
         "seconds_to_next_stop": null
       }
