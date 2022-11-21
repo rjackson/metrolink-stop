@@ -15,9 +15,9 @@ const DefaultErrorContent = ({ errorMessage }: { errorMessage: string }) => (
 type Props = {
   isLoading: boolean;
   isError: boolean;
-  errorMessage: string;
-  errorContent: JSX.Element;
-  loadingContent: JSX.Element;
+  errorMessage?: string;
+  errorContent?: JSX.Element;
+  loadingContent?: JSX.Element;
 } & PropsWithChildren;
 
 /**
