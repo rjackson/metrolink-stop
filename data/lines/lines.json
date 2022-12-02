@@ -1,9 +1,9 @@
 {
-  "METLBLUE:O:CURRENT": {
-    "route_id": "METLBLUE:O:CURRENT",
+  "METLBLUE:O:2022-11-30": {
+    "route_id": "METLBLUE:O:2022-11-30",
     "route_short_name": "Blue Line",
     "direction": "Outbound",
-    "trip_id": "METLBLUE:003MF7MF:O:10:CURRENT",
+    "trip_id": "METLBLUE:003MF7MF:O:10:2022-11-30",
     "stops": [
       {
         "stop_name": "Eccles (Manchester Metrolink)",
@@ -175,11 +175,11 @@
       }
     ]
   },
-  "METLBLUE:I:2022-12-01": {
-    "route_id": "METLBLUE:I:2022-12-01",
+  "METLBLUE:I:2022-11-30": {
+    "route_id": "METLBLUE:I:2022-11-30",
     "route_short_name": "Blue Line",
     "direction": "Inbound",
-    "trip_id": "METLBLUE:003MF7MF:I:10:2022-12-01",
+    "trip_id": "METLBLUE:003MF7MF:I:10:2022-11-30",
     "stops": [
       {
         "stop_name": "Ashton-Under-Lyne (Manchester Metrolink)",
@@ -1459,11 +1459,11 @@
       }
     ]
   },
-  "METLPURP:O:2022-12-01": {
-    "route_id": "METLPURP:O:2022-12-01",
+  "METLPURP:O:2022-11-30": {
+    "route_id": "METLPURP:O:2022-11-30",
     "route_short_name": "Purple Line",
     "direction": "Outbound",
-    "trip_id": "METLPURP:002MF7MF:O:10:2022-12-01",
+    "trip_id": "METLPURP:002MF7MF:O:10:2022-11-30",
     "stops": [
       {
         "stop_name": "Piccadilly (Manchester Metrolink)",
@@ -1551,11 +1551,11 @@
       }
     ]
   },
-  "METLPURP:I:2022-12-01": {
-    "route_id": "METLPURP:I:2022-12-01",
+  "METLPURP:I:2022-11-30": {
+    "route_id": "METLPURP:I:2022-11-30",
     "route_short_name": "Purple Line",
     "direction": "Inbound",
-    "trip_id": "METLPURP:002MF7MF:I:10:2022-12-01",
+    "trip_id": "METLPURP:002MF7MF:I:10:2022-11-30",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -1643,11 +1643,11 @@
       }
     ]
   },
-  "METLRED:I:2022-12-01": {
-    "route_id": "METLRED:I:2022-12-01",
+  "METLRED:I:CURRENT": {
+    "route_id": "METLRED:I:CURRENT",
     "route_short_name": "Red Line",
     "direction": "Inbound",
-    "trip_id": "METLRED:007BH7MF:I:1:2022-12-01",
+    "trip_id": "METLRED:007BH7MF:I:1:CURRENT",
     "stops": [
       {
         "stop_name": "The Trafford Centre (Manchester Metrolink)",
@@ -1705,11 +1705,11 @@
       }
     ]
   },
-  "METLRED:O:2022-12-01": {
-    "route_id": "METLRED:O:2022-12-01",
+  "METLRED:O:2022-11-30": {
+    "route_id": "METLRED:O:2022-11-30",
     "route_short_name": "Red Line",
     "direction": "Outbound",
-    "trip_id": "METLRED:007MF7MF:O:10:2022-12-01",
+    "trip_id": "METLRED:007MF7MF:O:10:2022-11-30",
     "stops": [
       {
         "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
@@ -1767,11 +1767,11 @@
       }
     ]
   },
-  "METLYELL:O:CURRENT": {
-    "route_id": "METLYELL:O:CURRENT",
+  "METLYELL:O:2022-11-30": {
+    "route_id": "METLYELL:O:2022-11-30",
     "route_short_name": "Yellow Line",
     "direction": "Outbound",
-    "trip_id": "METLYELL:004SA11MF:O:10:CURRENT",
+    "trip_id": "METLYELL:004SA11MF:O:10:2022-11-30",
     "stops": [
       {
         "stop_name": "Ashton-Under-Lyne (Manchester Metrolink)",
@@ -1889,11 +1889,11 @@
       }
     ]
   },
-  "METLYELL:I:CURRENT": {
-    "route_id": "METLYELL:I:CURRENT",
+  "METLYELL:I:2022-11-30": {
+    "route_id": "METLYELL:I:2022-11-30",
     "route_short_name": "Yellow Line",
     "direction": "Inbound",
-    "trip_id": "METLYELL:004SA11MF:I:10:CURRENT",
+    "trip_id": "METLYELL:004SA11MF:I:10:2022-11-30",
     "stops": [
       {
         "stop_name": "Crumpsall (Manchester Metrolink)",
