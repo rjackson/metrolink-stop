@@ -351,11 +351,11 @@
       }
     ]
   },
-  "METLGREE:I:2022-12-24": {
-    "route_id": "METLGREE:I:2022-12-24",
+  "METLGREE:I:CURRENT": {
+    "route_id": "METLGREE:I:CURRENT",
     "route_short_name": "Green Line",
     "direction": "Inbound",
-    "trip_id": "METLGREE:001BHBH3:I:10:2022-12-24",
+    "trip_id": "METLGREE:001BHBH3:I:10:CURRENT",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -509,11 +509,11 @@
       }
     ]
   },
-  "METLGREE:O:2022-12-24": {
-    "route_id": "METLGREE:O:2022-12-24",
+  "METLGREE:O:CURRENT": {
+    "route_id": "METLGREE:O:CURRENT",
     "route_short_name": "Green Line",
     "direction": "Outbound",
-    "trip_id": "METLGREE:001BHBH3:O:10:2022-12-24",
+    "trip_id": "METLGREE:001BHBH3:O:10:CURRENT",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -1395,11 +1395,11 @@
       }
     ]
   },
-  "METLPURP:I:2022-12-24": {
-    "route_id": "METLPURP:I:2022-12-24",
+  "METLPURP:I:CURRENT": {
+    "route_id": "METLPURP:I:CURRENT",
     "route_short_name": "Purple Line",
     "direction": "Inbound",
-    "trip_id": "METLPURP:002BHBH4:I:39:2022-12-24",
+    "trip_id": "METLPURP:002BHBH4:I:39:CURRENT",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -1505,11 +1505,11 @@
       }
     ]
   },
-  "METLPURP:O:2022-12-24": {
-    "route_id": "METLPURP:O:2022-12-24",
+  "METLPURP:O:CURRENT": {
+    "route_id": "METLPURP:O:CURRENT",
     "route_short_name": "Purple Line",
     "direction": "Outbound",
-    "trip_id": "METLPURP:002BHBH4:O:41:2022-12-24",
+    "trip_id": "METLPURP:002BHBH4:O:41:CURRENT",
     "stops": [
       {
         "stop_name": "Etihad Campus (Manchester Metrolink)",
