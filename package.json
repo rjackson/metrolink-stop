@@ -7,10 +7,12 @@
     "regenerate-tfgm-gtfs": "(cd ./data/lines; bash prepare.sh; NODE_OPTIONS='--experimental-json-modules' node process.mjs)",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "type-check": "tsc --pretty --noEmit"
   },
   "pre-commit": [
-    "lint"
+    "lint",
+    "type-check"
   ],
   "dependencies": {
     "@rjackson/rjds": "^0.4.0",
