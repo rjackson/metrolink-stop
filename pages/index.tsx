@@ -1,16 +1,17 @@
-import { getStops } from "../lib/tfgm-metrolink";
+import { getStops, StopsEntry } from "../lib/tfgm-metrolink";
 import Link from "next/link";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import Fuse from "fuse.js";
 import { useVisitedStopsState, useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import { Anchor, Button, H3, Input, Panel, Section } from "@rjackson/rjds";
 import slugify from "../utils/slugify";
+import { GetStaticProps } from "next";
 
-/**
- * @param {Object} props
- * @param {{StationLocation: string, Line: string}[]} props.stops
- */
-export default function Home({ stops }) {
+type Props = {
+  stops: StopsEntry[];
+};
+
+export default function Home({ stops }: Props) {
   const [searchTerm, setSearchTerm] = useState("");
   const fuse = new Fuse(stops, { keys: ["StationLocation", "Line"], includeScore: true });
   const results = fuse.search(searchTerm);
@@ -58,7 +59,7 @@ export default function Home({ stops }) {
                 name="search"
                 id="search"
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                 className=""
                 autoComplete="off"
               />
@@ -80,7 +81,7 @@ export default function Home({ stops }) {
   );
 }
 
-export async function getStaticProps() {
+export const getStaticProps: GetStaticProps = async () => {
   const stops = await getStops();
 
   // Sort alphabetically by default
@@ -89,4 +90,4 @@ export async function getStaticProps() {
   return {
     props: { stops: sortedStops }, // will be passed to the page component as props
   };
-}
+};

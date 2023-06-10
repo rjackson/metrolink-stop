@@ -1,7 +1,8 @@
 import { SingleColumnLayout, Header, Anchor, Section } from "@rjackson/rjds";
 import Link from "next/link";
+import { PropsWithChildren } from "react";
 
-const MainLayout = ({ children }) => {
+const MainLayout = ({ children }: PropsWithChildren) => {
   return (
     <SingleColumnLayout
       header={

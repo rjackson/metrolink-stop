@@ -1,10 +1,15 @@
-import { H2, Panel, Section } from "@rjackson/rjds";
-import { useEffect, useState } from "react";
-import MetrolinkDestination from "../components/MetrolinkDestination";
-import { getStops } from "../lib/tfgm-metrolink";
+// i am a bad guy:
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-export default function Debug({ allStops }) {
-  const [metrolinksDump, setMetrolinksDump] = useState([]);
+import { Button, H2, Panel, Section } from "@rjackson/rjds";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { useState } from "react";
+import MetrolinkDestination from "../components/MetrolinkDestination";
+import { TfgmMetrolink, getAll } from "../lib/tfgm-metrolink";
+
+export default function Debug({ allStops }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [metrolinksDump, setMetrolinksDump] = useState(allStops);
   const uniqueMessages = [...new Set(metrolinksDump.map(({ MessageBoard }) => MessageBoard))];
   const uniqueDirections = [...new Set(metrolinksDump.map(({ Direction }) => Direction))];
   const uniqueDestinations = [
@@ -28,31 +33,18 @@ export default function Debug({ allStops }) {
 
   const allStopNames = [...new Set(metrolinksDump.map(({ StationLocation }) => StationLocation))];
 
-  const fetchDump = async () => {
+  const onRefresh = async () => {
     try {
       const req = await fetch(`/api/dump`);
       const data = await req.json();
 
-      return req.status == 200 ? data : null;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      setMetrolinksDump(data);
     } catch (err) {
       console.log(err);
-      return null;
     }
   };
 
-  useEffect(() => {
-    let mounted = true;
-
-    fetchDump().then((dump) => {
-      if (mounted) {
-        setMetrolinksDump(dump);
-      }
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
   return (
     <>
       <Section>
@@ -60,7 +52,7 @@ export default function Debug({ allStops }) {
           <H2>Unique messages</H2>
           <ul>
             {uniqueMessages.map((message) => (
-              <li key={message}>{message || "(empty)"}</li>
+              <li key={message}>{message}</li>
             ))}
           </ul>
         </Panel>
@@ -70,7 +62,7 @@ export default function Debug({ allStops }) {
           <H2>Unique directions</H2>
           <ul>
             {uniqueDirections.map((direction) => (
-              <li key={direction}>{direction || "(empty)"}</li>
+              <li key={direction}>{direction}</li>
             ))}
           </ul>
         </Panel>
@@ -80,7 +72,7 @@ export default function Debug({ allStops }) {
           <H2>Unique statuses</H2>
           <ul>
             {uniqueStatuses.map((status) => (
-              <li key={status}>{status || "(empty)"}</li>
+              <li key={status}>{status}</li>
             ))}
           </ul>
         </Panel>
@@ -90,7 +82,7 @@ export default function Debug({ allStops }) {
           <H2>Unique carriages</H2>
           <ul>
             {uniqueCarriages.map((carriage) => (
-              <li key={carriage}>{carriage || "(empty)"}</li>
+              <li key={carriage}>{carriage}</li>
             ))}
           </ul>
         </Panel>
@@ -101,7 +93,7 @@ export default function Debug({ allStops }) {
           <ul>
             {uniqueDestinations.map((destination) => (
               <li key={destination}>
-                <MetrolinkDestination destination={destination} allStops={allStops} />
+                <MetrolinkDestination destination={destination ?? '(empty)'} allStops={allStops} />
               </li>
             ))}
           </ul>
@@ -122,24 +114,18 @@ export default function Debug({ allStops }) {
       <Section>
         <Panel>
           <H2>Dump</H2>
-          <button
-            onClick={async () => {
-              setMetrolinksDump(await fetchDump());
-            }}
-          >
-            Refresh
-          </button>
-          <pre>{JSON.stringify(metrolinksDump, 0, 2)}</pre>
+          <Button onClick={onRefresh}>Refresh</Button>
+          <pre>{JSON.stringify(metrolinksDump, null, 2)}</pre>
         </Panel>
       </Section>
     </>
   );
 }
 
-export async function getStaticProps() {
-  const allStops = await getStops();
+export const getServerSideProps: GetServerSideProps<{ allStops: TfgmMetrolink[] }> = async () => {
+  const allStops = await getAll();
 
   return {
     props: { allStops }, // will be passed to the page component as props
   };
-}
+};
