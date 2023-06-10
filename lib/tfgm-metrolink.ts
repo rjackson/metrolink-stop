@@ -8,6 +8,7 @@ const tfgmO = () => {
     headers: {
       "Ocp-Apim-Subscription-Key": subscriptionKey,
     },
+    referrer: undefined // defaults to invalid value "client" by default
   });
 };
 
