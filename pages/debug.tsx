@@ -2,14 +2,14 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { H2, Panel, Section } from "@rjackson/rjds";
+import { Button, H2, Panel, Section } from "@rjackson/rjds";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useState } from "react";
 import MetrolinkDestination from "../components/MetrolinkDestination";
-import { getStops } from "../lib/tfgm-metrolink";
+import { TfgmMetrolink, getAll } from "../lib/tfgm-metrolink";
 
 export default function Debug({ allStops }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [metrolinksDump, setMetrolinksDump] = useState([]);
+  const [metrolinksDump, setMetrolinksDump] = useState(allStops);
   const uniqueMessages = [...new Set(metrolinksDump.map(({ MessageBoard }) => MessageBoard))];
   const uniqueDirections = [...new Set(metrolinksDump.map(({ Direction }) => Direction))];
   const uniqueDestinations = [
@@ -93,7 +93,7 @@ export default function Debug({ allStops }: InferGetServerSidePropsType<typeof g
           <ul>
             {uniqueDestinations.map((destination) => (
               <li key={destination}>
-                <MetrolinkDestination destination={destination} allStops={allStops} />
+                <MetrolinkDestination destination={destination ?? '(empty)'} allStops={allStops} />
               </li>
             ))}
           </ul>
@@ -114,11 +114,7 @@ export default function Debug({ allStops }: InferGetServerSidePropsType<typeof g
       <Section>
         <Panel>
           <H2>Dump</H2>
-          <button
-            onClick={() => onRefresh}
-          >
-            Refresh
-          </button>
+          <Button onClick={onRefresh}>Refresh</Button>
           <pre>{JSON.stringify(metrolinksDump, null, 2)}</pre>
         </Panel>
       </Section>
@@ -126,8 +122,8 @@ export default function Debug({ allStops }: InferGetServerSidePropsType<typeof g
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const allStops = await getStops();
+export const getServerSideProps: GetServerSideProps<{ allStops: TfgmMetrolink[] }> = async () => {
+  const allStops = await getAll();
 
   return {
     props: { allStops }, // will be passed to the page component as props
