@@ -20,7 +20,7 @@ type AppPropsWithLayout = AppProps & {
 function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const prefersDark = usePrefersDark();
   const router = useRouter();
-  const getLayout = Component.getLayout || ((page) => <MainLayout>{page}</MainLayout>);
+  const getLayout = Component.getLayout ?? ((page) => <MainLayout>{page}</MainLayout>);
 
   useFathom();
 

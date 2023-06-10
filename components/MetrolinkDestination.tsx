@@ -3,7 +3,7 @@ import Link from "next/link";
 import { StopsEntry } from "../lib/tfgm-metrolink";
 import slugify from "../utils/slugify";
 
-const customMappings: { [name: string]: string } = {
+const customMappings: Record<string, string> = {
   MCUK: "MediaCityUK",
   "Ashton-under-Lyne": "Ashton-Under-Lyne",
   Ashton: "Ashton-Under-Lyne",
@@ -16,7 +16,7 @@ type DestinationProps = {
   stopNames: string[];
 };
 const Destination = ({ destination, stopNames }: DestinationProps) => {
-  const middleDestination = customMappings?.[destination] || destination;
+  const middleDestination = customMappings[destination] || destination;
 
   return (
     <>

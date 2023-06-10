@@ -9,6 +9,7 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 const useMetrolinkStop = (
   stopName: string
 ): { stopInfo?: StopInfo; isLoading: boolean; isError: boolean; error: unknown } => {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const { data, error } = useSWR<StopInfo>(`/api/stop/${encodeURIComponent(stopName)}`, fetcher, {
     // Auto refresh every minute
     refreshInterval: 60 * 1000,
@@ -17,6 +18,7 @@ const useMetrolinkStop = (
     // given data only has minute granularity)
     focusThrottleInterval: 30 * 1000,
   });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   return { stopInfo: data, isLoading: !error && !data, isError: error !== undefined, error };
 };
 

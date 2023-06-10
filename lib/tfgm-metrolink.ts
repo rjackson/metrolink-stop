@@ -1,7 +1,11 @@
 import { o } from "odata";
 
-const baseUrl = process.env.TFGM_ODATA_ENDPOINT as string;
-const subscriptionKey = process.env.TFGM_ODATA_SUBSCRIPTION_KEY as string;
+const baseUrl = process.env.TFGM_ODATA_ENDPOINT;
+const subscriptionKey = process.env.TFGM_ODATA_SUBSCRIPTION_KEY;
+
+if (!baseUrl || !subscriptionKey) {
+  throw new Error("Missing TFGM credentials")
+}
 
 const tfgmO = () => {
   return o(baseUrl, {
@@ -45,6 +49,8 @@ export type TfgmMetrolink = {
 }
 
 export async function getAll(): Promise<TfgmMetrolink[]> {
+  // TODO: Figure out how to type odata
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return await tfgmO().get("Metrolinks").query();
 }
 
@@ -56,6 +62,9 @@ export type StopsEntry = {
 export async function getStops(): Promise<StopsEntry[]> {
   // try quertying this stuff directly from the odata endpoint – actually learn it u boob
   // also figure out unit tests for quicker dev of this lib
+
+  // TODO: Figure out how to type odata
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const metrolinks: TfgmMetrolink[] = await tfgmO().get("Metrolinks").query({
     $select: "StationLocation, Line",
   });
@@ -96,6 +105,8 @@ export async function getStopInfo(stopLocation: string): Promise<StopInfo> {
   // https://github.com/oasis-tcs/odata-abnf/blob/be8f43ca99beae393de370e5a6788f0b81b181bb/abnf/odata-abnf-construction-rules.txt#L958
   const encodedStopLocation = stopLocation.replace("'", "''");
 
+  // TODO: Figure out how to type odata
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   const metrolinks: TfgmMetrolink[] = await tfgmO()
     .get("Metrolinks")
     .query({

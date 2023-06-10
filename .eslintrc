@@ -4,10 +4,15 @@
     "node": true,
     "es6": true
   },
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 6,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
+  "plugins": [
+    "@typescript-eslint"
+  ],
   "extends": [
     "eslint:recommended",
     "next",
@@ -15,10 +20,16 @@
     "prettier",
     "plugin:jsx-a11y/strict",
     "plugin:@typescript-eslint/eslint-recommended",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:@typescript-eslint/strict"
   ],
   "rules": {
     // This rule is deprecated and is 'off' in the latest definition of the strict config, which is currently unreleased
-    "jsx-a11y/label-has-for": "off"
+    "jsx-a11y/label-has-for": "off",
+    "@typescript-eslint/consistent-type-definitions": [
+      "error",
+      "type"
+    ]
   }
 }

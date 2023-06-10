@@ -158,7 +158,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   const stops = await getStops();
   const { StationLocation: stop } = stops.filter(
     ({ StationLocation }) => slugify(StationLocation) === sluggedStop
-  )?.[0];
+  )[0];
 
   return {
     props: { stop, allStops: stops }, // will be passed to the page component as props

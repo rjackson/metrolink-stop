@@ -1,13 +1,14 @@
-import { H2, Panel, Section } from "@rjackson/rjds";
-import { GetStaticProps } from "next";
-import { useEffect, useState } from "react";
-import MetrolinkDestination from "../components/MetrolinkDestination";
-import { getStops, StopsEntry } from "../lib/tfgm-metrolink";
+// i am a bad guy:
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-type Props = {
-  allStops: StopsEntry[];
-};
-export default function Debug({ allStops }: Props) {
+import { H2, Panel, Section } from "@rjackson/rjds";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { useState } from "react";
+import MetrolinkDestination from "../components/MetrolinkDestination";
+import { getStops } from "../lib/tfgm-metrolink";
+
+export default function Debug({ allStops }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [metrolinksDump, setMetrolinksDump] = useState([]);
   const uniqueMessages = [...new Set(metrolinksDump.map(({ MessageBoard }) => MessageBoard))];
   const uniqueDirections = [...new Set(metrolinksDump.map(({ Direction }) => Direction))];
@@ -32,31 +33,18 @@ export default function Debug({ allStops }: Props) {
 
   const allStopNames = [...new Set(metrolinksDump.map(({ StationLocation }) => StationLocation))];
 
-  const fetchDump = async () => {
+  const onRefresh = async () => {
     try {
       const req = await fetch(`/api/dump`);
       const data = await req.json();
 
-      return req.status == 200 ? data : null;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      setMetrolinksDump(data);
     } catch (err) {
       console.log(err);
-      return null;
     }
   };
 
-  useEffect(() => {
-    let mounted = true;
-
-    fetchDump().then((dump) => {
-      if (mounted) {
-        setMetrolinksDump(dump);
-      }
-    });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
   return (
     <>
       <Section>
@@ -64,7 +52,7 @@ export default function Debug({ allStops }: Props) {
           <H2>Unique messages</H2>
           <ul>
             {uniqueMessages.map((message) => (
-              <li key={message}>{message || "(empty)"}</li>
+              <li key={message}>{message}</li>
             ))}
           </ul>
         </Panel>
@@ -74,7 +62,7 @@ export default function Debug({ allStops }: Props) {
           <H2>Unique directions</H2>
           <ul>
             {uniqueDirections.map((direction) => (
-              <li key={direction}>{direction || "(empty)"}</li>
+              <li key={direction}>{direction}</li>
             ))}
           </ul>
         </Panel>
@@ -84,7 +72,7 @@ export default function Debug({ allStops }: Props) {
           <H2>Unique statuses</H2>
           <ul>
             {uniqueStatuses.map((status) => (
-              <li key={status}>{status || "(empty)"}</li>
+              <li key={status}>{status}</li>
             ))}
           </ul>
         </Panel>
@@ -94,7 +82,7 @@ export default function Debug({ allStops }: Props) {
           <H2>Unique carriages</H2>
           <ul>
             {uniqueCarriages.map((carriage) => (
-              <li key={carriage}>{carriage || "(empty)"}</li>
+              <li key={carriage}>{carriage}</li>
             ))}
           </ul>
         </Panel>
@@ -127,9 +115,7 @@ export default function Debug({ allStops }: Props) {
         <Panel>
           <H2>Dump</H2>
           <button
-            onClick={async () => {
-              setMetrolinksDump(await fetchDump());
-            }}
+            onClick={() => onRefresh}
           >
             Refresh
           </button>
@@ -140,7 +126,7 @@ export default function Debug({ allStops }: Props) {
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getServerSideProps: GetServerSideProps = async () => {
   const allStops = await getStops();
 
   return {
