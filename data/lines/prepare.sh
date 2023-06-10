@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# TODO: Make sure our build envs can run this! (replace xsv, and maybe unzip??)
-
-set -e
+set -ex
 
 (
     cd gtfs
@@ -16,6 +14,7 @@ set -e
     )
 
     for file in "${files[@]}"; do
+        # Reduce down to Metrolink-related entries
         xsv search -s 1 "^METL" -o "${file}.processed.txt" "${file}.txt"
         mv "${file}.processed.txt" "${file}.txt"
     done
