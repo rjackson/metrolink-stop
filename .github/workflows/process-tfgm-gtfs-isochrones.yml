@@ -1,13 +1,15 @@
-name: process-tfgm-gtfs
+name: process-tfgm-gtfs-isochrones
 on:
   schedule:
-    - cron: 0 0 * * *
+    # 00:30 on first day of the month 
+    - cron: 30 0 1 * *
   workflow_dispatch: {}
   push:
     paths:
-      - .github/workflows/process-tfgm-gtfs.yml
+      - .github/workflows/process-tfgm-gtfs-isochrones.yml
 env:
   GIT_TERMINAL_PROMPT: 0
+  RENV_PATHS_ROOT: ~/.local/share/renv
 jobs:
   scheduled:
     runs-on: ubuntu-latest
@@ -17,12 +19,25 @@ jobs:
           curl -L -o xsv.tar.gz https://github.com/BurntSushi/xsv/releases/download/0.13.0/xsv-0.13.0-x86_64-unknown-linux-musl.tar.gz
           sudo tar xf xsv.tar.gz -C /usr/local/bin
       - uses: actions/checkout@v2
+      - name: Cache R packages
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.RENV_PATHS_ROOT }}
+          key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-renv-
+      - name: Restore R packages
+        working-directory: ./data/lines
+        shell: Rscript {0}
+        run: |
+          if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+          renv::restore()
       - uses: actions/setup-node@v2
         with:
           node-version: "14"
       - run: npm install
-      - name: Extract Metrolink lines from GTFS
-        run: npm run regenerate-gtfs-lines
+      - name: Calculate isochrone map from GTFS
+        run: npm run regenerate-gtfs-isochrone
       - name: Verify Changed files
         uses: tj-actions/verify-changed-files@v9
         id: verify-changed-files

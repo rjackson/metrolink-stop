@@ -1,4 +1,10 @@
-# lines.json
+# GTFS Processing
+
+This folder downloads TfGM's General Transit Feed Specification dataset and parses it to extract data to enrich Metrolink Stops.
+
+## lines.json
+
+(Currently unused)
 
 Transport for Greater Manchester (TfGM) do not appear to publish a simple list of Metrolink lines, and the stops that serve each line.
 
@@ -35,3 +41,11 @@ For stops, the names are suffixed with "(Manchester Metrolink)". Stripping that 
 | Besses o'th'barn (Manchester Metrolink)      | Besses O’ Th’ Barn       |
 
 Usages of this data may need to maintain a manual mapping between the ambiguous GTFS names and the names we wish to use.
+
+## Travel Time Map (isochrones)
+
+Adapted from [chriswhong/nyc-subway-isochrones](https://github.com/chriswhong/nyc-subway-isochrones).
+
+We parse the GTFS and filter it down to Metrolink stops, and then for each stop we compute the maximum distance reachable within certain time periods through a combination of Metrolink transit and walking.
+
+TODO: Write up properly, maybe?
