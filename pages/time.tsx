@@ -7,21 +7,13 @@ import { GetStaticProps, InferGetStaticPropsType } from "next";
 import { loadIsochrones } from "../lib/isochrones";
 import { useState } from "react";
 import stops from "../data/lines/stops.json";
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
 type MapProps = {
   isochrones: Awaited<ReturnType<typeof loadIsochrones>>;
 };
 
 const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> => {
-  const L = await import("leaflet");
-  const { MapContainer, TileLayer, GeoJSON, Marker, Popup } = await import("react-leaflet");
-
-  L.Marker.prototype.options.icon = L.icon({
-    iconUrl: icon.src,
-    shadowUrl: iconShadow.src,
-  });
+  const { MapContainer, TileLayer, GeoJSON, CircleMarker } = await import("react-leaflet");
 
   const center: LatLngTuple = [53.4781, -2.2433]; // St Peters Square
   const zoom = 10;
@@ -39,17 +31,23 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
           />
           {activeIsochrone && <GeoJSON key={selectedStop} data={activeIsochrone} />}
           {stops.map((stop) => (
-            <Marker
+            <CircleMarker
               key={stop.stop_code}
-              position={[stop.stop_lat, stop.stop_lon]}
+              center={[stop.stop_lat, stop.stop_lon]}
+              pathOptions={{
+                color: "black",
+                fillOpacity: 1,
+                fillColor: selectedStop == stop.stop_id ? "yellow" : "white",
+                weight: 1,
+              }}
+              radius={selectedStop == stop.stop_id ? 5 : 3}
+              pane="markerPane"
               eventHandlers={{
                 click: () => {
                   setSelectedStop(stop.stop_id);
                 },
               }}
-            >
-              <Popup>{stop.stop_name}</Popup>
-            </Marker>
+            />
           ))}
         </MapContainer>
         <style>
