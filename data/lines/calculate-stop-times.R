@@ -1,9 +1,13 @@
-library(gtfsrouter)
+renv::restore();
+
+library("gtfsrouter")
 packageVersion("gtfsrouter")
-library(lubridate)
+library("hms") # load before lubridate because some sort of conflict?
+library("lubridate")
 library("stringr")
 library("plyr")
 library("dplyr")
+library("pbapply")
 
 gtfs <- extract_gtfs(
     filename = "./gtfs/tfgm.zip",
