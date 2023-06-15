@@ -11,4 +11,4 @@ const db = await openDb();
 const stops = await db.all(`SELECT * FROM stops WHERE stop_id LIKE '9400ZZMA%'`);
 
 
-writeFile(STOPS_PATH, JSON.stringify(stops));
+writeFile(STOPS_PATH, JSON.stringify(stops, null, 2));
