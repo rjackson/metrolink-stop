@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "regenerate-gtfs-stops": "npm run gtfs-prepare && npm run gtfs-stops",
     "regenerate-gtfs-lines": "npm run gtfs-prepare && npm run gtfs-lines",
     "regenerate-gtfs-isochrones": "npm run gtfs-prepare && npm run gtfs-stop-times && npm run gtfs-isochrones",
     "gtfs-prepare": "(cd ./data/lines; bash prepare.sh)",
+    "gtfs-stops": "(cd ./data/lines;  NODE_OPTIONS='--experimental-json-modules' node process-stops.mjs)",
     "gtfs-lines": "(cd ./data/lines;  NODE_OPTIONS='--experimental-json-modules' node process-lines.mjs)",
     "gtfs-stop-times": "(cd ./data/lines; Rscript calculate-stop-times.R)",
     "gtfs-isochrones": "(cd ./data/lines; NODE_OPTIONS='--experimental-json-modules' node process-isochrones.mjs)",

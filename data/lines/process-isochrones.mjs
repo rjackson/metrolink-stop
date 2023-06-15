@@ -10,8 +10,8 @@ import { parse } from "csv-parse/sync";
 const GEOJSON_PATH = "./isochrones/geojson";
 const STOP_TIMES_PATH = "./isochrones/time-between-stops";
 
+// Parse all stop-time CSVs and generate isochrone geojsons
 const csvFilenames = (await readdir(STOP_TIMES_PATH)).filter((filename) => filename.endsWith(".csv"));
-console.log(csvFilenames);
 
 await Promise.all(
   csvFilenames.map(async (csvFilename) => {

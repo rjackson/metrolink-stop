@@ -21,6 +21,8 @@ jobs:
         with:
           node-version: "14"
       - run: npm install
+      - name: Extract stops from GTFS
+        run: npm run regenerate-gtfs-stops
       - name: Extract Metrolink lines from GTFS
         run: npm run regenerate-gtfs-lines
       - name: Verify Changed files
