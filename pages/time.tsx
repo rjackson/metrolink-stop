@@ -22,8 +22,6 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
     const [selectedStop, setSelectedStop] = useState<string | undefined>();
     const activeIsochrone = selectedStop ? isochrones[selectedStop] : undefined;
 
-    // TODO: "stops" from GTFS are more like platforms. Merge them & build bi-directional isochrones?
-
     return (
       <div className="w-full h-full">
         <MapContainer center={center} zoom={zoom} scrollWheelZoom={true} preferCanvas={true}>

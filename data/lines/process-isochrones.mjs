@@ -1,4 +1,4 @@
-import { readFile, readdir, writeFile } from "fs/promises";
+import { readFile, readdir, unlink, writeFile } from "fs/promises";
 import {
   buffer as turfBuffer,
   dissolve as turfDissolve,
@@ -9,6 +9,10 @@ import { parse } from "csv-parse/sync";
 
 const GEOJSON_PATH = "./isochrones/geojson";
 const STOP_TIMES_PATH = "./isochrones/time-between-stops";
+
+// Clear out existing geojsons
+const geojsonFilenames = (await readdir(GEOJSON_PATH)).filter((filename) => filename.endsWith(".geojson"));
+geojsonFilenames.forEach((filename) => unlink(`${GEOJSON_PATH}/${filename}`));
 
 // Parse all stop-time CSVs and generate isochrone geojsons
 const csvFilenames = (await readdir(STOP_TIMES_PATH)).filter((filename) => filename.endsWith(".csv"));
