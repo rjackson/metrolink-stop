@@ -23,6 +23,7 @@
   ],
   "dependencies": {
     "@rjackson/rjds": "^0.4.0",
+    "esri-leaflet-vector": "^4.1.0",
     "fathom-client": "^3.4.1",
     "fuse.js": "^6.4.6",
     "geojson-validation": "^1.0.2",

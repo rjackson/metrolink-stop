@@ -1,4 +1,4 @@
-import { H3, Section } from "@rjackson/rjds";
+import { H3, Section, usePrefersDark } from "@rjackson/rjds";
 import "leaflet/dist/leaflet.css";
 import dynamic from "next/dynamic";
 import { LatLngTuple } from "leaflet";
@@ -13,21 +13,26 @@ type MapProps = {
 };
 
 const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> => {
-  const { MapContainer, TileLayer, GeoJSON, CircleMarker } = await import("react-leaflet");
-
+  
+  const { MapContainer, GeoJSON, CircleMarker } = await import("react-leaflet");
+  const { VectorBasemapLayer } = await import("../components/leaflet/VectorBasemapLayer");
+  
   const center: LatLngTuple = [53.4781, -2.2433]; // St Peters Square
   const zoom = 10;
-
+  
   const ClientOnlyMap = ({ isochrones }: MapProps) => {
+    const prefersDark = usePrefersDark();
+
     const [selectedStop, setSelectedStop] = useState<string | undefined>();
     const activeIsochrone = selectedStop ? isochrones[selectedStop] : undefined;
-
     return (
       <div className="w-full h-full">
         <MapContainer center={center} zoom={zoom} scrollWheelZoom={true} preferCanvas={true}>
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          <VectorBasemapLayer
+            // todo: Possible to overlay labels and road markings over geojson?
+            styleKey={prefersDark ? "ArcGIS:DarkGray" : "ArcGIS:LightGray"}
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            apiKey={process.env.NEXT_PUBLIC_ESRI_API_KEY!}
           />
           {activeIsochrone && <GeoJSON key={selectedStop} data={activeIsochrone} />}
           {stops.map((stop) => (
