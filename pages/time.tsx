@@ -7,6 +7,7 @@ import { GetStaticProps, InferGetStaticPropsType } from "next";
 import { loadIsochrones } from "../lib/isochrones";
 import { useState } from "react";
 import stops from "../data/lines/stops.json";
+import { fuchsia, indigo } from "tailwindcss/colors";
 
 type MapProps = {
   isochrones: Awaited<ReturnType<typeof loadIsochrones>>;
@@ -19,16 +20,15 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
   const center: LatLngTuple = [53.4781, -2.2433]; // St Peters Square
   const zoom = 10;
 
-  // TODO: Better colour scales
   // TODO: Separate vector tile background / details (want labels and road networks _above_ background)
   const ClientOnlyMap = ({ isochrones }: MapProps) => {
     const prefersDark = usePrefersDark();
 
     const durationColors = {
-      "10": `hsl(60, 100%, ${prefersDark ? 50 : 50}%)`,
-      "20": `hsl(60, 100%, ${prefersDark ? 33.4 : 67}%)`,
-      "30": `hsl(60, 100%, ${prefersDark ? 17 : 84}%)`,
-      "40": `hsl(60, 100%, ${prefersDark ? 0 : 100}%)`,
+      "10": prefersDark ? fuchsia[300] : indigo[800],
+      "20": prefersDark ? fuchsia[500] : indigo[600],
+      "30": prefersDark ? fuchsia[700] : indigo[400],
+      "40": prefersDark ? fuchsia[900] : indigo[200],
     };
 
     const [selectedStop, setSelectedStop] = useState<string | undefined>();
@@ -53,7 +53,7 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
                   // @ts-expect-error
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                   fillColor: durationColors[feature.properties.duration],
-                  fillOpacity: 0.5,
+                  fillOpacity: .66,
                   color: prefersDark ? "black" : "white",
                   weight: prefersDark ? 1 : 2,
                 };
