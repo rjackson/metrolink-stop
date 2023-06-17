@@ -22,6 +22,7 @@
     "type-check"
   ],
   "dependencies": {
+    "@react-hook/resize-observer": "^1.2.6",
     "@rjackson/rjds": "^0.4.0",
     "esri-leaflet-vector": "^4.1.0",
     "fathom-client": "^3.4.1",
