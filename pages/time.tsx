@@ -19,6 +19,8 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
   const center: LatLngTuple = [53.4781, -2.2433]; // St Peters Square
   const zoom = 10;
 
+  // TODO: Better colour scales
+  // TODO: Separate vector tile background / details (want labels and road networks _above_ background)
   const ClientOnlyMap = ({ isochrones }: MapProps) => {
     const prefersDark = usePrefersDark();
 
@@ -60,22 +62,37 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
           )}
           {stops.map((stop) => (
             <CircleMarker
+              /* Larger invisible touch-target */
               key={stop.stop_code}
               center={[stop.stop_lat, stop.stop_lon]}
-              pathOptions={{
-                color: "black",
-                fillOpacity: prefersDark ? 0.8 : 1,
-                fillColor: selectedStop == stop.stop_id ? "yellow" : "white",
-                weight: 1,
-              }}
-              radius={selectedStop == stop.stop_id ? 5 : 3}
               pane="markerPane"
+              radius={10}
               eventHandlers={{
+                click: () => {
+                  setSelectedStop(stop.stop_id);
+                },
                 mouseover: () => {
                   setSelectedStop(stop.stop_id);
                 },
               }}
-            />
+              pathOptions={{
+                opacity: 0,
+                fillOpacity: 0,
+              }}
+            >
+              <CircleMarker
+                key={stop.stop_code}
+                center={[stop.stop_lat, stop.stop_lon]}
+                pathOptions={{
+                  color: "black",
+                  fillOpacity: prefersDark ? 0.8 : 1,
+                  fillColor: selectedStop == stop.stop_id ? "yellow" : "white",
+                  weight: 1,
+                }}
+                radius={selectedStop == stop.stop_id ? 5 : 3}
+                pane="markerPane"
+              />
+            </CircleMarker>
           ))}
         </MapContainer>
         <style>
@@ -93,7 +110,7 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
   return ClientOnlyMap;
 };
 
-const Map = dynamic(initClientOnlyMap, { ssr: false });
+const IsochroneMap = dynamic(initClientOnlyMap, { ssr: false });
 
 export default function TravelTimeMap({ isochrones }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
@@ -105,7 +122,7 @@ export default function TravelTimeMap({ isochrones }: InferGetStaticPropsType<ty
         <Section as="main" className="space-y-2 md:space-y-6" aria-labelledby="travel-time-map">
           <H3 id="travel-time-map">Travel Time Map</H3>
 
-          <Map isochrones={isochrones} />
+          <IsochroneMap isochrones={isochrones} />
         </Section>
       </div>
     </>
