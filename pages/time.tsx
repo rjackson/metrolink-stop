@@ -243,8 +243,7 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
                   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                   fillColor: durationColors[feature.properties.duration],
                   fillOpacity: 0.66,
-                  color: prefersDark ? "black" : "white",
-                  weight: prefersDark ? 1 : 2,
+                  weight: 0,
                 };
               }}
             />
