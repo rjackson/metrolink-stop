@@ -70,7 +70,7 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
     // We need to separate vector maps into 2 layers so we can display part of it as the basemap, and more detailed
     // parts above our isochrone (higher zIndex). We could do custom vector tiles in ArcGIS but then we double our API
     // usage costs.
-    // Alternatively, we can do it all render-side from one base map (with some `fetch` trickery to deduplicate identical requests... TODO)
+    // Alternatively, we can do it all render-side from one base map (requests deduplicated via service workers)
     // Firstly, what layers do we want in the background vs foreground
     const includeLayerTypeInBackground: Record<LayerSpecification["type"], boolean> = {
       fill: true,
@@ -152,8 +152,8 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
       "City small scale/x large admin1 capital": undefined,
       "City small scale/x large admin2 capital": undefined,
       "City small scale/x large non capital": undefined,
-      "Neighborhood": undefined,
-    }
+      Neighborhood: undefined,
+    };
 
     const [selectedStop, setSelectedStop] = useState<string | undefined>();
     const activeIsochrone = selectedStop ? isochrones[selectedStop] : undefined;
@@ -209,7 +209,6 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
                           ...layer.paint,
                           "line-width": 1,
                           "line-opacity": 0.2,
-                          
                         },
                       };
                     }
@@ -224,7 +223,6 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
                           "text-halo-blur": 1,
                         },
                       };
-
                     }
                     return layer;
                   }),
