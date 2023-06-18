@@ -12,6 +12,8 @@ import useResizeObserver from "@react-hook/resize-observer";
 import stops from "../lib/gtfs-stops";
 import lines from "../lib/gtfs-lines";
 
+import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
+
 type MapProps = {
   isochrones: Awaited<ReturnType<typeof loadIsochrones>>;
 };
@@ -41,7 +43,6 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
     return null;
   };
 
-  // TODO: Separate vector tile background / details (want labels and road networks _above_ background)
   const ClientOnlyMap = ({ isochrones }: MapProps) => {
     const prefersDark = usePrefersDark();
     const containerRef = useRef<HTMLDivElement>(null);
@@ -66,6 +67,94 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
       "Yellow Line": yellow[500],
     };
 
+    // We need to separate vector maps into 2 layers so we can display part of it as the basemap, and more detailed
+    // parts above our isochrone (higher zIndex). We could do custom vector tiles in ArcGIS but then we double our API
+    // usage costs.
+    // Alternatively, we can do it all render-side from one base map (with some `fetch` trickery to deduplicate identical requests... TODO)
+    // Firstly, what layers do we want in the background vs foreground
+    const includeLayerTypeInBackground: Record<LayerSpecification["type"], boolean> = {
+      fill: true,
+      line: false,
+      symbol: false, // text labels
+      circle: true,
+      heatmap: true,
+      "fill-extrusion": true,
+      raster: true,
+      hillshade: true,
+      background: true,
+    };
+
+    // We'll exclude all road layers, except a few whitelisted ones (to avoid too much visual noise when zoomed in)
+    const permittedRoadLayers: Partial<Record<LayerSpecification["id"], undefined>> = {
+      // "Road/4WD/0": undefined,
+      // "Road/4WD/1": undefined,
+      "Road/Freeway Motorway, ramp or traffic circle/0": undefined,
+      "Road/Freeway Motorway, ramp or traffic circle/1": undefined,
+      "Road/Freeway Motorway/0": undefined,
+      "Road/Freeway Motorway/1": undefined,
+      "Road/Highway/0": undefined,
+      "Road/Highway/1": undefined,
+      // "Road/Local/0": undefined,
+      // "Road/Local/1": undefined,
+      "Road/Major, ramp or traffic circle/0": undefined,
+      "Road/Major, ramp or traffic circle/1": undefined,
+      "Road/Major/0": undefined,
+      "Road/Major/1": undefined,
+      "Road/Minor, ramp or traffic circle/0": undefined,
+      "Road/Minor, ramp or traffic circle/1": undefined,
+      "Road/Minor/0": undefined,
+      "Road/Minor/1": undefined,
+      // "Road/Pedestrian/0": undefined,
+      // "Road/Pedestrian/1": undefined,
+      // "Road/Service/0": undefined,
+      // "Road/Service/1": undefined,
+      // "Road/label/Freeway Motorway, alt name": undefined,
+      // "Road/label/Freeway Motorway": undefined,
+      // "Road/label/Highway": undefined,
+      // "Road/label/Local": undefined,
+      // "Road/label/Major, alt name": undefined,
+      // "Road/label/Major": undefined,
+      // "Road/label/Minor": undefined,
+      // "Road/label/Pedestrian": undefined,
+      // "Road/label/Rectangle white black (Alt)": undefined,
+      // "Road/label/Rectangle white black": undefined,
+    };
+
+    const textLayersToEmphasize: Partial<Record<LayerSpecification["id"], undefined>> = {
+      "Admin0 point/2x large": undefined,
+      "Admin0 point/large": undefined,
+      "Admin0 point/medium": undefined,
+      "Admin0 point/small": undefined,
+      "Admin0 point/x large": undefined,
+      "Admin0 point/x small": undefined,
+      "City large scale/large": undefined,
+      "City large scale/medium": undefined,
+      "City large scale/small": undefined,
+      "City large scale/town large": undefined,
+      "City large scale/town small": undefined,
+      "City large scale/x large": undefined,
+      "City small scale/large admin0 capital": undefined,
+      "City small scale/large non capital": undefined,
+      "City small scale/large other capital": undefined,
+      "City small scale/medium admin0 capital": undefined,
+      "City small scale/medium non capital": undefined,
+      "City small scale/medium other capital": undefined,
+      "City small scale/other capital": undefined,
+      "City small scale/small admin0 capital": undefined,
+      "City small scale/small non capital": undefined,
+      "City small scale/small other capital": undefined,
+      "City small scale/town large admin0 capital": undefined,
+      "City small scale/town large non capital": undefined,
+      "City small scale/town large other capital": undefined,
+      "City small scale/town small admin0 capital": undefined,
+      "City small scale/town small non capital": undefined,
+      "City small scale/x large admin0 capital": undefined,
+      "City small scale/x large admin1 capital": undefined,
+      "City small scale/x large admin2 capital": undefined,
+      "City small scale/x large non capital": undefined,
+      "Neighborhood": undefined,
+    }
+
     const [selectedStop, setSelectedStop] = useState<string | undefined>();
     const activeIsochrone = selectedStop ? isochrones[selectedStop] : undefined;
     const outboundLines = lines.filter((line) => line.route_id.endsWith(":O:CURRENT"));
@@ -78,12 +167,71 @@ const initClientOnlyMap = async (): Promise<(props: MapProps) => JSX.Element> =>
         <MapContainer ref={mapRef} center={center} zoom={zoom} scrollWheelZoom={true} preferCanvas={false}>
           <MapZoomer markersRef={markersRef} />
           <VectorBasemapLayer
-            // todo: Possible to overlay labels and road markings over geojson?
             styleKey={prefersDark ? "ArcGIS:DarkGray" : "ArcGIS:LightGray"}
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             apiKey={process.env.NEXT_PUBLIC_ESRI_API_KEY!}
+            style={(style: StyleSpecification) => {
+              return { ...style, layers: style.layers.filter((layer) => includeLayerTypeInBackground[layer.type]) };
+            }}
           />
-          <Pane name="isochronePane" style={{ zIndex: 300 }} />
+          <VectorBasemapLayer
+            styleKey={prefersDark ? "ArcGIS:DarkGray" : "ArcGIS:LightGray"}
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            apiKey={process.env.NEXT_PUBLIC_ESRI_API_KEY!}
+            pane="esri-labels"
+            style={(style: StyleSpecification) => {
+              return {
+                ...style,
+                layers: style.layers
+                  .filter((layer) => {
+                    if (includeLayerTypeInBackground[layer.type]) {
+                      return false;
+                    }
+
+                    // Only allow certain roads
+                    if (layer.id.startsWith("Road/") && !Object.hasOwn(permittedRoadLayers, layer.id)) {
+                      return false;
+                    }
+
+                    // Hide all labels
+                    if (layer.id.includes("/label/")) {
+                      return false;
+                    }
+
+                    return true;
+                  })
+                  .map((layer) => {
+                    if (Object.hasOwn(permittedRoadLayers, layer.id)) {
+                      // Knock back the transparency of permitted road layers
+                      return {
+                        ...layer,
+                        paint: {
+                          ...layer.paint,
+                          "line-width": 1,
+                          "line-opacity": 0.2,
+                          
+                        },
+                      };
+                    }
+
+                    if (Object.hasOwn(textLayersToEmphasize, layer.id)) {
+                      return {
+                        ...layer,
+                        paint: {
+                          ...layer.paint,
+                          "text-color": prefersDark ? "white" : "black",
+                          "text-halo-width": 2,
+                          "text-halo-blur": 1,
+                        },
+                      };
+
+                    }
+                    return layer;
+                  }),
+              };
+            }}
+          />
+          <Pane name="isochronePane" style={{ zIndex: 290 }} />
           {activeIsochrone && (
             <GeoJSON
               key={selectedStop}
