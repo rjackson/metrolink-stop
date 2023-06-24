@@ -21,7 +21,7 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
   const center: LatLngTuple = [53.4781, -2.2433]; // St Peters Square
   const zoom = 11;
 
-  const MapZoomer = ({ markersRef }: { markersRef: RefObject<FeatureGroup> }) => {
+  const MapZoomer = ({ linesRef }: { linesRef: RefObject<FeatureGroup> }) => {
     const map = useMap();
     const debounceTimeout = useRef<NodeJS.Timeout>();
 
@@ -29,12 +29,12 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
       clearTimeout(debounceTimeout.current);
 
       debounceTimeout.current = setTimeout(() => {
-        const bounds = markersRef.current?.getBounds();
+        const bounds = linesRef.current?.getBounds();
         if (bounds?.isValid()) {
           map.fitBounds(bounds, { padding: [100, 100] });
         }
       }, 300);
-    }, [map, markersRef]);
+    }, [map, linesRef]);
 
     return null;
   };
@@ -150,8 +150,8 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
 
     return (
       <div ref={containerRef} className="w-full h-full">
-        <MapContainer ref={mapRef} center={center} zoom={zoom} scrollWheelZoom={true} preferCanvas={false}>
-          <MapZoomer markersRef={markersRef} />
+        <MapContainer ref={mapRef} center={center} zoom={zoom} scrollWheelZoom={true} preferCanvas={true}>
+          <MapZoomer linesRef={linesRef} />
           <VectorBasemapLayer
             styleKey={prefersDark ? "ArcGIS:DarkGray" : "ArcGIS:LightGray"}
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
