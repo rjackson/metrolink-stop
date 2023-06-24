@@ -1,4 +1,4 @@
-import { usePrefersDark } from "@rjackson/rjds";
+import { Anchor, Panel, usePrefersDark } from "@rjackson/rjds";
 import "leaflet/dist/leaflet.css";
 import dynamic from "next/dynamic";
 import { FeatureGroup, LatLngTuple } from "leaflet";
@@ -13,9 +13,12 @@ import stops from "../lib/gtfs-stops";
 
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
 import { loadMetrolinkLinesGeoJSON } from "../lib/tfgm-open-data/gm-metrolink-network/loadMetrolinkLines";
+import Link from "next/link";
 
 const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<typeof getStaticProps>) => JSX.Element> => {
-  const { MapContainer, GeoJSON, CircleMarker, useMap, FeatureGroup, Pane } = await import("react-leaflet");
+  const { MapContainer, GeoJSON, CircleMarker, useMap, FeatureGroup, Pane, ZoomControl } = await import(
+    "react-leaflet"
+  );
   const { VectorBasemapLayer } = await import("../components/leaflet/VectorBasemapLayer");
 
   const center: LatLngTuple = [53.4781, -2.2433]; // St Peters Square
@@ -149,9 +152,60 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
     });
 
     return (
-      <div ref={containerRef} className="w-full h-full">
-        <MapContainer ref={mapRef} center={center} zoom={zoom} scrollWheelZoom={true} preferCanvas={true}>
+      <div ref={containerRef} className="relative h-full w-full">
+        <Panel as="header" className="absolute left-1 right-1 top-1 z-[800] mx-4 my-4 space-y-2 md:w-full md:max-w-sm">
+          <div className="flex items-center justify-center space-x-2 md:flex-col md:items-start md:space-x-0">
+            <Link href="/" passHref>
+              <Anchor>
+                <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
+              </Anchor>
+            </Link>
+            <h2 className="text-xl font-semibold text-gray-600 dark:text-gray-300 md:text-2xl">Time Travel Map</h2>
+          </div>
+          <p>Hover over a stop to see how far you can travel in:</p>
+          <ul className="px-3">
+            {Object.entries(durationColors).map(([duration, color]) => (
+              <li key={duration} className="flex space-x-2">
+                <span className="inline-block h-6 w-6 rounded-md" style={{ backgroundColor: color }} />{" "}
+                <span>{duration} minutes</span>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+        <Panel
+          as="footer"
+          className="text-md absolute bottom-1 left-1 right-1 z-[800] mx-4 my-4 flex items-center justify-center space-x-2 py-1 text-sm md:w-full md:max-w-sm md:flex-col md:space-y-1"
+        >
+          <p>
+            <span aria-hidden>💛</span>
+            <Link href="https://rjackson.dev" passHref>
+              <Anchor aria-label="RJackson.dev">rjackson.dev</Anchor>
+            </Link>
+          </p>
+
+          <p>
+            Contains{" "}
+            <Link href="https://tfgm.com/" passHref>
+              <Anchor target="_blank" rel="noreferrer">
+                <abbr className="md:hidden" title="Transport for Greater Manchester">
+                  TfGM
+                </abbr>
+                <span className="hidden md:inline">Transport for Greater Manchester</span>
+              </Anchor>
+            </Link>{" "}
+            data.
+          </p>
+        </Panel>
+        <MapContainer
+          ref={mapRef}
+          center={center}
+          zoom={zoom}
+          scrollWheelZoom={true}
+          preferCanvas={true}
+          zoomControl={false}
+        >
           <MapZoomer linesRef={linesRef} />
+          <ZoomControl position="topright" />
           <VectorBasemapLayer
             styleKey={prefersDark ? "ArcGIS:DarkGray" : "ArcGIS:LightGray"}
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -235,14 +289,16 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
             />
           )}
           <FeatureGroup ref={linesRef}>
-            {!prefersDark && <GeoJSON
-              data={lines}
-              pathOptions={{
-                color: yellow[500],
-                opacity: 1,
-                weight: 5,
-              }}
-            />}
+            {!prefersDark && (
+              <GeoJSON
+                data={lines}
+                pathOptions={{
+                  color: yellow[500],
+                  opacity: 1,
+                  weight: 5,
+                }}
+              />
+            )}
             <GeoJSON
               data={lines}
               pathOptions={{
