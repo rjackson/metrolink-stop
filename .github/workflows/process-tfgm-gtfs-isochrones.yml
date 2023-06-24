@@ -1,0 +1,53 @@
+name: process-tfgm-gtfs-isochrones
+on:
+  schedule:
+    # 00:30 on first day of the month 
+    - cron: 30 0 1 * *
+  workflow_dispatch: {}
+  push:
+    paths:
+      - .github/workflows/process-tfgm-gtfs-isochrones.yml
+env:
+  GIT_TERMINAL_PROMPT: 0
+  RENV_PATHS_ROOT: ~/.local/share/renv
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install system dependencies
+        run: |
+          curl -L -o xsv.tar.gz https://github.com/BurntSushi/xsv/releases/download/0.13.0/xsv-0.13.0-x86_64-unknown-linux-musl.tar.gz
+          sudo tar xf xsv.tar.gz -C /usr/local/bin
+      - uses: actions/checkout@v2
+      - name: Cache R packages
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.RENV_PATHS_ROOT }}
+          key: ${{ runner.os }}-renv-${{ hashFiles('**/renv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-renv-
+      - name: Restore R packages
+        working-directory: ./data/lines
+        shell: Rscript {0}
+        run: |
+          if (!requireNamespace("renv", quietly = TRUE)) install.packages("renv")
+          renv::restore()
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - run: npm install
+      - name: Calculate isochrone map from GTFS
+        run: npm run regenerate-gtfs-isochrone
+      - name: Verify Changed files
+        uses: tj-actions/verify-changed-files@v9
+        id: verify-changed-files
+        with:
+          files: data/**/*.json
+      - name: Commit changes
+        if: contains(steps.verify-changed-files.outputs.changed_files, 'data/')
+        run: |
+          git config --global user.name 'Metrolink Stop (automated)'
+          git config --global user.email 'metrolink-stop@rjackson.me'
+          git add "${{ steps.verify-changed-files.outputs.changed_files }}"
+          git commit -m "Regenerate data from TfGM GTFS"
+          git push

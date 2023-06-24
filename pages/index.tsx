@@ -6,6 +6,7 @@ import { useVisitedStopsState, useVisitedStopsUpdate } from "../components/conte
 import { Anchor, Button, H3, Input, Panel, Section } from "@rjackson/rjds";
 import slugify from "../utils/slugify";
 import { GetStaticProps } from "next";
+import Pill from "../components/Pill";
 
 type Props = {
   stops: StopsEntry[];
@@ -50,7 +51,20 @@ export default function Home({ stops }: Props) {
         <H3 id="all-stops" className={`${recentStops.length == 0 ? "sr-only" : ""}`}>
           All stops
         </H3>
+
         <Panel className="space-y-6">
+          <nav>
+            <ul className="space-y-2 md:text-center">
+              <li className="flex items-center justify-center space-x-1">
+                <Pill>New</Pill>{" "}
+                <Link href={`/time`} passHref>
+                  <Anchor>Travel time map</Anchor>
+                </Link>{" "}
+                &ndash; see how far you can travel from each stop
+              </li>
+            </ul>
+          </nav>
+
           <form onSubmit={(e) => e.preventDefault()}>
             <div role="search" className="flex flex-col space-y-2 md:items-center md:max-w-sm md:mx-auto">
               <label htmlFor="search">Search</label>

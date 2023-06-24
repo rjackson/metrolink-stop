@@ -47,6 +47,8 @@ const stopsPerLine = Object.fromEntries(
       const stops = await db.all(
         `SELECT
     s.stop_name,
+    s.stop_lat,
+    s.stop_lon,
     st.arrival_timestamp,
     st.arrival_timestamp - LAG(st.arrival_timestamp) OVER (
         ORDER BY st.stop_sequence ASC

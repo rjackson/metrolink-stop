@@ -1,1 +1,8 @@
 db.sqlite
+.Rhistory
+.Rapp.history
+.RData
+.RDataTmp
+.Rprofile
+renv
+*.Rproj
