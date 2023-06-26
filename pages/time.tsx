@@ -314,7 +314,7 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
                 /* Larger invisible touch-target */
                 key={stop.stop_code}
                 center={[stop.stop_lat, stop.stop_lon]}
-                radius={10}
+                radius={24}
                 pane="markerPane"
                 eventHandlers={{
                   click: () => {
