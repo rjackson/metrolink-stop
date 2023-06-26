@@ -36,5 +36,5 @@ jobs:
           git config --global user.name 'Metrolink Stop (automated)'
           git config --global user.email 'metrolink-stop@rjackson.me'
           git add "${{ steps.verify-changed-files.outputs.changed_files }}"
-          git commit -m "Regenerate data from TfGM GTFS"
+          git commit -m "Regenerate data from TfGM GTFS" --no-verify
           git push
