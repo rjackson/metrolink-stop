@@ -10,6 +10,7 @@ const MapLayout = ({ children, ...props }: MapLayoutProps): JSX.Element => {
         flex-col-reverse
         w-screen
         h-screen
+        max-h-[100dvh]
         text-lg
 
         lg:flex-row
