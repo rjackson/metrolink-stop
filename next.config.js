@@ -29,5 +29,19 @@ module.exports = withPWA(
       };
       return config;
     },
+    async redirects() {
+      return [
+        {
+          source: '/map',
+          destination: '/time',
+          permanent: false
+        },
+        {
+          source: '/travel',
+          destination: '/time',
+          permanent: false
+        },
+      ]
+    }
   })
 );
