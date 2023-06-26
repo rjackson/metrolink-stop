@@ -55,7 +55,7 @@ export default function Home({ stops }: Props) {
         <Panel className="space-y-6">
           <nav>
             <ul className="space-y-2 md:text-center">
-              <li className="flex items-center justify-center space-x-1">
+              <li className="">
                 <Pill>New</Pill>{" "}
                 <Link href={`/time`} passHref>
                   <Anchor>Travel time map</Anchor>
