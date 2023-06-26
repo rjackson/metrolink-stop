@@ -153,48 +153,47 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
 
     return (
       <div ref={containerRef} className="relative h-full w-full">
-        <Panel as="header" className="absolute left-1 right-1 top-1 z-[800] mx-4 my-4 space-y-2 md:w-full md:max-w-sm">
-          <div className="flex items-center justify-center space-x-2 md:flex-col md:items-start md:space-x-0">
-            <Link href="/" passHref>
-              <Anchor>
-                <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
-              </Anchor>
-            </Link>
-            <h2 className="text-xl font-semibold text-gray-600 dark:text-gray-300 md:text-2xl">Time Travel Map</h2>
-          </div>
-          <p>Hover over a stop to see how far you can travel in:</p>
-          <ul className="px-3">
-            {Object.entries(durationColors).map(([duration, color]) => (
-              <li key={duration} className="flex space-x-2">
-                <span className="inline-block h-6 w-6 rounded-md" style={{ backgroundColor: color }} />{" "}
-                <span>{duration} minutes</span>
-              </li>
-            ))}
-          </ul>
-        </Panel>
         <Panel
-          as="footer"
-          className="text-md absolute bottom-1 left-1 right-1 z-[800] mx-4 my-4 flex items-center justify-center space-x-2 py-1 text-sm md:w-full md:max-w-sm md:flex-col md:space-y-1"
+          as="header"
+          className="absolute left-1 right-1 top-1 z-[800] mx-4 my-2 space-y-4 pb-4 md:w-full md:max-w-sm"
         >
-          <p>
-            <span aria-hidden>💛</span>
-            <Link href="https://rjackson.dev" passHref>
-              <Anchor aria-label="RJackson.dev">rjackson.dev</Anchor>
-            </Link>
-          </p>
+          <div className="space-y-2">
+            <div className="flex items-center justify-center space-x-2 md:flex-col md:items-start md:space-x-0 md:space-y-1">
+              <Link href="/" passHref>
+                <Anchor>
+                  <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
+                </Anchor>
+              </Link>
+              <h2 className="text-xl font-semibold text-gray-600 dark:text-gray-300 md:text-2xl">Travel Time Map</h2>
+            </div>
+            <p>Hover over a stop to see how far you can travel in:</p>
+            <ul className="px-3">
+              {Object.entries(durationColors).map(([duration, color]) => (
+                <li key={duration} className="flex space-x-2">
+                  <span className="inline-block h-6 w-6 rounded-md" style={{ backgroundColor: color }} />{" "}
+                  <span>{duration} minutes</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <footer className="flex justify-center space-x-2 text-sm">
+            <p>
+              <span aria-hidden>💛</span>{" "}
+              <Link href="https://rjackson.dev" passHref>
+                <Anchor aria-label="RJackson.dev">rjackson.dev</Anchor>
+              </Link>
+            </p>
 
-          <p>
-            Contains{" "}
-            <Link href="https://tfgm.com/" passHref>
-              <Anchor target="_blank" rel="noreferrer">
-                <abbr className="md:hidden" title="Transport for Greater Manchester">
-                  TfGM
-                </abbr>
-                <span className="hidden md:inline">Transport for Greater Manchester</span>
-              </Anchor>
-            </Link>{" "}
-            data.
-          </p>
+            <p>
+              Contains{" "}
+              <Link href="https://tfgm.com/" passHref>
+                <Anchor target="_blank" rel="noreferrer">
+                  <abbr title="Transport for Greater Manchester">TfGM</abbr>
+                </Anchor>
+              </Link>{" "}
+              data.
+            </p>
+          </footer>
         </Panel>
         <MapContainer
           ref={mapRef}
