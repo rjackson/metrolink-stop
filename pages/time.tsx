@@ -14,6 +14,7 @@ import stops from "../lib/gtfs-stops";
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
 import { loadMetrolinkLinesGeoJSON } from "../lib/tfgm-open-data/gm-metrolink-network/loadMetrolinkLines";
 import Link from "next/link";
+import { useMediaQuery } from "@react-hook/media-query";
 
 const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<typeof getStaticProps>) => JSX.Element> => {
   const { MapContainer, GeoJSON, CircleMarker, useMap, FeatureGroup, Pane, ZoomControl } = await import(
@@ -26,6 +27,7 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
 
   const MapZoomer = ({ linesRef }: { linesRef: RefObject<FeatureGroup> }) => {
     const map = useMap();
+    const breakpointLg = useMediaQuery("(min-width: 1024px)"); // tailwind lg breakpoint
     const debounceTimeout = useRef<NodeJS.Timeout>();
 
     useEffect(() => {
@@ -34,10 +36,12 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
       debounceTimeout.current = setTimeout(() => {
         const bounds = linesRef.current?.getBounds();
         if (bounds?.isValid()) {
-          map.fitBounds(bounds, { padding: [100, 100] });
+          map.fitBounds(bounds, {
+            paddingBottomRight: [0, breakpointLg ? 0 : 288], // px
+          });
         }
       }, 300);
-    }, [map, linesRef]);
+    }, [map, linesRef, breakpointLg]);
 
     return null;
   };
@@ -154,18 +158,18 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
     return (
       <div ref={containerRef} className="relative h-full w-full">
         <Panel
-          as="header"
-          className="absolute left-1 right-1 top-1 z-[800] mx-4 my-2 space-y-4 pb-4 md:w-full md:max-w-sm"
+          as="main"
+          className="absolute bottom-0 left-0 right-0 z-[800] mx-4 mb-4 space-y-4 py-3 lg:bottom-auto lg:top-0 lg:mt-4 lg:w-full lg:max-w-sm lg:py-4"
         >
           <div className="space-y-2">
-            <div className="flex items-center justify-center space-x-2 md:flex-col md:items-start md:space-x-0 md:space-y-1">
+            <header className="flex items-center justify-center space-x-2 md:flex-col md:items-start md:space-x-0 md:space-y-1">
               <Link href="/" passHref>
                 <Anchor>
                   <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
                 </Anchor>
               </Link>
               <h2 className="text-xl font-semibold text-gray-600 dark:text-gray-300 md:text-2xl">Travel Time Map</h2>
-            </div>
+            </header>
             <p>Hover over a stop to see how far you can travel in:</p>
             <ul className="px-3">
               {Object.entries(durationColors).map(([duration, color]) => (
