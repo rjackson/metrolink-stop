@@ -19,7 +19,6 @@ class DedupeNetworkFirst extends NetworkFirst {
         if (inflightResponsePromise) {
             const inflightResponse = await inflightResponsePromise;
 
-            console.log("Cloned promise wew");
             return inflightResponse.clone();
         } else {
             inflightResponsePromise = super._handle(request, handler);
