@@ -17,7 +17,7 @@ import Link from "next/link";
 import { useMediaQuery } from "@react-hook/media-query";
 
 const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<typeof getStaticProps>) => JSX.Element> => {
-  const { MapContainer, GeoJSON, CircleMarker, useMap, FeatureGroup, Pane, ZoomControl } = await import(
+  const { MapContainer, GeoJSON, CircleMarker, useMap, FeatureGroup, Pane, ZoomControl, Tooltip } = await import(
     "react-leaflet"
   );
   const { VectorBasemapLayer } = await import("../components/leaflet/VectorBasemapLayer");
@@ -352,6 +352,7 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
                   radius={selectedStop == stop.stop_id ? 5 : 3}
                   pane="markerPane"
                 />
+                <Tooltip>{stop.stop_name.replace(" (Manchester Metrolink)", "")}</Tooltip>
               </CircleMarker>
             ))}
           </FeatureGroup>
