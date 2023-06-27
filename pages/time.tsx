@@ -180,6 +180,13 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
               ))}
             </ul>
           </div>
+          <nav className="text-sm text-center">
+              <Link href="/" passHref>
+                <Anchor>
+                  <p>Check live departure times for your stop</p>
+                </Anchor>
+              </Link>
+          </nav>
           <footer className="flex justify-center space-x-2 text-sm">
             <p>
               <span aria-hidden>💛</span>{" "}
