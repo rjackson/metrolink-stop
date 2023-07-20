@@ -1,9 +1,9 @@
 {
-  "METLBLUE:O:2023-04-17": {
-    "route_id": "METLBLUE:O:2023-04-17",
+  "METLBLUE:O:2023-09-21": {
+    "route_id": "METLBLUE:O:2023-09-21",
     "route_short_name": "Blue Line",
     "direction": "Outbound",
-    "trip_id": "METLBLUE:003MF7MF:O:11:2023-04-17",
+    "trip_id": "METLBLUE:003MF7MF:O:11:2023-09-21",
     "stops": [
       {
         "stop_name": "Eccles (Manchester Metrolink)",
@@ -231,11 +231,11 @@
       }
     ]
   },
-  "METLBLUE:I:2023-04-17": {
-    "route_id": "METLBLUE:I:2023-04-17",
+  "METLBLUE:I:2023-09-21": {
+    "route_id": "METLBLUE:I:2023-09-21",
     "route_short_name": "Blue Line",
     "direction": "Inbound",
-    "trip_id": "METLBLUE:003MF7MF:I:10:2023-04-17",
+    "trip_id": "METLBLUE:003MF7MF:I:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Ashton-Under-Lyne (Manchester Metrolink)",
@@ -463,11 +463,11 @@
       }
     ]
   },
-  "METLGREE:I:2023-04-17": {
-    "route_id": "METLGREE:I:2023-04-17",
+  "METLGREE:I:2023-09-21": {
+    "route_id": "METLGREE:I:2023-09-21",
     "route_short_name": "Green Line",
     "direction": "Inbound",
-    "trip_id": "METLGREE:001MF1MF:I:10:2023-04-17",
+    "trip_id": "METLGREE:001MF1MF:I:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -671,11 +671,11 @@
       }
     ]
   },
-  "METLGREE:O:2023-04-17": {
-    "route_id": "METLGREE:O:2023-04-17",
+  "METLGREE:O:2023-09-21": {
+    "route_id": "METLGREE:O:2023-09-21",
     "route_short_name": "Green Line",
     "direction": "Outbound",
-    "trip_id": "METLGREE:001MF1MF:O:10:2023-04-17",
+    "trip_id": "METLGREE:001MF1MF:O:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -879,11 +879,11 @@
       }
     ]
   },
-  "METLNAVY:I:2023-04-17": {
-    "route_id": "METLNAVY:I:2023-04-17",
+  "METLNAVY:I:2023-09-21": {
+    "route_id": "METLNAVY:I:2023-09-21",
     "route_short_name": "Navy Line",
     "direction": "Inbound",
-    "trip_id": "METLNAVY:006MF7MF:I:10:2023-04-17",
+    "trip_id": "METLNAVY:006MF7MF:I:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Manchester Airport (Manchester Metrolink)",
@@ -1087,11 +1087,11 @@
       }
     ]
   },
-  "METLNAVY:O:2023-04-17": {
-    "route_id": "METLNAVY:O:2023-04-17",
+  "METLNAVY:O:2023-09-21": {
+    "route_id": "METLNAVY:O:2023-09-21",
     "route_short_name": "Navy Line",
     "direction": "Outbound",
-    "trip_id": "METLNAVY:006MF7MF:O:10:2023-04-17",
+    "trip_id": "METLNAVY:006MF7MF:O:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Victoria (Manchester Metrolink)",
@@ -1567,11 +1567,11 @@
       }
     ]
   },
-  "METLPINK:O:2023-04-17": {
-    "route_id": "METLPINK:O:2023-04-17",
+  "METLPINK:O:2023-09-21": {
+    "route_id": "METLPINK:O:2023-09-21",
     "route_short_name": "Pink Line",
     "direction": "Outbound",
-    "trip_id": "METLPINK:005MF7MF:O:101:2023-04-17",
+    "trip_id": "METLPINK:005MF7MF:O:101:2023-09-21",
     "stops": [
       {
         "stop_name": "Rochdale Town Centre (Manchester Metrolink)",
@@ -1839,11 +1839,11 @@
       }
     ]
   },
-  "METLPURP:O:2023-04-17": {
-    "route_id": "METLPURP:O:2023-04-17",
+  "METLPURP:O:2023-09-21": {
+    "route_id": "METLPURP:O:2023-09-21",
     "route_short_name": "Purple Line",
     "direction": "Outbound",
-    "trip_id": "METLPURP:002MF7MF:O:10:2023-04-17",
+    "trip_id": "METLPURP:002MF7MF:O:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Piccadilly (Manchester Metrolink)",
@@ -1959,11 +1959,11 @@
       }
     ]
   },
-  "METLPURP:I:2023-04-17": {
-    "route_id": "METLPURP:I:2023-04-17",
+  "METLPURP:I:2023-09-21": {
+    "route_id": "METLPURP:I:2023-09-21",
     "route_short_name": "Purple Line",
     "direction": "Inbound",
-    "trip_id": "METLPURP:002MF7MF:I:10:2023-04-17",
+    "trip_id": "METLPURP:002MF7MF:I:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Altrincham (Manchester Metrolink)",
@@ -2159,11 +2159,11 @@
       }
     ]
   },
-  "METLRED:O:2023-04-17": {
-    "route_id": "METLRED:O:2023-04-17",
+  "METLRED:O:2023-09-21": {
+    "route_id": "METLRED:O:2023-09-21",
     "route_short_name": "Red Line",
     "direction": "Outbound",
-    "trip_id": "METLRED:007MF7MF:O:10:2023-04-17",
+    "trip_id": "METLRED:007MF7MF:O:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Deansgate-Castlefield (Manchester Metrolink)",
@@ -2239,11 +2239,11 @@
       }
     ]
   },
-  "METLYELL:I:2023-04-17": {
-    "route_id": "METLYELL:I:2023-04-17",
+  "METLYELL:I:2023-09-21": {
+    "route_id": "METLYELL:I:2023-09-21",
     "route_short_name": "Yellow Line",
     "direction": "Inbound",
-    "trip_id": "METLYELL:004MF11MF:I:10:2023-04-17",
+    "trip_id": "METLYELL:004MF11MF:I:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Bury (Manchester Metrolink)",
@@ -2367,11 +2367,11 @@
       }
     ]
   },
-  "METLYELL:O:2023-04-17": {
-    "route_id": "METLYELL:O:2023-04-17",
+  "METLYELL:O:2023-09-21": {
+    "route_id": "METLYELL:O:2023-09-21",
     "route_short_name": "Yellow Line",
     "direction": "Outbound",
-    "trip_id": "METLYELL:004MF11MF:O:10:2023-04-17",
+    "trip_id": "METLYELL:004MF11MF:O:10:2023-09-21",
     "stops": [
       {
         "stop_name": "Piccadilly (Manchester Metrolink)",
