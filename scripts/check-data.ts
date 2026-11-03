@@ -38,7 +38,7 @@ async function downloadGtfsStops(): Promise<GtfsStopRow[]> {
     const zipPath = path.join(dir, "gtfs.zip");
     await writeFile(zipPath, Buffer.from(await response.arrayBuffer()));
     const stopsTxt = execFileSync("unzip", ["-p", zipPath, "stops.txt"], { maxBuffer: 64 * 1024 * 1024 });
-    return parse(stopsTxt, { columns: true, bom: true, relax_quotes: true }) as GtfsStopRow[];
+    return parse<GtfsStopRow>(stopsTxt, { columns: true, bom: true, relax_quotes: true });
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
