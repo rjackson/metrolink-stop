@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* Compile the class names used by the design system's components too */
+@source "./node_modules/@rjackson/rjds";
+
+/* Dark mode via the .dark class App sets from the visitor's colour scheme preference, as rjds expects */
+@custom-variant dark (&:where(.dark, .dark *));

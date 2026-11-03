@@ -1,5 +1,5 @@
 import AppLink from "../AppLink";
-import { SingleColumnLayout, Header, Anchor, Section } from "@rjackson/rjds";
+import { SingleColumnLayout, Header, Anchor } from "@rjackson/rjds";
 import { PropsWithChildren } from "react";
 
 const MainLayout = ({ children }: PropsWithChildren) => {
@@ -13,7 +13,7 @@ const MainLayout = ({ children }: PropsWithChildren) => {
         </Header>
       }
       footer={
-        <Section as="footer" className="text-center">
+        <footer className="w-full px-6 py-2 text-center">
           <p aria-hidden>💛</p>
 
           <p>
@@ -30,7 +30,7 @@ const MainLayout = ({ children }: PropsWithChildren) => {
               </Anchor>{" "}
             data.
           </p>
-        </Section>
+        </footer>
       }
     >
       {children}

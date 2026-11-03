@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import { FeatureGroup, LatLngTuple } from "leaflet";
 import { loadIsochrone } from "../lib/isochrones";
 import { lazy, RefObject, Suspense, useEffect, useRef, useState, type JSX } from "react";
-import { fuchsia, indigo, yellow } from "tailwindcss/colors";
+import colors from "tailwindcss/colors";
 import useResizeObserver from "@react-hook/resize-observer";
 import stops from "../lib/gtfs-stops";
 
@@ -23,10 +23,10 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
   const center: LatLngTuple = [53.4781, -2.2433]; // St Peters Square
   const zoom = 11;
 
-  const MapZoomer = ({ linesRef }: { linesRef: RefObject<FeatureGroup> }) => {
+  const MapZoomer = ({ linesRef }: { linesRef: RefObject<FeatureGroup | null> }) => {
     const map = useMap();
     const breakpointLg = useMediaQuery("(min-width: 1024px)"); // tailwind lg breakpoint
-    const debounceTimeout = useRef<NodeJS.Timeout>();
+    const debounceTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
     useEffect(() => {
       clearTimeout(debounceTimeout.current);
@@ -52,10 +52,10 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
     const markersRef = useRef<FeatureGroup>(null);
 
     const durationColors = {
-      "10": prefersDark ? fuchsia[300] : indigo[800],
-      "20": prefersDark ? fuchsia[500] : indigo[600],
-      "30": prefersDark ? fuchsia[700] : indigo[400],
-      "40": prefersDark ? fuchsia[900] : indigo[200],
+      "10": prefersDark ? colors.fuchsia[300] : colors.indigo[800],
+      "20": prefersDark ? colors.fuchsia[500] : colors.indigo[600],
+      "30": prefersDark ? colors.fuchsia[700] : colors.indigo[400],
+      "40": prefersDark ? colors.fuchsia[900] : colors.indigo[200],
     };
 
     // We need to separate vector maps into 2 layers so we can display part of it as the basemap, and more detailed
@@ -177,47 +177,46 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
 
     return (
       <div ref={containerRef} className="relative h-full w-full">
-        <Panel
-          as="main"
-          className="absolute bottom-0 left-0 right-0 z-[800] mx-4 mb-4 space-y-4 py-3 lg:bottom-auto lg:top-0 lg:mt-4 lg:w-full lg:max-w-sm lg:py-4"
-        >
-          <div className="space-y-2">
-            <header className="flex items-center justify-center space-x-2 md:flex-col md:items-start md:space-x-0 md:space-y-1">
-              <AppLink to="/">
-                  <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
-                </AppLink>
-              <h2 className="text-xl font-semibold text-gray-600 dark:text-gray-300 md:text-2xl">Travel Time Map</h2>
-            </header>
-            <p>Hover over a stop to see how far you can travel in:</p>
-            <ul className="px-3">
-              {Object.entries(durationColors).map(([duration, color]) => (
-                <li key={duration} className="flex space-x-2">
-                  <span className="inline-block h-6 w-6 rounded-md" style={{ backgroundColor: color }} />{" "}
-                  <span>{duration} minutes</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <nav className="text-sm text-center">
-              <AppLink to="/">
-                  <p>Check live departure times for your stop</p>
-                </AppLink>
-          </nav>
-          <footer className="flex justify-center space-x-2 text-sm">
-            <p>
-              <span aria-hidden>💛</span>{" "}
-              <Anchor href="https://rjackson.dev" aria-label="RJackson.dev">rjackson.dev</Anchor>
-            </p>
+        <main className="absolute bottom-0 left-0 right-0 z-800 mx-4 mb-4 lg:bottom-auto lg:top-0 lg:mt-4 lg:w-full lg:max-w-sm">
+          <Panel className="space-y-4 py-3 lg:py-4">
+            <div className="space-y-2">
+              <header className="flex items-center justify-center space-x-2 md:flex-col md:items-start md:space-x-0 md:space-y-1">
+                <AppLink to="/">
+                    <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
+                  </AppLink>
+                <h2 className="text-xl font-semibold text-gray-600 dark:text-gray-300 md:text-2xl">Travel Time Map</h2>
+              </header>
+              <p>Hover over a stop to see how far you can travel in:</p>
+              <ul className="px-3">
+                {Object.entries(durationColors).map(([duration, color]) => (
+                  <li key={duration} className="flex space-x-2">
+                    <span className="inline-block h-6 w-6 rounded-md" style={{ backgroundColor: color }} />{" "}
+                    <span>{duration} minutes</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <nav className="text-sm text-center">
+                <AppLink to="/">
+                    <p>Check live departure times for your stop</p>
+                  </AppLink>
+            </nav>
+            <footer className="flex justify-center space-x-2 text-sm">
+              <p>
+                <span aria-hidden>💛</span>{" "}
+                <Anchor href="https://rjackson.dev" aria-label="RJackson.dev">rjackson.dev</Anchor>
+              </p>
 
-            <p>
-              Contains{" "}
-              <Anchor href="https://tfgm.com/" target="_blank" rel="noreferrer">
-                  <abbr title="Transport for Greater Manchester">TfGM</abbr>
-                </Anchor>{" "}
-              data.
-            </p>
-          </footer>
-        </Panel>
+              <p>
+                Contains{" "}
+                <Anchor href="https://tfgm.com/" target="_blank" rel="noreferrer">
+                    <abbr title="Transport for Greater Manchester">TfGM</abbr>
+                  </Anchor>{" "}
+                data.
+              </p>
+            </footer>
+          </Panel>
+        </main>
         <MapContainer
           ref={mapRef}
           center={center}
@@ -313,7 +312,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
               <GeoJSON
                 data={lines}
                 pathOptions={{
-                  color: yellow[500],
+                  color: colors.yellow[500],
                   opacity: 1,
                   weight: 5,
                 }}
@@ -322,7 +321,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
             <GeoJSON
               data={lines}
               pathOptions={{
-                color: prefersDark ? yellow[300] : yellow[300],
+                color: prefersDark ? colors.yellow[300] : colors.yellow[300],
                 opacity: 1,
                 weight: 3,
               }}
