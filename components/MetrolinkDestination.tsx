@@ -32,7 +32,7 @@ type Props = {
   destination: string;
   allStops: StopsEntry[];
 };
-export default function MetrolinkDestination({ destination, allStops = [] }: Props) {
+export default function MetrolinkDestination({ destination, allStops }: Props) {
   const stopNames = allStops.map(({ StationLocation }) => StationLocation);
 
   if (destination.includes(" via ")) {

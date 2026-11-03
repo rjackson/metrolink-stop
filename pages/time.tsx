@@ -3,7 +3,7 @@ import { Anchor, Panel, usePrefersDark } from "@rjackson/rjds";
 import "leaflet/dist/leaflet.css";
 import { FeatureGroup, LatLngTuple } from "leaflet";
 import { loadIsochrone } from "../lib/isochrones";
-import { lazy, RefObject, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, RefObject, Suspense, useEffect, useRef, useState, type JSX } from "react";
 import { fuchsia, indigo, yellow } from "tailwindcss/colors";
 import useResizeObserver from "@react-hook/resize-observer";
 import stops from "../lib/gtfs-stops";
@@ -162,7 +162,9 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
             setActiveIsochrone(data ? { stopId: selectedStop, data } : undefined);
           }
         })
-        .catch((err) => console.error(`Failed to load isochrone for ${selectedStop}`, err));
+        .catch((err: unknown) => {
+          console.error(`Failed to load isochrone for ${selectedStop}`, err);
+        });
 
       return () => {
         cancelled = true;

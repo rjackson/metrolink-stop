@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import type { JSX, PropsWithChildren } from "react";
 import { BarLoader } from "react-spinners";
 import colors from "tailwindcss/colors";
 

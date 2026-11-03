@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 const Pill = ({ children, ...props }: React.ComponentPropsWithoutRef<"span">): JSX.Element => (
   <span
     className={`

@@ -42,7 +42,7 @@ export default function Home() {
       )}
 
       <Section aria-labelledby="all-stops" className="space-y-4">
-        <H3 id="all-stops" className={`${recentStops.length == 0 ? "sr-only" : ""}`}>
+        <H3 id="all-stops" className={recentStops.length == 0 ? "sr-only" : ""}>
           All stops
         </H3>
 
@@ -57,7 +57,9 @@ export default function Home() {
             </ul>
           </nav>
 
-          <form onSubmit={(e) => e.preventDefault()}>
+          <form onSubmit={(e) => {
+              e.preventDefault();
+            }}>
             <div role="search" className="flex flex-col space-y-2 md:items-center md:max-w-sm md:mx-auto">
               <label htmlFor="search">Search</label>
               <Input
@@ -65,7 +67,9 @@ export default function Home() {
                 name="search"
                 id="search"
                 value={searchTerm}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  setSearchTerm(e.target.value);
+                }}
                 className=""
                 autoComplete="off"
               />

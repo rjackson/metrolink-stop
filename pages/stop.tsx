@@ -1,5 +1,5 @@
 import AppLink from "../components/AppLink";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import useMetrolinkStop from "../components/hooks/useMetrolinkStop";
 import MetrolinkDestination from "../components/MetrolinkDestination";
@@ -35,12 +35,9 @@ export default function Stop({ stop: stopName, allStops }: Props) {
     isError,
   } = useMetrolinkStop(stopName);
 
-  const [lastUpdatedDateTimeLabel, setLastUpdatedDateTimeLabel] = useState(lastUpdated);
-
-  useEffect(() => {
-    const lastUpdatedDate = new Date(lastUpdated);
-    setLastUpdatedDateTimeLabel(lastUpdatedDate.toLocaleTimeString("en-GB", { timeStyle: "long" }));
-  }, [lastUpdated]);
+  const lastUpdatedDateTimeLabel = lastUpdated
+    ? new Date(lastUpdated).toLocaleTimeString("en-GB", { timeStyle: "long" })
+    : "";
 
   useDocumentTitle(`${name} stop info`);
 

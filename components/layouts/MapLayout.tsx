@@ -1,3 +1,5 @@
+import type { JSX } from "react";
+
 type MapLayoutProps = {
   children: React.ReactNode;
 } & React.ComponentPropsWithoutRef<"div">;

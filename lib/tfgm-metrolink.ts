@@ -13,7 +13,8 @@ function query<T>(document: string, variables: Record<string, unknown> = {}): Pr
   return tfgmQuery<T>(document, variables, endpoint);
 }
 
-export type Destination = "See Tram Front" | "Not in Service" | string;
+/** A stop name, or a message such as "See Tram Front" or "Not in Service" */
+export type Destination = string;
 export type Carriages = "Single" | "Double";
 export type Status = "Due" | "Departing" | "Arrived" | "Approaching";
 

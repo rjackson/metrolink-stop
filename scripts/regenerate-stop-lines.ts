@@ -14,7 +14,7 @@ async function main() {
   console.log(`Wrote lines for ${Object.keys(stopLines).length} stops to ${OUTPUT_PATH}`);
 }
 
-main().catch((err) => {
+main().catch((err: unknown) => {
   console.error(err);
   process.exit(1);
 });
