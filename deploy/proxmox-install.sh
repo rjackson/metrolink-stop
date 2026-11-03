@@ -296,7 +296,7 @@ VITE_FATHOM_CUSTOM_DOMAIN=${VITE_FATHOM_CUSTOM_DOMAIN}
 
 # Send TfGM API requests through a proxy instead of directly to
 # https://apiary.tfgm.com/ (e.g. if TfGM stop allowing cross-origin requests).
-VITE_TFGM_GRAPHQL_ENDPOINT=
+# VITE_TFGM_GRAPHQL_ENDPOINT=
 EOF
   msg_ok "Wrote ${ENV_FILE}."
 else

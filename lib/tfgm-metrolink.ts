@@ -7,7 +7,8 @@ import { DEFAULT_TFGM_GRAPHQL_ENDPOINT, tfgmQuery } from "./tfgm-graphql";
  * This replaced the deprecated api.tfgm.com OData endpoint. Set VITE_TFGM_GRAPHQL_ENDPOINT to route requests through
  * a proxy instead (e.g. if TfGM ever stop allowing cross-origin requests).
  */
-const endpoint = import.meta.env.VITE_TFGM_GRAPHQL_ENDPOINT ?? DEFAULT_TFGM_GRAPHQL_ENDPOINT;
+// An empty value (e.g. `VITE_TFGM_GRAPHQL_ENDPOINT=` in an env file) means unset, hence `||` rather than `??`
+const endpoint = import.meta.env.VITE_TFGM_GRAPHQL_ENDPOINT || DEFAULT_TFGM_GRAPHQL_ENDPOINT;
 
 function query<T>(document: string, variables: Record<string, unknown> = {}): Promise<T> {
   return tfgmQuery<T>(document, variables, endpoint);
