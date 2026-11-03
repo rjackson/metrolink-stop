@@ -5,7 +5,6 @@ import { useVisitedStopsState, useVisitedStopsUpdate } from "../components/conte
 import { Button, H3, Input, Panel, Section } from "@rjackson/rjds";
 import slugify from "../utils/slugify";
 import { stops } from "../lib/stops";
-import Pill from "../components/Pill";
 
 const fuse = new Fuse(stops, { keys: ["StationLocation", "lines"], includeScore: true });
 
@@ -50,7 +49,6 @@ export default function Home() {
           <nav>
             <ul className="space-y-2 md:text-center">
               <li className="">
-                <Pill>New</Pill>{" "}
                 <AppLink to={`/time`}>Travel time map</AppLink>{" "}
                 &ndash; see how far you can travel from each stop
               </li>
