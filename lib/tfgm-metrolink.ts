@@ -305,10 +305,21 @@ export type Departure = {
   wait: number;
 };
 
+export type Alert = {
+  id: string;
+  title: string;
+  description: string | null;
+  /** GTFS-realtime style effect, e.g. NO_SERVICE, ACCESSIBILITY_ISSUE, OTHER */
+  effect: string;
+  link: { href: string; label: string } | null;
+};
+
 export type StopInfo = {
   name: string;
   departures: Departure[];
+  /** Plain text versions of `alerts`. Kept for compatibility with older clients */
   messages: string[];
+  alerts: Alert[];
   lastUpdated: string;
 };
 
@@ -386,14 +397,23 @@ export async function getStopInfo(stopLocation: string): Promise<StopInfo> {
     })
     .sort((a, b) => a.wait - b.wait);
 
-  const messages = relevantAlerts(stop, lineAlerts[0]?.alerts ?? []).map(({ title, description }) =>
-    description ? `${title}\n${description.trim()}` : title
+  const alerts = relevantAlerts(stop, lineAlerts[0]?.alerts ?? []).map(
+    ({ id, title, description, effect, link }): Alert => ({
+      id,
+      title,
+      description: description?.trim() ? description.trim() : null,
+      effect,
+      link,
+    })
   );
+
+  const messages = alerts.map(({ title, description }) => (description ? `${title}\n${description}` : title));
 
   return {
     name: stopLocation,
     departures,
     messages,
+    alerts,
     lastUpdated: plausibleLastUpdated(stop.departures ?? []),
   };
 }

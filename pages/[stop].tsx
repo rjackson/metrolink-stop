@@ -6,10 +6,22 @@ import useMetrolinkStop from "../components/hooks/useMetrolinkStop";
 import MetrolinkDestination from "../components/MetrolinkDestination";
 import { getStops, StopsEntry } from "../lib/tfgm-metrolink";
 import LoadingWrapper from "../components/LoadingWrapper";
+import Pill from "../components/Pill";
 import { Anchor, H2, H3, Panel, Section } from "@rjackson/rjds";
 import slugify from "../utils/slugify";
 import { GetStaticPaths, GetStaticProps } from "next";
 import { ParsedUrlQuery } from "querystring";
+
+/** Short labels for TfGM alert effects worth highlighting. Others (e.g. OTHER) are shown without a label */
+const alertEffectLabels: Partial<Record<string, string>> = {
+  NO_SERVICE: "No service",
+  REDUCED_SERVICE: "Reduced service",
+  SIGNIFICANT_DELAYS: "Delays",
+  DETOUR: "Diversion",
+  MODIFIED_SERVICE: "Service change",
+  STOP_MOVED: "Stop moved",
+  ACCESSIBILITY_ISSUE: "Step-free access",
+};
 
 type Props = {
   stop: string;
@@ -17,7 +29,7 @@ type Props = {
 };
 export default function Stop({ stop: stopName, allStops }: Props) {
   const {
-    stopInfo: { name = stopName, departures = [], messages = [], lastUpdated = "" } = {},
+    stopInfo: { name = stopName, departures = [], messages = [], alerts, lastUpdated = "" } = {},
     isLoading,
     isError,
   } = useMetrolinkStop(stopName);
@@ -116,7 +128,30 @@ export default function Stop({ stop: stopName, allStops }: Props) {
               isError={isError}
               errorMessage={"Failed to load message board information"}
             >
-              {messages.length > 0 ? (
+              {alerts && alerts.length > 0 ? (
+                <ul className="space-y-6">
+                  {alerts.map(({ id, title, description, effect, link }) => (
+                    <li key={id} className="space-y-1">
+                      <p className="font-semibold">
+                        {alertEffectLabels[effect] && (
+                          <>
+                            <Pill>{alertEffectLabels[effect]}</Pill>{" "}
+                          </>
+                        )}
+                        {title}
+                      </p>
+                      {description && <p className="whitespace-pre-line">{description}</p>}
+                      {link && (
+                        <p>
+                          <Anchor href={link.href} target="_blank" rel="noopener noreferrer">
+                            {link.label.charAt(0).toUpperCase() + link.label.slice(1)}
+                          </Anchor>
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              ) : messages.length > 0 ? (
                 <ul className="space-y-2">
                   {messages.map((message, i) => (
                     <li key={i} className="whitespace-pre-line">
