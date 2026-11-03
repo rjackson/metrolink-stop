@@ -63,17 +63,13 @@ rarely: only when stops open, close or move, or lines change.
 | Data | Source | Regenerate with |
 | --- | --- | --- |
 | `data/stop-lines.json` | TfGM GraphQL API | `npm run regenerate-stop-lines` |
-| `data/lines/isochrones/geojson/` | TfGM GTFS (needs R) | `npm run regenerate-gtfs-isochrones` |
-| `data/lines/stops.json` | TfGM GTFS | `npm run gtfs-stops`, after the isochrones |
+| `data/lines/isochrones/geojson/`, `data/lines/stops.json` | TfGM GTFS (needs R) | `npm run regenerate-gtfs` |
 | `data/tfgm-open-data/` | TfGM open data | Downloaded by hand |
 | `data/stop-names.json` | Frozen (see above) | Edited by hand |
 
-To regenerate the GTFS data:
-
-```bash
-npm run regenerate-gtfs-isochrones  # download the feed, calculate travel times (R), build isochrones
-npm run gtfs-stops                  # stops.json: one platform per stop, matching the isochrones
-```
+`npm run regenerate-gtfs` downloads the feed, calculates travel times between stops (R), builds the isochrones, and
+writes `stops.json` with one platform per stop, matching the isochrones. Each step is also available on its own
+(`gtfs-prepare`, `gtfs-stop-times`, `gtfs-isochrones`, `gtfs-stops`).
 
 The R step installs its packages into `data/lines/renv` with renv on first run, which takes a few minutes. The feed
 is downloaded and normalised by `data/lines/prepare.sh` and `normalise-gtfs.mjs`: TfGM's current feed uses numeric
