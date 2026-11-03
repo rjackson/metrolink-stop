@@ -1,20 +1,16 @@
 import gtfsStops from "./gtfs-stops";
 import stopLinesJson from "../data/stop-lines.json";
+import stopNamesJson from "../data/stop-names.json";
 import slugify from "../utils/slugify";
 
 /**
- * Stop names were originally taken from the TfGM OData API's `StationLocation` attribute. They're used to build URL
- * slugs and are persisted in visitors' local storage (recently visited stops), so they must not change. Names now come
- * from GTFS data, and these overrides restore the original names wherever GTFS differs.
+ * Stop names, keyed by stop-level ATCO code.
+ *
+ * Names are used to build URL slugs and are persisted in visitors' local storage (recently visited stops), so they
+ * must never change. These were originally the TfGM OData API's `StationLocation` names. Stops not listed here (i.e.
+ * new ones) fall back to their GTFS name; add them here once they're live so later GTFS renames can't change them.
  */
-const legacyStopNames: Partial<Record<string, string>> = {
-  "9400ZZMABOB": "Besses O’ Th’ Barn",
-  "9400ZZMAGMX": "Deansgate - Castlefield",
-  "9400ZZMAFIR": "Firswood",
-  "9400ZZMAEVC": "Trafford Palazzo",
-  "9400ZZMANEW": "Newton Heath and Moston",
-  "9400ZZMASTW": "St Werburgh’s Road",
-};
+const stopNames = stopNamesJson as Partial<Record<string, string>>;
 
 export type StopIdentity = {
   StationLocation: string;
@@ -35,7 +31,7 @@ export const stopIdentities: StopIdentity[] = (() => {
   gtfsStops.forEach(({ stop_id, stop_name }) => {
     const atcoCode = stop_id.replace(/\d+$/, "");
     if (!byAtco.has(atcoCode)) {
-      const StationLocation = legacyStopNames[atcoCode] ?? stop_name.replace(/ \(Manchester Metrolink\)$/, "");
+      const StationLocation = stopNames[atcoCode] ?? stop_name.replace(/ \(Manchester Metrolink\)$/, "");
       byAtco.set(atcoCode, { StationLocation, atcoCode });
     }
   });
