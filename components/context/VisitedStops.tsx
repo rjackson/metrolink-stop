@@ -15,15 +15,9 @@ const VisitedStopsUpdateContext = createContext<VisitedStopsUpdateContextType | 
 
 export function VisitedStopsProvider({ capacity = 10, children }: PropsWithChildren<{ capacity?: number }>) {
   const [storedSet, setStoredSet] = useLocalStorage<string[]>("visited-stops", []);
-  const [set, { add, has, remove, reset }] = useSet<string>(new Set([]));
-
-  // Load persisted stops on mount
-  useEffect(() => {
-    if (storedSet instanceof Set) {
-      storedSet.forEach((v) => add(v));
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // Start from the persisted stops (stored as a JSON array, oldest first). Read during the first render rather than in
+  // an effect, as pages track their stop from their own effects, which run before this provider's
+  const [set, { add, has, remove, reset }] = useSet<string>(new Set(Array.isArray(storedSet) ? storedSet : []));
 
   // Persist any changes to the set
   useEffect(() => {
