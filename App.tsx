@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes, useLocation, useParams } from "react-router";
 import { usePrefersDark } from "@rjackson/rjds";
 import { VisitedStopsProvider } from "./components/context/VisitedStops";
 import MainLayout from "./components/layouts/MainLayout";

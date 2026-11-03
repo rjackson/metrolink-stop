@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "react-router";
 import * as Fathom from "fathom-client";
 
 const customDomain = import.meta.env.VITE_FATHOM_CUSTOM_DOMAIN;
