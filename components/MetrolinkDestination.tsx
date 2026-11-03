@@ -1,6 +1,5 @@
-import { Anchor } from "@rjackson/rjds";
-import Link from "next/link";
-import { StopsEntry } from "../lib/tfgm-metrolink";
+import AppLink from "./AppLink";
+import { StopsEntry } from "../lib/stops";
 import slugify from "../utils/slugify";
 
 const customMappings: Record<string, string> = {
@@ -21,9 +20,7 @@ const Destination = ({ destination, stopNames }: DestinationProps) => {
   return (
     <>
       {stopNames.includes(middleDestination) ? (
-        <Link href={`/${slugify(middleDestination)}`} passHref>
-          <Anchor>{destination}</Anchor>
-        </Link>
+        <AppLink to={`/${slugify(middleDestination)}`}>{destination}</AppLink>
       ) : (
         <span>{destination}</span>
       )}

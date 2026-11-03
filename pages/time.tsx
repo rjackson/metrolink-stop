@@ -1,22 +1,20 @@
+import AppLink from "../components/AppLink";
 import { Anchor, Panel, usePrefersDark } from "@rjackson/rjds";
 import "leaflet/dist/leaflet.css";
-import dynamic from "next/dynamic";
 import { FeatureGroup, LatLngTuple } from "leaflet";
-import Head from "next/head";
-import { GetStaticProps, InferGetStaticPropsType } from "next";
-import { loadIsochrones } from "../lib/isochrones";
-import { ReactElement, RefObject, useEffect, useRef, useState } from "react";
+import { loadIsochrone } from "../lib/isochrones";
+import { lazy, RefObject, Suspense, useEffect, useRef, useState } from "react";
 import { fuchsia, indigo, yellow } from "tailwindcss/colors";
-import { MapLayout } from "../components/layouts/MapLayout";
 import useResizeObserver from "@react-hook/resize-observer";
 import stops from "../lib/gtfs-stops";
 
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
-import { loadMetrolinkLinesGeoJSON } from "../lib/tfgm-open-data/gm-metrolink-network/loadMetrolinkLines";
-import Link from "next/link";
+import { metrolinkLinesGeoJSON as lines } from "../lib/tfgm-open-data/gm-metrolink-network/loadMetrolinkLines";
+import useDocumentTitle from "../components/hooks/useDocumentTitle";
+import type { GeoJsonObject } from "geojson";
 import { useMediaQuery } from "@react-hook/media-query";
 
-const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<typeof getStaticProps>) => JSX.Element> => {
+const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
   const { MapContainer, GeoJSON, CircleMarker, useMap, FeatureGroup, Pane, ZoomControl, Tooltip } = await import(
     "react-leaflet"
   );
@@ -46,7 +44,7 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
     return null;
   };
 
-  const ClientOnlyMap = ({ isochrones, lines }: InferGetStaticPropsType<typeof getStaticProps>) => {
+  const ClientOnlyMap = () => {
     const prefersDark = usePrefersDark();
     const containerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<L.Map>(null);
@@ -149,7 +147,27 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
     };
 
     const [selectedStop, setSelectedStop] = useState<string | undefined>();
-    const activeIsochrone = selectedStop ? isochrones[selectedStop] : undefined;
+    const [activeIsochrone, setActiveIsochrone] = useState<{ stopId: string; data: GeoJsonObject } | undefined>();
+
+    // Keep showing the previous isochrone until the newly selected one has loaded
+    useEffect(() => {
+      if (!selectedStop) {
+        return;
+      }
+
+      let cancelled = false;
+      loadIsochrone(selectedStop)
+        .then((data) => {
+          if (!cancelled) {
+            setActiveIsochrone(data ? { stopId: selectedStop, data } : undefined);
+          }
+        })
+        .catch((err) => console.error(`Failed to load isochrone for ${selectedStop}`, err));
+
+      return () => {
+        cancelled = true;
+      };
+    }, [selectedStop]);
 
     useResizeObserver(containerRef, () => {
       mapRef.current?.invalidateSize();
@@ -163,11 +181,9 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
         >
           <div className="space-y-2">
             <header className="flex items-center justify-center space-x-2 md:flex-col md:items-start md:space-x-0 md:space-y-1">
-              <Link href="/" passHref>
-                <Anchor>
+              <AppLink to="/">
                   <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
-                </Anchor>
-              </Link>
+                </AppLink>
               <h2 className="text-xl font-semibold text-gray-600 dark:text-gray-300 md:text-2xl">Travel Time Map</h2>
             </header>
             <p>Hover over a stop to see how far you can travel in:</p>
@@ -181,27 +197,21 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
             </ul>
           </div>
           <nav className="text-sm text-center">
-              <Link href="/" passHref>
-                <Anchor>
+              <AppLink to="/">
                   <p>Check live departure times for your stop</p>
-                </Anchor>
-              </Link>
+                </AppLink>
           </nav>
           <footer className="flex justify-center space-x-2 text-sm">
             <p>
               <span aria-hidden>💛</span>{" "}
-              <Link href="https://rjackson.dev" passHref>
-                <Anchor aria-label="RJackson.dev">rjackson.dev</Anchor>
-              </Link>
+              <Anchor href="https://rjackson.dev" aria-label="RJackson.dev">rjackson.dev</Anchor>
             </p>
 
             <p>
               Contains{" "}
-              <Link href="https://tfgm.com/" passHref>
-                <Anchor target="_blank" rel="noreferrer">
+              <Anchor href="https://tfgm.com/" target="_blank" rel="noreferrer">
                   <abbr title="Transport for Greater Manchester">TfGM</abbr>
-                </Anchor>
-              </Link>{" "}
+                </Anchor>{" "}
               data.
             </p>
           </footer>
@@ -218,16 +228,14 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
           <ZoomControl position="topright" />
           <VectorBasemapLayer
             styleKey={prefersDark ? "ArcGIS:DarkGray" : "ArcGIS:LightGray"}
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            apiKey={process.env.NEXT_PUBLIC_ESRI_API_KEY!}
+            apiKey={import.meta.env.VITE_ESRI_API_KEY ?? ""}
             style={(style: StyleSpecification) => {
               return { ...style, layers: style.layers.filter((layer) => includeLayerTypeInBackground[layer.type]) };
             }}
           />
           <VectorBasemapLayer
             styleKey={prefersDark ? "ArcGIS:DarkGray" : "ArcGIS:LightGray"}
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            apiKey={process.env.NEXT_PUBLIC_ESRI_API_KEY!}
+            apiKey={import.meta.env.VITE_ESRI_API_KEY ?? ""}
             pane="esri-labels"
             style={(style: StyleSpecification) => {
               return {
@@ -282,8 +290,8 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
           <Pane name="isochronePane" style={{ zIndex: 290 }} />
           {activeIsochrone && (
             <GeoJSON
-              key={selectedStop}
-              data={activeIsochrone}
+              key={activeIsochrone.stopId}
+              data={activeIsochrone.data}
               pane="isochronePane"
               style={(feature) => {
                 return {
@@ -373,39 +381,15 @@ const initClientOnlyMap = async (): Promise<(props: InferGetStaticPropsType<type
   return ClientOnlyMap;
 };
 
-const IsochroneMap = dynamic(initClientOnlyMap, { ssr: false });
+// Leaflet and friends are imported dynamically within, so they're only loaded alongside the map
+const IsochroneMap = lazy(async () => ({ default: await initClientOnlyMap() }));
 
-export default function TravelTimeMap({ isochrones, lines }: InferGetStaticPropsType<typeof getStaticProps>) {
+export default function TravelTimeMap() {
+  useDocumentTitle("Travel Time Map");
+
   return (
-    <>
-      <Head>
-        <title>Travel Time Map</title>
-      </Head>
-      {/* <div className="space-y-8">
-        <Section as="main" className="space-y-2 md:space-y-6" aria-labelledby="travel-time-map">
-          <H3 id="travel-time-map">Travel Time Map</H3>
-        </Section> */}
-
-      <IsochroneMap isochrones={isochrones} lines={lines} />
-      {/* </div> */}
-    </>
+    <Suspense>
+      <IsochroneMap />
+    </Suspense>
   );
 }
-
-export const getStaticProps: GetStaticProps<{
-  isochrones: Awaited<ReturnType<typeof loadIsochrones>>;
-  lines: Awaited<ReturnType<typeof loadMetrolinkLinesGeoJSON>>;
-}> = async () => {
-  // TODO: Expose this publically and lazy load, rather than shove a ton of data right down the pipe?
-  const isochrones = await loadIsochrones();
-  const lines = await loadMetrolinkLinesGeoJSON();
-
-  return {
-    props: {
-      isochrones,
-      lines,
-    },
-  };
-};
-
-TravelTimeMap.getLayout = (page: ReactElement) => <MapLayout>{page}</MapLayout>;

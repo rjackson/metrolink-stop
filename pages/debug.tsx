@@ -1,11 +1,9 @@
-// i am a bad guy:
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-
 import { Button, H2, Panel, Section } from "@rjackson/rjds";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useState } from "react";
+import useSWR from "swr";
 import MetrolinkDestination from "../components/MetrolinkDestination";
-import { getAll, getStops, StopsEntry } from "../lib/tfgm-metrolink";
+import LoadingWrapper from "../components/LoadingWrapper";
+import { getAll } from "../lib/tfgm-metrolink";
+import { stops as allStops } from "../lib/stops";
 
 type Dump = Awaited<ReturnType<typeof getAll>>;
 
@@ -24,8 +22,19 @@ const UniqueList = ({ title, values }: { title: string; values: (string | null |
   </Section>
 );
 
-export default function Debug({ dump: initialDump, allStops }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [dump, setDump] = useState(initialDump);
+export default function Debug() {
+  const { data, error, mutate, isValidating } = useSWR<Dump, unknown>("debug-dump", getAll, {
+    revalidateOnFocus: false,
+  });
+
+  return (
+    <LoadingWrapper isLoading={!data && !error} isError={!!error} errorMessage="Failed to load data">
+      {data && <DebugDump dump={data} onRefresh={() => void mutate()} isRefreshing={isValidating} />}
+    </LoadingWrapper>
+  );
+}
+
+function DebugDump({ dump, onRefresh, isRefreshing }: { dump: Dump; onRefresh: () => void; isRefreshing: boolean }) {
   const tramStops = dump.tramStops.flatMap((stop) => (stop ? [stop] : []));
   const departures = tramStops.flatMap(({ departures = [] }) => departures);
   const alerts = [
@@ -33,17 +42,6 @@ export default function Debug({ dump: initialDump, allStops }: InferGetServerSid
     ...tramStops.flatMap(({ stopAlerts = [] }) => stopAlerts),
   ];
   const uniqueDestinations = [...new Set(departures.map(({ trip }) => trip.destinationDisplay))];
-
-  const onRefresh = async () => {
-    try {
-      const req = await fetch(`/api/dump`);
-      const data = await req.json();
-
-      setDump(data as Dump);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   return (
     <>
@@ -78,18 +76,12 @@ export default function Debug({ dump: initialDump, allStops }: InferGetServerSid
       <Section>
         <Panel>
           <H2>Dump</H2>
-          <Button onClick={onRefresh}>Refresh</Button>
+          <Button onClick={onRefresh} disabled={isRefreshing}>
+            {isRefreshing ? "Refreshing…" : "Refresh"}
+          </Button>
           <pre>{JSON.stringify(dump, null, 2)}</pre>
         </Panel>
       </Section>
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps<{ dump: Dump; allStops: StopsEntry[] }> = async () => {
-  const [dump, allStops] = await Promise.all([getAll(), getStops()]);
-
-  return {
-    props: { dump, allStops }, // will be passed to the page component as props
-  };
-};

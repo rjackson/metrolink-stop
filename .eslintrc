@@ -6,17 +6,26 @@
   },
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 2022,
+    "ecmaFeatures": {
+      "jsx": true
+    },
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
   "plugins": [
     "@typescript-eslint"
   ],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
   "extends": [
     "eslint:recommended",
-    "next",
-    "next/core-web-vitals",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:react-hooks/recommended",
     "prettier",
     "plugin:jsx-a11y/strict",
     "plugin:@typescript-eslint/eslint-recommended",

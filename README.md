@@ -1,30 +1,71 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# metrolink stops
 
-## Getting Started
+Live departures for Manchester Metrolink stops, plus a travel time map.
 
-First, run the development server:
+It's a fully static single page app (Vite + React). Live departures and alerts are fetched by the browser directly from
+TfGM's GraphQL API (`https://apiary.tfgm.com/`), which needs no key and allows cross-origin requests. Everything else
+(stops, lines, the travel time map) is generated from TfGM data, committed under `data/`, and bundled at build time.
+
+## Development
 
 ```bash
+cp .env.example .env.local # then fill in as required
+npm install
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run lint` and `npm run type-check` run as a pre-commit hook.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Building and hosting
 
-## Learn More
+```bash
+npm run build   # outputs to dist/
+npm run preview # serve dist/ locally
+```
 
-To learn more about Next.js, take a look at the following resources:
+`dist/` can be served by any static file server, with two requirements:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Single page app fallback**: serve `index.html` for any path that isn't a file, so stop URLs like `/cornbrook`
+  work on direct visits and refreshes.
+- **Don't cache `/sw.js` long-term**, so browsers pick up the worker that retires old service workers. Everything under `/assets/` is content-hashed
+  and can be cached forever.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+For example, with Caddy:
 
-## Deploy on Vercel
+```caddy
+metrolink.example.com {
+	root * /srv/metrolink-stop/dist
+	encode gzip zstd
+	try_files {path} /index.html
+	file_server
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/import?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+	header /sw.js Cache-Control "no-cache"
+	header /assets/* Cache-Control "public, max-age=31536000, immutable"
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Environment variables (see `.env.example`) are baked in at build time, so rebuild after changing them.
+
+If TfGM ever stop allowing cross-origin requests, set `VITE_TFGM_GRAPHQL_ENDPOINT` to a proxy that forwards to
+`https://apiary.tfgm.com/` (e.g. a small Cloudflare Worker). `lib/tfgm-graphql.ts` has no browser-specific code, so
+it can be reused there.
+
+### URL compatibility
+
+Stop URLs are slugs of the stop names originally used by the TfGM OData API, and the same names are stored in
+visitors' local storage (recently visited stops). `lib/stops.ts` keeps those names stable; check it when stops are
+added or renamed. Older URLs with an `/en-GB` prefix, and `/map` and `/travel`, redirect to their current equivalents.
+
+## Data
+
+Generated data lives in `data/` and is committed:
+
+| Data                                   | Source              | Regenerate with                       |
+| -------------------------------------- | ------------------- | ------------------------------------- |
+| `data/lines/stops.json`                | TfGM GTFS           | `npm run regenerate-gtfs-stops`       |
+| `data/lines/lines.json`                | TfGM GTFS           | `npm run regenerate-gtfs-lines`       |
+| `data/lines/isochrones/`               | TfGM GTFS (needs R) | `npm run regenerate-gtfs-isochrones`  |
+| `data/stop-lines.json`                 | TfGM GraphQL API    | `npm run regenerate-stop-lines`       |
+| `data/tfgm-open-data/`                 | TfGM open data      | Manually downloaded                   |
+
+After regenerating, rebuild and redeploy.

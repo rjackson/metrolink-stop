@@ -1,16 +1,13 @@
 import useSWR from "swr";
-import { StopInfo } from "../../lib/tfgm-metrolink";
-
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
+import { getStopInfo, StopInfo } from "../../lib/tfgm-metrolink";
 
 /**
- * @param {string} stopName The exact name of a Metrolink stop, as stored in the StationLocation attribute
+ * @param {string} stopName The exact name of a Metrolink stop, as listed in lib/stops
  */
 const useMetrolinkStop = (
   stopName: string
 ): { stopInfo?: StopInfo; isLoading: boolean; isError: boolean; error: unknown } => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const { data, error } = useSWR<StopInfo>(`/api/stop/${encodeURIComponent(stopName)}`, fetcher, {
+  const { data, error } = useSWR<StopInfo, unknown>(["stop", stopName], () => getStopInfo(stopName), {
     // Auto refresh every minute
     refreshInterval: 60 * 1000,
 
@@ -18,7 +15,6 @@ const useMetrolinkStop = (
     // given data only has minute granularity)
     focusThrottleInterval: 30 * 1000,
   });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   return { stopInfo: data, isLoading: !error && !data, isError: error !== undefined, error };
 };
 

@@ -1,153 +1,21 @@
-import gtfsStops from "./gtfs-stops";
+import { stopIdentities, findStopByName } from "./stops";
+import { DEFAULT_TFGM_GRAPHQL_ENDPOINT, tfgmQuery } from "./tfgm-graphql";
 
 /**
- * Client for TfGM's GraphQL API (the backend behind tfgm.com's live departure pages).
+ * Live departures and alerts from TfGM's GraphQL API, called directly from the browser.
  *
- * This replaced the deprecated api.tfgm.com OData endpoint. The API is unauthenticated, has introspection disabled
- * and masks error details, so the query shapes here are taken from what tfgm.com itself uses.
+ * This replaced the deprecated api.tfgm.com OData endpoint. Set VITE_TFGM_GRAPHQL_ENDPOINT to route requests through
+ * a proxy instead (e.g. if TfGM ever stop allowing cross-origin requests).
  */
-const endpoint = process.env.TFGM_GRAPHQL_ENDPOINT ?? "https://apiary.tfgm.com/";
+const endpoint = import.meta.env.VITE_TFGM_GRAPHQL_ENDPOINT ?? DEFAULT_TFGM_GRAPHQL_ENDPOINT;
+
+function query<T>(document: string, variables: Record<string, unknown> = {}): Promise<T> {
+  return tfgmQuery<T>(document, variables, endpoint);
+}
 
 export type Destination = "See Tram Front" | "Not in Service" | string;
 export type Carriages = "Single" | "Double";
 export type Status = "Due" | "Departing" | "Arrived" | "Approaching";
-
-type GraphQLResponse<T> = {
-  data?: T | null;
-  errors?: { message: string; path?: (string | number)[]; extensions?: { code?: string } }[];
-};
-
-async function query<T>(document: string, variables: Record<string, unknown> = {}): Promise<T> {
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ query: document, variables }),
-  });
-
-  // Errors come back as JSON even with non-2xx statuses (e.g. 500 with code TOO_COMPLEX for oversized queries)
-  const { data, errors } = (await response.json().catch(() => ({}))) as GraphQLResponse<T>;
-
-  // Partial errors are expected (e.g. an unknown ATCO code yields a null entry and a RESOURCE_NOT_FOUND error), so
-  // only treat the response as a failure when there's no data at all
-  if (!response.ok || !data) {
-    const message = errors?.map(({ message, extensions }) => `${extensions?.code ?? ""} ${message}`).join("; ");
-    throw new Error(`TfGM API request failed (${response.status}): ${message ?? response.statusText}`);
-  }
-
-  return data;
-}
-
-/* -------------------------------------------------------------------------------------------------------------------
- * Stops
- * -----------------------------------------------------------------------------------------------------------------*/
-
-/**
- * Stop names were originally taken from the OData `StationLocation` attribute. They're used to build URL slugs and are
- * persisted in visitors' local storage (recently visited stops), so they must not change. Names now come from GTFS
- * data, and these overrides restore the original names wherever GTFS differs.
- */
-const legacyStopNames: Partial<Record<string, string>> = {
-  "9400ZZMABOB": "Besses O’ Th’ Barn",
-  "9400ZZMAGMX": "Deansgate - Castlefield",
-  "9400ZZMAFIR": "Firswood",
-  "9400ZZMAEVC": "Trafford Palazzo",
-  "9400ZZMANEW": "Newton Heath and Moston",
-  "9400ZZMASTW": "St Werburgh’s Road",
-};
-
-type StopIdentity = {
-  StationLocation: string;
-  atcoCode: string;
-};
-
-/**
- * Every stop, keyed on the stop-level ATCO code (GTFS uses platform-level codes, e.g. 9400ZZMAHTN1 and 9400ZZMAHTN2,
- * but the API only accepts the stop-level 9400ZZMAHTN).
- */
-const stopIdentities: StopIdentity[] = (() => {
-  const byAtco = new Map<string, StopIdentity>();
-  gtfsStops.forEach(({ stop_id, stop_name }) => {
-    const atcoCode = stop_id.replace(/\d+$/, "");
-    if (!byAtco.has(atcoCode)) {
-      const StationLocation = legacyStopNames[atcoCode] ?? stop_name.replace(/ \(Manchester Metrolink\)$/, "");
-      byAtco.set(atcoCode, { StationLocation, atcoCode });
-    }
-  });
-  return [...byAtco.values()];
-})();
-
-function findAtcoCode(stopLocation: string): string | undefined {
-  return stopIdentities.find(({ StationLocation }) => StationLocation === stopLocation)?.atcoCode;
-}
-
-export type StopsEntry = StopIdentity & {
-  /** Lines serving this stop, e.g. "Blue Line", "Ashton-Under-Lyne - Bury". Used for search */
-  lines: string[];
-};
-
-type StopLinesData = {
-  locationByAtco: ({
-    atcoCode: string;
-    lines?: { id: string; services: { name: string }[] }[];
-  } | null)[];
-};
-
-const STOP_LINES_QUERY = `
-  query GetTramStopLines($atcoCodes: [String!]!) {
-    locationByAtco(atcoCodes: $atcoCodes) {
-      atcoCode
-      ... on MassTransportLocation {
-        lines {
-          ... on TramLine {
-            id
-            services {
-              name
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-
-let stopsPromise: Promise<StopsEntry[]> | undefined;
-
-/**
- * List every stop, along with the lines that serve it.
- *
- * Line information is fetched from the API. If that fails, stops are still returned (without lines) so the stop list
- * and pages keep working.
- */
-export function getStops(): Promise<StopsEntry[]> {
-  // Memoised, as this is called for every statically generated page
-  stopsPromise ??= (async () => {
-    const linesByAtco = new Map<string, string[]>();
-
-    try {
-      const { locationByAtco } = await query<StopLinesData>(STOP_LINES_QUERY, {
-        atcoCodes: stopIdentities.map(({ atcoCode }) => atcoCode),
-      });
-
-      locationByAtco.forEach((location) => {
-        if (!location) {
-          return;
-        }
-
-        const lines = (location.lines ?? []).flatMap(({ id, services }) => [
-          id.replace(/_/g, " "),
-          ...services.map(({ name }) => name),
-        ]);
-        linesByAtco.set(location.atcoCode, [...new Set(lines)]);
-      });
-    } catch (err) {
-      console.error("Failed to fetch stop lines", err);
-    }
-
-    return stopIdentities.map((stop) => ({ ...stop, lines: linesByAtco.get(stop.atcoCode) ?? [] }));
-  })();
-
-  return stopsPromise;
-}
 
 /* -------------------------------------------------------------------------------------------------------------------
  * Departures and alerts
@@ -369,7 +237,7 @@ function plausibleLastUpdated(departures: TfgmDeparture[]): string {
  * @param stopLocation The stop's name, as listed by getStops()
  */
 export async function getStopInfo(stopLocation: string): Promise<StopInfo> {
-  const atcoCode = findAtcoCode(stopLocation);
+  const atcoCode = findStopByName(stopLocation)?.atcoCode;
 
   if (!atcoCode) {
     throw new Error(`No metrolink found matching ${stopLocation}`);

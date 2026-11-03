@@ -1,34 +1,33 @@
-import { readFile, readdir } from "fs/promises";
-import { GeoJsonObject } from "geojson";
-import { isGeoJSONObject } from "geojson-validation";
-import path from "path";
+import type { GeoJsonObject } from "geojson";
 
-const GEOJSON_PATH = path.join(process.cwd(), "data/lines/isochrones/geojson");
+// Each stop's isochrone is bundled as its own chunk and only fetched when that stop is selected, rather than shipping
+// all of them (several MB) up front
+const loaders = import.meta.glob<string>("../data/lines/isochrones/geojson/*.geojson", {
+  query: "?raw",
+  import: "default",
+});
 
-const tsIsGeoJsonObject = (data: unknown): data is GeoJsonObject => isGeoJSONObject(data);
+const loadersByStopId = new Map(
+  Object.entries(loaders).map(([path, load]) => [path.replace(/^.*\//, "").replace(/\.geojson$/, ""), load])
+);
 
-type isochroneEntry = [string, GeoJsonObject];
-type isochroneMap = Record<string, GeoJsonObject>;
+const cache = new Map<string, Promise<GeoJsonObject>>();
 
-export const loadIsochrones = async (): Promise<isochroneMap> => {
-  const files = (await readdir(GEOJSON_PATH)).filter((filename) => filename.endsWith(".geojson"));
+/**
+ * Load the isochrone for a GTFS stop ID (e.g. 9400ZZMAABM1). Resolves to undefined if there isn't one
+ */
+export function loadIsochrone(stopId: string): Promise<GeoJsonObject | undefined> {
+  const load = loadersByStopId.get(stopId);
 
-  const jsons = await Promise.allSettled(
-    files.map(async (filename) => {
-      const data = await readFile(`${GEOJSON_PATH}/${filename}`);
-      const json = JSON.parse(data.toString()) as unknown;
+  if (!load) {
+    return Promise.resolve(undefined);
+  }
 
-      if (!tsIsGeoJsonObject(json)) {
-        throw new Error("Invalid geojson file");
-      }
+  let isochrone = cache.get(stopId);
+  if (!isochrone) {
+    isochrone = load().then((raw) => JSON.parse(raw) as GeoJsonObject);
+    cache.set(stopId, isochrone);
+  }
 
-      return [filename.replace(/\.geojson$/, ""), json];
-    })
-  );
-
-  const geojsons = jsons
-    .filter((v): v is PromiseFulfilledResult<isochroneEntry> => v.status === "fulfilled")
-    .map((v) => v.value);
-
-  return Object.fromEntries(geojsons);
-};
+  return isochrone;
+}

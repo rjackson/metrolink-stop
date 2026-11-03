@@ -1,20 +1,16 @@
-import { getStops, StopsEntry } from "../lib/tfgm-metrolink";
-import Link from "next/link";
+import AppLink from "../components/AppLink";
 import { ChangeEvent, useState } from "react";
 import Fuse from "fuse.js";
 import { useVisitedStopsState, useVisitedStopsUpdate } from "../components/context/VisitedStops";
-import { Anchor, Button, H3, Input, Panel, Section } from "@rjackson/rjds";
+import { Button, H3, Input, Panel, Section } from "@rjackson/rjds";
 import slugify from "../utils/slugify";
-import { GetStaticProps } from "next";
+import { stops } from "../lib/stops";
 import Pill from "../components/Pill";
 
-type Props = {
-  stops: StopsEntry[];
-};
+const fuse = new Fuse(stops, { keys: ["StationLocation", "lines"], includeScore: true });
 
-export default function Home({ stops }: Props) {
+export default function Home() {
   const [searchTerm, setSearchTerm] = useState("");
-  const fuse = new Fuse(stops, { keys: ["StationLocation", "lines"], includeScore: true });
   const results = fuse.search(searchTerm);
   const stopResults = searchTerm ? results.map(({ item }) => item) : stops;
 
@@ -37,9 +33,7 @@ export default function Home({ stops }: Props) {
             <ul className="space-y-2 md:text-center">
               {recentStops.map((StationLocation) => (
                 <li key={StationLocation}>
-                  <Link href={`/${slugify(StationLocation)}`} passHref>
-                    <Anchor>{StationLocation}</Anchor>
-                  </Link>
+                  <AppLink to={`/${slugify(StationLocation)}`}>{StationLocation}</AppLink>
                 </li>
               ))}
             </ul>
@@ -57,9 +51,7 @@ export default function Home({ stops }: Props) {
             <ul className="space-y-2 md:text-center">
               <li className="">
                 <Pill>New</Pill>{" "}
-                <Link href={`/time`} passHref>
-                  <Anchor>Travel time map</Anchor>
-                </Link>{" "}
+                <AppLink to={`/time`}>Travel time map</AppLink>{" "}
                 &ndash; see how far you can travel from each stop
               </li>
             </ul>
@@ -82,10 +74,7 @@ export default function Home({ stops }: Props) {
           <ul className="space-y-2 md:text-center">
             {stopResults.map(({ StationLocation }) => (
               <li key={StationLocation}>
-                <Link href={`/${slugify(StationLocation)}`} passHref>
-                  {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-                  <Anchor>{StationLocation}</Anchor>
-                </Link>
+                <AppLink to={`/${slugify(StationLocation)}`}>{StationLocation}</AppLink>
               </li>
             ))}
           </ul>
@@ -94,14 +83,3 @@ export default function Home({ stops }: Props) {
     </div>
   );
 }
-
-export const getStaticProps: GetStaticProps = async () => {
-  const stops = await getStops();
-
-  // Sort alphabetically by default
-  const sortedStops = stops.sort((a, b) => a.StationLocation.localeCompare(b.StationLocation));
-
-  return {
-    props: { stops: sortedStops }, // will be passed to the page component as props
-  };
-};

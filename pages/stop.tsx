@@ -1,16 +1,13 @@
-import Head from "next/head";
-import Link from "next/link";
+import AppLink from "../components/AppLink";
 import { useEffect, useState } from "react";
 import { useVisitedStopsUpdate } from "../components/context/VisitedStops";
 import useMetrolinkStop from "../components/hooks/useMetrolinkStop";
 import MetrolinkDestination from "../components/MetrolinkDestination";
-import { getStops, StopsEntry } from "../lib/tfgm-metrolink";
+import { StopsEntry } from "../lib/stops";
+import useDocumentTitle from "../components/hooks/useDocumentTitle";
 import LoadingWrapper from "../components/LoadingWrapper";
 import Pill from "../components/Pill";
 import { Anchor, H2, H3, Panel, Section } from "@rjackson/rjds";
-import slugify from "../utils/slugify";
-import { GetStaticPaths, GetStaticProps } from "next";
-import { ParsedUrlQuery } from "querystring";
 
 /** Short labels for TfGM alert effects worth highlighting. Others (e.g. OTHER) are shown without a label */
 const alertEffectLabels: Partial<Record<string, string>> = {
@@ -45,6 +42,8 @@ export default function Stop({ stop: stopName, allStops }: Props) {
     setLastUpdatedDateTimeLabel(lastUpdatedDate.toLocaleTimeString("en-GB", { timeStyle: "long" }));
   }, [lastUpdated]);
 
+  useDocumentTitle(`${name} stop info`);
+
   const { track } = useVisitedStopsUpdate();
   useEffect(() => {
     track(stopName);
@@ -53,19 +52,13 @@ export default function Stop({ stop: stopName, allStops }: Props) {
 
   return (
     <>
-      <Head>
-        <title>{name} stop info</title>
-      </Head>
       <div className="space-y-6 md:space-y-10">
         <div className="flex flex-col items-center md:flex-row">
           <div className="flex-1">
-            <Link href="/" passHref>
-              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-              <Anchor>
+            <AppLink to="/">
                 <span aria-hidden>👈</span> Back
                 <span className="sr-only">to list of stops</span>
-              </Anchor>
-            </Link>
+              </AppLink>
           </div>
           <div>
             <H2>{name}</H2>
@@ -189,38 +182,10 @@ export default function Stop({ stop: stopName, allStops }: Props) {
       </div>
       <nav className="px-6 py-2">
         {/* (a stop chooser at some point in the future) */}
-        <Link href="/" passHref>
-          <Anchor>
+        <AppLink to="/">
             <span aria-hidden>👈</span> Back to list of stops
-          </Anchor>
-        </Link>
+          </AppLink>
       </nav>
     </>
   );
 }
-
-// const slugify = (stop) => stop?.toLowerCase().replace(/ /g, "-");
-
-export const getStaticProps: GetStaticProps = async (context) => {
-  const { stop: sluggedStop } = context.params as ParsedUrlQuery & { slug: string };
-
-  const stops = await getStops();
-  const { StationLocation: stop } = stops.filter(
-    ({ StationLocation }) => slugify(StationLocation) === sluggedStop
-  )[0];
-
-  return {
-    props: { stop, allStops: stops }, // will be passed to the page component as props
-  };
-};
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  const gottenStops = await getStops();
-  const stops = gottenStops.map(({ StationLocation }) => StationLocation);
-  const paths = stops.map((stop) => ({ params: { stop: slugify(stop) } }));
-
-  return {
-    paths,
-    fallback: false,
-  };
-};
