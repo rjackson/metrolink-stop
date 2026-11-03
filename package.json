@@ -8,6 +8,7 @@
     "preview": "vite preview",
     "lint": "eslint --ext .ts,.tsx --max-warnings 0 App.tsx main.tsx vite.config.ts pages components lib utils scripts",
     "regenerate-stop-lines": "tsx scripts/regenerate-stop-lines.ts",
+    "check-data": "tsx scripts/check-data.ts",
     "regenerate-gtfs-stops": "npm run gtfs-prepare && npm run gtfs-stops",
     "regenerate-gtfs-lines": "npm run gtfs-prepare && npm run gtfs-lines",
     "regenerate-gtfs-isochrones": "npm run gtfs-prepare && npm run gtfs-stop-times && npm run gtfs-isochrones",

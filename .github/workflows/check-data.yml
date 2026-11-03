@@ -1,0 +1,32 @@
+# Checks whether the committed data (stops, lines) is out of date, and fails if
+# so. Data is regenerated, committed and deployed by hand: see README.
+#
+# Deliberately low-stakes. GitHub disables scheduled workflows after 60 days
+# without repository activity, and stale data only means a new stop or line
+# change is missing until the next manual update.
+name: check-data
+on:
+  schedule:
+    # 06:00 UTC every Monday
+    - cron: 0 6 * * 1
+  workflow_dispatch: {}
+  push:
+    paths:
+      - .github/workflows/check-data.yml
+      - scripts/check-data.ts
+      - scripts/stop-lines.ts
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Check data against TfGM sources
+        run: npm run check-data
