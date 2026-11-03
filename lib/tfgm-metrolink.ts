@@ -188,8 +188,6 @@ export type Alert = {
 export type StopInfo = {
   name: string;
   departures: Departure[];
-  /** Plain text versions of `alerts`. Kept for compatibility with older clients */
-  messages: string[];
   alerts: Alert[];
   lastUpdated: string;
 };
@@ -279,12 +277,9 @@ export async function getStopInfo(stopLocation: string): Promise<StopInfo> {
     })
   );
 
-  const messages = alerts.map(({ title, description }) => (description ? `${title}\n${description}` : title));
-
   return {
     name: stopLocation,
     departures,
-    messages,
     alerts,
     lastUpdated: plausibleLastUpdated(stop.departures ?? []),
   };

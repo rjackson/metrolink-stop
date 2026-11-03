@@ -30,7 +30,7 @@ type Props = {
 };
 export default function Stop({ stop: stopName, allStops }: Props) {
   const {
-    stopInfo: { name = stopName, departures = [], messages = [], alerts, lastUpdated = "" } = {},
+    stopInfo: { name = stopName, departures = [], alerts = [], lastUpdated = "" } = {},
     isLoading,
     isError,
   } = useMetrolinkStop(stopName);
@@ -130,7 +130,7 @@ export default function Stop({ stop: stopName, allStops }: Props) {
               isError={isError}
               errorMessage={"Failed to load message board information"}
             >
-              {alerts && alerts.length > 0 ? (
+              {alerts.length > 0 ? (
                 <ul className="space-y-6">
                   {alerts.map(({ id, title, description, effect, link }) => (
                     <li key={id} className="space-y-1">
@@ -150,14 +150,6 @@ export default function Stop({ stop: stopName, allStops }: Props) {
                           </Anchor>
                         </p>
                       )}
-                    </li>
-                  ))}
-                </ul>
-              ) : messages.length > 0 ? (
-                <ul className="space-y-2">
-                  {messages.map((message, i) => (
-                    <li key={i} className="whitespace-pre-line">
-                      {message}
                     </li>
                   ))}
                 </ul>
