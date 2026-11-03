@@ -1,191 +1,399 @@
-import { o } from "odata";
+import gtfsStops from "./gtfs-stops";
 
-const baseUrl = process.env.TFGM_ODATA_ENDPOINT;
-const subscriptionKey = process.env.TFGM_ODATA_SUBSCRIPTION_KEY;
+/**
+ * Client for TfGM's GraphQL API (the backend behind tfgm.com's live departure pages).
+ *
+ * This replaced the deprecated api.tfgm.com OData endpoint. The API is unauthenticated, has introspection disabled
+ * and masks error details, so the query shapes here are taken from what tfgm.com itself uses.
+ */
+const endpoint = process.env.TFGM_GRAPHQL_ENDPOINT ?? "https://apiary.tfgm.com/";
 
-if (!baseUrl || !subscriptionKey) {
-  throw new Error("Missing TFGM credentials")
-}
+export type Destination = "See Tram Front" | "Not in Service" | string;
+export type Carriages = "Single" | "Double";
+export type Status = "Due" | "Departing" | "Arrived" | "Approaching";
 
-const tfgmO = () => {
-  return o(baseUrl, {
-    headers: {
-      "Ocp-Apim-Subscription-Key": subscriptionKey,
-    },
-    referrer: undefined // defaults to invalid value "client" by default
-  });
+type GraphQLResponse<T> = {
+  data?: T | null;
+  errors?: { message: string; path?: (string | number)[]; extensions?: { code?: string } }[];
 };
 
-export type Destination = 'See Tram Front' | 'Not in Service' | string
-export type Carriages = "Single" | "Double"
-export type Status = "Due" | "Departing" | "Arrived"
-
-export type TfgmMetrolink = {
-  Id: number;
-  Line: string;
-  TLAREF: string;
-  PIDREF: string;
-  StationLocation: string;
-  AtcoCode: string | null;
-  Direction: string | null;
-  Dest0: string | null;
-  Carriages0: Carriages | null;
-  Status0: Status | null;
-  Wait0: string | null;
-  Dest1: string | null;
-  Carriages1: Carriages | null;
-  Status1: Status | null;
-  Wait1: string | null;
-  Dest2: string | null;
-  Carriages2: Carriages | null;
-  Status2: Status | null;
-  Wait2: string | null;
-  Dest3: string | null;
-  Carriages3: Carriages | null;
-  Status3: Status | null;
-  MessageBoard: string | null;
-  Wait3: string | null;
-  LastUpdated: string;
-}
-
-export async function getAll(): Promise<TfgmMetrolink[]> {
-  // TODO: Figure out how to type odata
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return await tfgmO().get("Metrolinks").query();
-}
-
-export type StopsEntry = {
-  StationLocation: string;
-  Line: string
-}
-
-export async function getStops(): Promise<StopsEntry[]> {
-  // try quertying this stuff directly from the odata endpoint – actually learn it u boob
-  // also figure out unit tests for quicker dev of this lib
-
-  // TODO: Figure out how to type odata
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const metrolinks: TfgmMetrolink[] = await tfgmO().get("Metrolinks").query({
-    $select: "StationLocation, Line",
+async function query<T>(document: string, variables: Record<string, unknown> = {}): Promise<T> {
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ query: document, variables }),
   });
 
-  // TODO: Source data only has one line PER location, which isn't useful when allowing users to filter station list by
-  // line (St Peter's Square only showing up under Eccles). Maybe add manual corrections to this list?
+  // Errors come back as JSON even with non-2xx statuses (e.g. 500 with code TOO_COMPLEX for oversized queries)
+  const { data, errors } = (await response.json().catch(() => ({}))) as GraphQLResponse<T>;
 
-  // Deduplicate and map and reduce into stop entries
-  const seenStops = new Set();
-  return metrolinks.reduce((uniqueStops: StopsEntry[], { StationLocation, Line }) => {
-    if (!seenStops.has(StationLocation)) {
-      seenStops.add(StationLocation)
-      uniqueStops.push({ StationLocation, Line })
+  // Partial errors are expected (e.g. an unknown ATCO code yields a null entry and a RESOURCE_NOT_FOUND error), so
+  // only treat the response as a failure when there's no data at all
+  if (!response.ok || !data) {
+    const message = errors?.map(({ message, extensions }) => `${extensions?.code ?? ""} ${message}`).join("; ");
+    throw new Error(`TfGM API request failed (${response.status}): ${message ?? response.statusText}`);
+  }
+
+  return data;
+}
+
+/* -------------------------------------------------------------------------------------------------------------------
+ * Stops
+ * -----------------------------------------------------------------------------------------------------------------*/
+
+/**
+ * Stop names were originally taken from the OData `StationLocation` attribute. They're used to build URL slugs and are
+ * persisted in visitors' local storage (recently visited stops), so they must not change. Names now come from GTFS
+ * data, and these overrides restore the original names wherever GTFS differs.
+ */
+const legacyStopNames: Partial<Record<string, string>> = {
+  "9400ZZMABOB": "Besses O’ Th’ Barn",
+  "9400ZZMAGMX": "Deansgate - Castlefield",
+  "9400ZZMAFIR": "Firswood",
+  "9400ZZMAEVC": "Trafford Palazzo",
+  "9400ZZMANEW": "Newton Heath and Moston",
+  "9400ZZMASTW": "St Werburgh’s Road",
+};
+
+type StopIdentity = {
+  StationLocation: string;
+  atcoCode: string;
+};
+
+/**
+ * Every stop, keyed on the stop-level ATCO code (GTFS uses platform-level codes, e.g. 9400ZZMAHTN1 and 9400ZZMAHTN2,
+ * but the API only accepts the stop-level 9400ZZMAHTN).
+ */
+const stopIdentities: StopIdentity[] = (() => {
+  const byAtco = new Map<string, StopIdentity>();
+  gtfsStops.forEach(({ stop_id, stop_name }) => {
+    const atcoCode = stop_id.replace(/\d+$/, "");
+    if (!byAtco.has(atcoCode)) {
+      const StationLocation = legacyStopNames[atcoCode] ?? stop_name.replace(/ \(Manchester Metrolink\)$/, "");
+      byAtco.set(atcoCode, { StationLocation, atcoCode });
     }
-    return uniqueStops
-  }, []);
+  });
+  return [...byAtco.values()];
+})();
+
+function findAtcoCode(stopLocation: string): string | undefined {
+  return stopIdentities.find(({ StationLocation }) => StationLocation === stopLocation)?.atcoCode;
+}
+
+export type StopsEntry = StopIdentity & {
+  /** Lines serving this stop, e.g. "Blue Line", "Ashton-Under-Lyne - Bury". Used for search */
+  lines: string[];
+};
+
+type StopLinesData = {
+  locationByAtco: ({
+    atcoCode: string;
+    lines?: { id: string; services: { name: string }[] }[];
+  } | null)[];
+};
+
+const STOP_LINES_QUERY = `
+  query GetTramStopLines($atcoCodes: [String!]!) {
+    locationByAtco(atcoCodes: $atcoCodes) {
+      atcoCode
+      ... on MassTransportLocation {
+        lines {
+          ... on TramLine {
+            id
+            services {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+let stopsPromise: Promise<StopsEntry[]> | undefined;
+
+/**
+ * List every stop, along with the lines that serve it.
+ *
+ * Line information is fetched from the API. If that fails, stops are still returned (without lines) so the stop list
+ * and pages keep working.
+ */
+export function getStops(): Promise<StopsEntry[]> {
+  // Memoised, as this is called for every statically generated page
+  stopsPromise ??= (async () => {
+    const linesByAtco = new Map<string, string[]>();
+
+    try {
+      const { locationByAtco } = await query<StopLinesData>(STOP_LINES_QUERY, {
+        atcoCodes: stopIdentities.map(({ atcoCode }) => atcoCode),
+      });
+
+      locationByAtco.forEach((location) => {
+        if (!location) {
+          return;
+        }
+
+        const lines = (location.lines ?? []).flatMap(({ id, services }) => [
+          id.replace(/_/g, " "),
+          ...services.map(({ name }) => name),
+        ]);
+        linesByAtco.set(location.atcoCode, [...new Set(lines)]);
+      });
+    } catch (err) {
+      console.error("Failed to fetch stop lines", err);
+    }
+
+    return stopIdentities.map((stop) => ({ ...stop, lines: linesByAtco.get(stop.atcoCode) ?? [] }));
+  })();
+
+  return stopsPromise;
+}
+
+/* -------------------------------------------------------------------------------------------------------------------
+ * Departures and alerts
+ * -----------------------------------------------------------------------------------------------------------------*/
+
+const ALERT_FRAGMENT = `
+  fragment AlertFragment on Alert {
+    id
+    title
+    description
+    advice
+    effect
+    validityScopes
+    validityPeriods {
+      start
+      end
+    }
+    link {
+      href
+      label
+    }
+    impactedServices {
+      name
+    }
+    impactedLocations {
+      atcoCode
+      name
+    }
+    impactedServicesAtLocations {
+      locations {
+        atcoCode
+        name
+      }
+      services {
+        name
+      }
+    }
+  }
+`;
+
+const STOP_INFO_QUERY = `
+  query GetTramStopTravelInformation($atcoCodes: [String!]!, $limit: Int!) {
+    tramStops: locationByAtco(atcoCodes: $atcoCodes) {
+      name
+      mode
+      atcoCode
+      ... on MassTransportLocation {
+        lines {
+          ... on TramLine {
+            id
+            services {
+              name
+            }
+          }
+        }
+        departures(limit: $limit) {
+          trip {
+            __typename
+            mode
+            ... on TramTrip {
+              carriages
+              destinationDisplay
+            }
+          }
+          timings {
+            scheduledDepartureTime
+            expectedDepartureTime
+            lastUpdated
+            status
+            wait
+          }
+        }
+        stopAlerts: alerts(filters: { validityScopes: NOW }) {
+          ...AlertFragment
+        }
+      }
+    }
+    lineAlerts: transportModes(modes: [TRAM]) {
+      alerts(filters: { validityScopes: NOW }) {
+        ...AlertFragment
+      }
+    }
+  }
+
+  ${ALERT_FRAGMENT}
+`;
+
+export type TfgmAlert = {
+  id: string;
+  title: string;
+  description: string | null;
+  advice: string | null;
+  effect: string;
+  validityScopes: string[];
+  validityPeriods: { start: string | null; end: string | null }[];
+  link: { href: string; label: string } | null;
+  impactedServices: { name: string }[];
+  impactedLocations: { atcoCode: string; name: string }[];
+  impactedServicesAtLocations: { locations: { atcoCode: string; name: string }[]; services: { name: string }[] }[];
+};
+
+export type TfgmDeparture = {
+  trip: { __typename: string; mode: string; carriages?: Carriages; destinationDisplay?: string };
+  timings: {
+    scheduledDepartureTime: string | null;
+    expectedDepartureTime: string | null;
+    lastUpdated: string | null;
+    status: Status | null;
+    wait: number | null;
+  };
+};
+
+export type TfgmTramStop = {
+  name: string;
+  mode: string;
+  atcoCode: string;
+  lines?: { id: string; services: { name: string }[] }[];
+  departures?: TfgmDeparture[];
+  stopAlerts?: TfgmAlert[];
+};
+
+type StopInfoData = {
+  tramStops: (TfgmTramStop | null)[];
+  lineAlerts: { alerts: TfgmAlert[] }[];
+};
+
+async function fetchStopInfo(atcoCodes: string[]): Promise<StopInfoData> {
+  return query<StopInfoData>(STOP_INFO_QUERY, { atcoCodes, limit: 20 });
+}
+
+/**
+ * Raw API data for every stop. Used for debugging
+ */
+export async function getAll(): Promise<StopInfoData> {
+  // The API rejects queries over a complexity limit (TOO_COMPLEX), which departures for ~20+ stops exceeds
+  const batchSize = 10;
+  const atcoCodes = stopIdentities.map(({ atcoCode }) => atcoCode);
+  const batches = [];
+  for (let i = 0; i < atcoCodes.length; i += batchSize) {
+    batches.push(atcoCodes.slice(i, i + batchSize));
+  }
+
+  const results = await Promise.all(batches.map((batch) => fetchStopInfo(batch)));
+
+  return {
+    tramStops: results.flatMap(({ tramStops }) => tramStops),
+    lineAlerts: results[0]?.lineAlerts ?? [],
+  };
 }
 
 export type Departure = {
-  destination: Destination
-  type: Carriages
-  status: Status
-  wait: number
-}
+  destination: Destination;
+  type: Carriages;
+  status: Status;
+  wait: number;
+};
 
 export type StopInfo = {
-  name: string
-  departures: Departure[]
-  messages: string[]
-  lastUpdated: string
+  name: string;
+  departures: Departure[];
+  messages: string[];
+  lastUpdated: string;
+};
+
+/**
+ * Alerts relevant to a stop: those raised against the stop itself, plus network-wide alerts affecting a service that
+ * calls at it (mirroring how tfgm.com selects alerts for its stop pages).
+ */
+function relevantAlerts(stop: TfgmTramStop, lineAlerts: TfgmAlert[]): TfgmAlert[] {
+  const stopServices = new Set((stop.lines ?? []).flatMap(({ services }) => services.map(({ name }) => name)));
+
+  const serviceAlerts = lineAlerts.filter(
+    ({ impactedServices, impactedServicesAtLocations }) =>
+      impactedServices.some(({ name }) => stopServices.has(name)) ||
+      impactedServicesAtLocations.some(({ services }) => services.some(({ name }) => stopServices.has(name)))
+  );
+
+  const seenIds = new Set<string>();
+  return [...(stop.stopAlerts ?? []), ...serviceAlerts].filter(({ id }) => {
+    if (seenIds.has(id)) {
+      return false;
+    }
+    seenIds.add(id);
+    return true;
+  });
+}
+
+/**
+ * The API's lastUpdated timestamp, if it's plausible. Falls back to the current time.
+ *
+ * The OData API reported local time with a UTC designator, so guard against the same happening here: anything more
+ * than 15 minutes out is ignored.
+ */
+function plausibleLastUpdated(departures: TfgmDeparture[]): string {
+  const now = Date.now();
+  const timestamps = departures
+    .map(({ timings }) => (timings.lastUpdated ? Date.parse(timings.lastUpdated) : NaN))
+    .filter((timestamp) => !isNaN(timestamp) && Math.abs(now - timestamp) < 15 * 60 * 1000);
+
+  return new Date(timestamps.length > 0 ? Math.max(...timestamps) : now).toISOString();
 }
 
 /**
  * Fetch information on a particular stop
+ *
+ * @param stopLocation The stop's name, as listed by getStops()
  */
 export async function getStopInfo(stopLocation: string): Promise<StopInfo> {
-  // two consecutive single quotes represent one within a string literal
-  // https://github.com/oasis-tcs/odata-abnf/blob/be8f43ca99beae393de370e5a6788f0b81b181bb/abnf/odata-abnf-construction-rules.txt#L958
-  const encodedStopLocation = stopLocation.replace("'", "''");
+  const atcoCode = findAtcoCode(stopLocation);
 
-  // TODO: Figure out how to type odata
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const metrolinks: TfgmMetrolink[] = await tfgmO()
-    .get("Metrolinks")
-    .query({
-      $filter: `StationLocation eq '${encodedStopLocation}'`,
-    });
-
-  if (metrolinks.length === 0) {
+  if (!atcoCode) {
     throw new Error(`No metrolink found matching ${stopLocation}`);
   }
 
-  const { StationLocation: name } = metrolinks[0];
+  const { tramStops, lineAlerts } = await fetchStopInfo([atcoCode]);
+  const stop = tramStops[0];
 
-  // lastUpdated from the API is falsely presenting GMT as UTC (i.e. summer time
-  // coming through with 'Z' timezone designation). Rather than deal with that noise,
-  // let's just throw back the current date
-  const lastUpdated = new Date().toISOString();
+  if (!stop) {
+    throw new Error(`No metrolink found matching ${stopLocation}`);
+  }
 
-  // Dedupe departures on AtcoCode – each of these is a unique physical stop, so this will be dupe information
-  const seenAtcoCodes = new Set();
-  const stopsByAtcoCode = metrolinks.reduce((stops: TfgmMetrolink[], stop) => {
-    if (!seenAtcoCodes.has(stop.AtcoCode)) {
-      seenAtcoCodes.add(stop.AtcoCode)
-      stops.push(stop);
-    }
-    return stops;
-  }, [])
+  const departures = (stop.departures ?? [])
+    .flatMap(({ trip, timings }): Departure[] => {
+      if (!trip.destinationDisplay || !trip.carriages || !timings.status || timings.wait === null) {
+        return [];
+      }
 
-  const departures = stopsByAtcoCode
-    .flatMap((metrolinkEntity) => {
-      const departures: Departure[] = [];
-      [0, 1, 2, 3]
-        .forEach((i) => {
-          const {
-            [`Dest${i}` as keyof TfgmMetrolink]: destination,
-            [`Carriages${i}` as keyof TfgmMetrolink]: type,
-            [`Status${i}` as keyof TfgmMetrolink]: status,
-            [`Wait${i}` as keyof TfgmMetrolink]: wait
-          } = metrolinkEntity;
-
-          if (destination) {
-            departures.push({
-              destination,
-              type,
-              status,
-              wait,
-            } as Departure);
-          }
-        })
-      return departures;
+      return [
+        {
+          destination: trip.destinationDisplay,
+          type: trip.carriages,
+          status: timings.status,
+          wait: timings.wait,
+        },
+      ];
     })
     .sort((a, b) => a.wait - b.wait);
 
-  const messages = [
-    ...new Set(
-      metrolinks
-        .map(({ MessageBoard }) => MessageBoard)
-        .filter((message) => {
-          if (!message) {
-            return false;
-          }
-
-          if (message == "<no message>") {
-            return false;
-          }
-
-          // Ignore next altrincham departures. They'll be shown in the full departures list
-          if (message.startsWith("^F0Next Altrincham Departures")) {
-            return false;
-          }
-
-          return true;
-        })
-    ),
-  ] as string[];
+  const messages = relevantAlerts(stop, lineAlerts[0]?.alerts ?? []).map(({ title, description }) =>
+    description ? `${title}\n${description.trim()}` : title
+  );
 
   return {
-    name,
+    name: stopLocation,
     departures,
     messages,
-    lastUpdated,
+    lastUpdated: plausibleLastUpdated(stop.departures ?? []),
   };
 }

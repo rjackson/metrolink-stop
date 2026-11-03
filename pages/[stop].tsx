@@ -119,7 +119,9 @@ export default function Stop({ stop: stopName, allStops }: Props) {
               {messages.length > 0 ? (
                 <ul className="space-y-2">
                   {messages.map((message, i) => (
-                    <li key={i}>{message}</li>
+                    <li key={i} className="whitespace-pre-line">
+                      {message}
+                    </li>
                   ))}
                 </ul>
               ) : (

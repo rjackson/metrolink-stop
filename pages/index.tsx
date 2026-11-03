@@ -14,7 +14,7 @@ type Props = {
 
 export default function Home({ stops }: Props) {
   const [searchTerm, setSearchTerm] = useState("");
-  const fuse = new Fuse(stops, { keys: ["StationLocation", "Line"], includeScore: true });
+  const fuse = new Fuse(stops, { keys: ["StationLocation", "lines"], includeScore: true });
   const results = fuse.search(searchTerm);
   const stopResults = searchTerm ? results.map(({ item }) => item) : stops;
 

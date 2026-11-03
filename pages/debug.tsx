@@ -1,45 +1,45 @@
 // i am a bad guy:
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
 import { Button, H2, Panel, Section } from "@rjackson/rjds";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useState } from "react";
 import MetrolinkDestination from "../components/MetrolinkDestination";
-import { TfgmMetrolink, getAll } from "../lib/tfgm-metrolink";
+import { getAll, getStops, StopsEntry } from "../lib/tfgm-metrolink";
 
-export default function Debug({ allStops }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [metrolinksDump, setMetrolinksDump] = useState(allStops);
-  const uniqueMessages = [...new Set(metrolinksDump.map(({ MessageBoard }) => MessageBoard))];
-  const uniqueDirections = [...new Set(metrolinksDump.map(({ Direction }) => Direction))];
-  const uniqueDestinations = [
-    ...new Set(metrolinksDump.flatMap(({ Dest0, Dest1, Dest2, Dest3 }) => [Dest0, Dest1, Dest2, Dest3])),
-  ];
-  const uniqueStatuses = [
-    ...new Set(
-      metrolinksDump.flatMap(({ Status0, Status1, Status2, Status3 }) => [Status0, Status1, Status2, Status3])
-    ),
-  ];
-  const uniqueCarriages = [
-    ...new Set(
-      metrolinksDump.flatMap(({ Carriages0, Carriages1, Carriages2, Carriages3 }) => [
-        Carriages0,
-        Carriages1,
-        Carriages2,
-        Carriages3,
-      ])
-    ),
-  ];
+type Dump = Awaited<ReturnType<typeof getAll>>;
 
-  const allStopNames = [...new Set(metrolinksDump.map(({ StationLocation }) => StationLocation))];
+const UniqueList = ({ title, values }: { title: string; values: (string | null | undefined)[] }) => (
+  <Section>
+    <Panel>
+      <H2>{title}</H2>
+      <ul>
+        {[...new Set(values)].map((value) => (
+          <li key={value ?? "(empty)"} className="whitespace-pre-line">
+            {value ?? "(empty)"}
+          </li>
+        ))}
+      </ul>
+    </Panel>
+  </Section>
+);
+
+export default function Debug({ dump: initialDump, allStops }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  const [dump, setDump] = useState(initialDump);
+  const tramStops = dump.tramStops.flatMap((stop) => (stop ? [stop] : []));
+  const departures = tramStops.flatMap(({ departures = [] }) => departures);
+  const alerts = [
+    ...(dump.lineAlerts[0]?.alerts ?? []),
+    ...tramStops.flatMap(({ stopAlerts = [] }) => stopAlerts),
+  ];
+  const uniqueDestinations = [...new Set(departures.map(({ trip }) => trip.destinationDisplay))];
 
   const onRefresh = async () => {
     try {
       const req = await fetch(`/api/dump`);
       const data = await req.json();
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      setMetrolinksDump(data);
+      setDump(data as Dump);
     } catch (err) {
       console.log(err);
     }
@@ -47,53 +47,16 @@ export default function Debug({ allStops }: InferGetServerSidePropsType<typeof g
 
   return (
     <>
-      <Section>
-        <Panel>
-          <H2>Unique messages</H2>
-          <ul>
-            {uniqueMessages.map((message) => (
-              <li key={message}>{message}</li>
-            ))}
-          </ul>
-        </Panel>
-      </Section>
-      <Section>
-        <Panel>
-          <H2>Unique directions</H2>
-          <ul>
-            {uniqueDirections.map((direction) => (
-              <li key={direction}>{direction}</li>
-            ))}
-          </ul>
-        </Panel>
-      </Section>
-      <Section>
-        <Panel>
-          <H2>Unique statuses</H2>
-          <ul>
-            {uniqueStatuses.map((status) => (
-              <li key={status}>{status}</li>
-            ))}
-          </ul>
-        </Panel>
-      </Section>
-      <Section>
-        <Panel>
-          <H2>Unique carriages</H2>
-          <ul>
-            {uniqueCarriages.map((carriage) => (
-              <li key={carriage}>{carriage}</li>
-            ))}
-          </ul>
-        </Panel>
-      </Section>
+      <UniqueList title="Unique alerts" values={alerts.map(({ effect, title }) => `[${effect}] ${title}`)} />
+      <UniqueList title="Unique statuses" values={departures.map(({ timings }) => timings.status)} />
+      <UniqueList title="Unique carriages" values={departures.map(({ trip }) => trip.carriages)} />
       <Section>
         <Panel>
           <H2>Unique destinations</H2>
           <ul>
             {uniqueDestinations.map((destination) => (
-              <li key={destination}>
-                <MetrolinkDestination destination={destination ?? '(empty)'} allStops={allStops} />
+              <li key={destination ?? "(empty)"}>
+                <MetrolinkDestination destination={destination ?? "(empty)"} allStops={allStops} />
               </li>
             ))}
           </ul>
@@ -103,9 +66,10 @@ export default function Debug({ allStops }: InferGetServerSidePropsType<typeof g
         <Panel>
           <H2>All stops</H2>
           <ul>
-            {allStopNames.map((destination) => (
-              <li key={destination}>
-                <MetrolinkDestination destination={destination} allStops={allStops} />
+            {allStops.map(({ StationLocation, atcoCode, lines }) => (
+              <li key={atcoCode}>
+                <MetrolinkDestination destination={StationLocation} allStops={allStops} /> ({atcoCode}):{" "}
+                {lines.join(", ")}
               </li>
             ))}
           </ul>
@@ -115,17 +79,17 @@ export default function Debug({ allStops }: InferGetServerSidePropsType<typeof g
         <Panel>
           <H2>Dump</H2>
           <Button onClick={onRefresh}>Refresh</Button>
-          <pre>{JSON.stringify(metrolinksDump, null, 2)}</pre>
+          <pre>{JSON.stringify(dump, null, 2)}</pre>
         </Panel>
       </Section>
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps<{ allStops: TfgmMetrolink[] }> = async () => {
-  const allStops = await getAll();
+export const getServerSideProps: GetServerSideProps<{ dump: Dump; allStops: StopsEntry[] }> = async () => {
+  const [dump, allStops] = await Promise.all([getAll(), getStops()]);
 
   return {
-    props: { allStops }, // will be passed to the page component as props
+    props: { dump, allStops }, // will be passed to the page component as props
   };
 };
