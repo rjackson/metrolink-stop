@@ -303,6 +303,8 @@ export type Departure = {
   type: Carriages;
   status: Status;
   wait: number;
+  /** Expected departure time (ISO 8601), if known */
+  departureTime?: string;
 };
 
 export type Alert = {
@@ -392,6 +394,7 @@ export async function getStopInfo(stopLocation: string): Promise<StopInfo> {
           type: trip.carriages,
           status: timings.status,
           wait: timings.wait,
+          ...(timings.expectedDepartureTime ? { departureTime: timings.expectedDepartureTime } : {}),
         },
       ];
     })

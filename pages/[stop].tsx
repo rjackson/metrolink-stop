@@ -23,6 +23,10 @@ const alertEffectLabels: Partial<Record<string, string>> = {
   ACCESSIBILITY_ISSUE: "Step-free access",
 };
 
+/** e.g. "14:05", in UK time regardless of the viewer's timezone */
+const formatClockTime = (isoTime: string) =>
+  new Date(isoTime).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/London" });
+
 type Props = {
   stop: string;
   allStops: StopsEntry[];
@@ -87,16 +91,24 @@ export default function Stop({ stop: stopName, allStops }: Props) {
                 </thead>
                 <tbody aria-live="polite" aria-atomic>
                   {departures.length > 0 ? (
-                    departures.map(({ destination, type, wait }, i) => (
+                    departures.map(({ destination, type, wait, departureTime }, i) => (
                       <tr key={i}>
                         <th scope="row" className="py-1 font-normal text-left truncate">
                           <MetrolinkDestination destination={destination} allStops={allStops} />
                         </th>
                         <td className="tabular-nums">
-                          <time dateTime="PT{wait}M" aria-label={`${wait} minutes`}>
+                          <time dateTime={`PT${wait}M`} aria-label={`${wait} minutes`}>
                             <span>{wait}</span>
                             <abbr title="minutes">m</abbr>
                           </time>
+                          {departureTime && (
+                            <>
+                              {" "}
+                              <time dateTime={departureTime} className="text-sm text-gray-500 dark:text-gray-400">
+                                ({formatClockTime(departureTime)})
+                              </time>
+                            </>
+                          )}
                         </td>
                         <td className="py-1 text-right">{type}</td>
                       </tr>
