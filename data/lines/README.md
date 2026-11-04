@@ -10,6 +10,7 @@ and derives the data behind the travel time map. See the main README for when an
 | Travel times between stops | `calculate-stop-times.R` (R, packages via renv) | `isochrones/time-between-stops/` (not committed) |
 | Isochrones | `process-isochrones.mjs` | `isochrones/geojson/` |
 | Stops | `process-stops.mjs` | `stops.json` |
+| Stop order along each line | `process-line-stops.mjs` | `../line-stops.json` |
 
 ## Feed format
 
