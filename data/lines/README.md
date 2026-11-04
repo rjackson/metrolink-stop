@@ -11,6 +11,7 @@ and derives the data behind the travel time map. See the main README for when an
 | Isochrones | `process-isochrones.mjs` | `isochrones/geojson/` |
 | Stops | `process-stops.mjs` | `stops.json` |
 | Stop order along each line | `process-line-stops.mjs` | `../line-stops.json` |
+| Track shapes between neighbouring stops, for the map | `process-link-shapes.mjs` | `../link-shapes.json` |
 
 ## Feed format
 

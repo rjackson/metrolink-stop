@@ -66,15 +66,18 @@ rarely: only when stops open, close or move, or lines change.
 | `data/stop-lines.json` | TfGM GraphQL API | `npm run regenerate-stop-lines` |
 | `data/lines/isochrones/geojson/`, `data/lines/stops.json` | TfGM GTFS (needs R) | `npm run regenerate-gtfs` |
 | `data/line-stops.json` | TfGM GTFS, for stops on each line from `data/stop-lines.json` | `npm run gtfs-line-stops` (after `gtfs-prepare`) |
+| `data/link-shapes.json` | TfGM GTFS, for the neighbouring stops in `data/line-stops.json` | `npm run gtfs-link-shapes` (after `gtfs-line-stops`) |
 | `data/tfgm-open-data/` | TfGM open data | Downloaded by hand |
 | `data/stop-names.json` | Frozen (see above) | Edited by hand |
 
 `npm run regenerate-gtfs` downloads the feed, calculates travel times between stops (R), builds the isochrones,
-writes `stops.json` with one platform per stop, matching the isochrones, and writes `line-stops.json`, the order of
-stops along each line (for the homepage's line filter and the stop pages' line routes). Each step is also available
-on its own (`gtfs-prepare`, `gtfs-stop-times`, `gtfs-isochrones`, `gtfs-stops`, `gtfs-line-stops`).
-`gtfs-line-stops` needs only `gtfs-prepare` first, not R. It takes which stops are on which line from
-`data/stop-lines.json`, so after `regenerate-stop-lines` changes that, rerun `gtfs-prepare` and `gtfs-line-stops` too.
+writes `stops.json` with one platform per stop, matching the isochrones, writes `line-stops.json`, the order of
+stops along each line (for the homepage's line filter and the stop pages' line routes), and `link-shapes.json`, the
+track's shape between neighbouring stops (for drawing the lines on the map). Each step is also available on its own
+(`gtfs-prepare`, `gtfs-stop-times`, `gtfs-isochrones`, `gtfs-stops`, `gtfs-line-stops`, `gtfs-link-shapes`).
+`gtfs-line-stops` and `gtfs-link-shapes` need only `gtfs-prepare` first, not R. They take which stops are on which line
+from `data/stop-lines.json`, so after `regenerate-stop-lines` changes that, rerun `gtfs-prepare`, `gtfs-line-stops` and
+`gtfs-link-shapes` too.
 
 The R step installs its packages into `data/lines/renv` with renv on first run, which takes a few minutes. The feed
 is downloaded and normalised by `data/lines/prepare.sh` and `normalise-gtfs.mjs`: TfGM's current feed uses numeric

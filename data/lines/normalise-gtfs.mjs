@@ -7,10 +7,10 @@
  *
  * 1. Metrolink stops get their ATCO code as stop_id, in stops.txt and stop_times.txt. The R script, the isochrone
  *    filenames, and the site all key stops on these. Other stops are left alone.
- * 2. The full feed (minus shapes, which nothing uses) is re-zipped as gtfs/tfgm.zip for the R script, which needs
- *    every stop to build walking transfers.
- * 3. routes.txt, trips.txt and stop_times.txt are then reduced to Metrolink trams only (not replacement buses), for
- *    the node-gtfs scripts.
+ * 2. The full feed (minus shapes) is re-zipped as gtfs/tfgm.zip for the R script, which needs every stop to build
+ *    walking transfers.
+ * 3. routes.txt, trips.txt, stop_times.txt and shapes.txt are then reduced to Metrolink trams only (not replacement
+ *    buses), for the node scripts.
  *
  * Works with both old and new feed formats. Run from data/lines, after unzipping the feed into ./gtfs.
  */
@@ -130,7 +130,9 @@ await rewrite("stop_times.txt", toAtco);
 
 // --- 2. Full feed, re-zipped for the R script -------------------------------------------------------------------------
 
-await rm(`${GTFS_DIR}/shapes.txt`, { force: true });
+// The R script doesn't need shapes (and they're most of the feed), so move them out of the zip's way. Tram shapes are
+// kept for process-line-links.mjs, below
+await rename(`${GTFS_DIR}/shapes.txt`, `${GTFS_DIR}/all-shapes.csv`).catch(() => {});
 await rm(`${GTFS_DIR}/tfgm.zip`, { force: true });
 execFileSync("sh", ["-c", "cd gtfs && zip -q tfgm.zip *.txt"], { stdio: "inherit" });
 console.log("Wrote gtfs/tfgm.zip");
@@ -160,13 +162,25 @@ await rewrite("routes.txt", (route) => {
 });
 
 const tripIds = new Set();
+const shapeIds = new Set();
 await rewrite("trips.txt", (trip) => {
   if (!routeIds.has(trip.route_id)) {
     return null;
   }
   tripIds.add(trip.trip_id);
+  shapeIds.add(trip.shape_id);
   return trip;
 });
 
 await rewrite("stop_times.txt", (stopTime) => (tripIds.has(stopTime.trip_id) ? stopTime : null));
+
+try {
+  await rewrite("all-shapes.csv", (point) => (shapeIds.has(point.shape_id) ? point : null));
+  await rename(`${GTFS_DIR}/all-shapes.csv`, `${GTFS_DIR}/shapes.txt`);
+} catch (err) {
+  if (err.code !== "ENOENT") {
+    throw err;
+  }
+  console.log("No shapes.txt in this feed");
+}
 
