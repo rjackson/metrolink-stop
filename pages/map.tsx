@@ -2,15 +2,15 @@ import AppLink from "../components/AppLink";
 import HomeTabs from "../components/HomeTabs";
 import { Anchor, Panel, usePrefersDark } from "@rjackson/rjds";
 import "leaflet/dist/leaflet.css";
-import { FeatureGroup, LatLngTuple } from "leaflet";
+import type { FeatureGroup, LatLngBounds, LatLngTuple, Map as LeafletMap } from "leaflet";
 import { loadIsochrone } from "../lib/isochrones";
-import { lazy, RefObject, Suspense, useEffect, useRef, useState, type JSX } from "react";
+import { Fragment, lazy, RefObject, Suspense, useEffect, useMemo, useRef, useState, type JSX } from "react";
 import colors from "tailwindcss/colors";
 import useResizeObserver from "@react-hook/resize-observer";
 import useSWR from "swr";
 import gtfsStops from "../lib/gtfs-stops";
 import { findStopByAtco } from "../lib/stops";
-import { getStopInfo, type StopInfo } from "../lib/tfgm-metrolink";
+import { getDepartures, getStopInfo, type Departure, type StopInfo } from "../lib/tfgm-metrolink";
 import slugify from "../utils/slugify";
 
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
@@ -41,11 +41,115 @@ const stops: MapStop[] = gtfsStops.map(({ stop_id, stop_name, stop_lat, stop_lon
   };
 });
 
+/** Below this zoom level stops are too close together to label, and fetching every stop's departures is wasteful */
+const LABEL_MIN_ZOOM = 13;
+
+/**
+ * Stops grouped into fixed batches of neighbours (west to east), one API request each. Fixed batches mean panning
+ * around reuses already-fetched departures rather than requesting a fresh set for every slightly different view.
+ */
+const DEPARTURE_BATCH_SIZE = 20;
+const departureBatches: string[][] = (() => {
+  const byLongitude = [...stops].sort((a, b) => a.lon - b.lon);
+  const batches: string[][] = [];
+  for (let i = 0; i < byLongitude.length; i += DEPARTURE_BATCH_SIZE) {
+    batches.push(byLongitude.slice(i, i + DEPARTURE_BATCH_SIZE).map(({ atcoCode }) => atcoCode));
+  }
+  return batches;
+})();
+
 const swrOptions = {
   // Data has minute granularity, so refresh every minute and don't revalidate on focus more than every 30s
   refreshInterval: 60 * 1000,
   focusThrottleInterval: 30 * 1000,
 };
+
+type LabelRow = { destination: string; time: string };
+type LabelContent = { name: string; rows?: LabelRow[] };
+
+const formatWait = (wait: number) => (wait === 0 ? "due" : `${wait} min`);
+
+/**
+ * The next tram to each of the first few destinations, soonest first. One row per destination, so a label shows
+ * where trams are heading rather than three trams to the same place
+ */
+function nextByDestination(departures: Departure[], limit = 3): LabelRow[] {
+  const rows: LabelRow[] = [];
+  const seen = new Set<string>();
+  for (const { destination, wait } of departures) {
+    if (seen.has(destination)) {
+      continue;
+    }
+    seen.add(destination);
+    rows.push({ destination, time: formatWait(wait) });
+    if (rows.length === limit) {
+      break;
+    }
+  }
+  return rows;
+}
+
+/** Lines of text in a label, for estimating its size */
+const labelTextLines = ({ name, rows }: LabelContent) =>
+  rows === undefined
+    ? [name]
+    : rows.length === 0
+      ? [name, "No trams due"]
+      : [name, ...rows.map(({ destination, time }) => `${destination}   ${time}`)];
+
+type LabelPlacement = "right" | "left";
+
+/**
+ * Decide which stops get a permanent label, and on which side, so that labels don't overlap each other or other
+ * stops. Stops earlier in the list win. Label sizes are estimated from their text, which is close enough at this font
+ * size and avoids measuring the DOM.
+ */
+function placeLabels(map: LeafletMap, candidates: MapStop[], labelText: (stop: MapStop) => string[]) {
+  const CHAR_WIDTH = 6.5; // px, at the label font size
+  const LINE_HEIGHT = 16;
+  const PADDING = 8;
+  const GAP = 10; // between the stop and its label
+
+  type Rect = { left: number; right: number; top: number; bottom: number };
+  const overlaps = (a: Rect, b: Rect) =>
+    a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+
+  const points = new Map(candidates.map((stop) => [stop.stopId, map.latLngToContainerPoint([stop.lat, stop.lon])]));
+  // Stop dots are obstacles too, so labels don't cover neighbouring stops
+  const placed: Rect[] = [...points.values()].map(({ x, y }) => ({
+    left: x - 4,
+    right: x + 4,
+    top: y - 4,
+    bottom: y + 4,
+  }));
+  const placements = new Map<string, LabelPlacement>();
+
+  candidates.forEach((stop) => {
+    const point = points.get(stop.stopId);
+    if (!point) {
+      return;
+    }
+
+    const lines = labelText(stop);
+    const width = Math.max(...lines.map((line) => line.length)) * CHAR_WIDTH + PADDING * 2;
+    const height = lines.length * LINE_HEIGHT + PADDING;
+    const top = point.y - height / 2;
+    const bottom = point.y + height / 2;
+
+    const options: [LabelPlacement, Rect][] = [
+      ["right", { left: point.x + GAP, right: point.x + GAP + width, top, bottom }],
+      ["left", { left: point.x - GAP - width, right: point.x - GAP, top, bottom }],
+    ];
+
+    const fit = options.find(([, rect]) => !placed.some((other) => overlaps(rect, other)));
+    if (fit) {
+      placements.set(stop.stopId, fit[0]);
+      placed.push(fit[1]);
+    }
+  });
+
+  return placements;
+}
 
 const SelectedStopDepartures = ({ stopInfo, isError }: { stopInfo?: StopInfo; isError: boolean }) => {
   if (isError) {
@@ -74,9 +178,8 @@ const SelectedStopDepartures = ({ stopInfo, isError }: { stopInfo?: StopInfo; is
 };
 
 const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
-  const { MapContainer, GeoJSON, CircleMarker, useMap, FeatureGroup, Pane, ZoomControl, Tooltip } = await import(
-    "react-leaflet"
-  );
+  const { MapContainer, GeoJSON, CircleMarker, useMap, useMapEvents, FeatureGroup, Pane, ZoomControl, Tooltip } =
+    await import("react-leaflet");
   const { VectorBasemapLayer } = await import("../components/leaflet/VectorBasemapLayer");
 
   const center: LatLngTuple = [53.4781, -2.2433]; // St Peters Square
@@ -99,6 +202,23 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
         }
       }, 300);
     }, [map, linesRef, breakpointLg]);
+
+    return null;
+  };
+
+  type MapView = { map: LeafletMap; zoom: number; bounds: LatLngBounds };
+
+  /** Reports the map's view whenever it settles after panning or zooming */
+  const ViewTracker = ({ onChange }: { onChange: (view: MapView) => void }) => {
+    const map = useMapEvents({
+      moveend: () => {
+        onChange({ map, zoom: map.getZoom(), bounds: map.getBounds() });
+      },
+    });
+
+    useEffect(() => {
+      onChange({ map, zoom: map.getZoom(), bounds: map.getBounds() });
+    }, [map, onChange]);
 
     return null;
   };
@@ -234,7 +354,46 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
       mapRef.current?.invalidateSize();
     });
 
+    const [view, setView] = useState<MapView | undefined>();
+    const [showLiveTimes, setShowLiveTimes] = useState(true);
+    const labelsEnabled = showLiveTimes && view !== undefined && view.zoom >= LABEL_MIN_ZOOM;
+
+    // Stops in (or just outside) the current view
+    const visibleStops = useMemo(() => {
+      if (!labelsEnabled) {
+        return [];
+      }
+      const bounds = view.bounds.pad(0.1);
+      return stops.filter(({ lat, lon }) => bounds.contains([lat, lon]));
+    }, [labelsEnabled, view]);
+
+    // Departures for every batch with a visible stop
+    const neededBatches = departureBatches.filter((batch) =>
+      visibleStops.some(({ atcoCode }) => batch.includes(atcoCode))
+    );
+    const { data: departures } = useSWR(
+      neededBatches.length > 0 ? ["map-departures", ...neededBatches.map((batch) => batch[0])] : null,
+      () => getDepartures(neededBatches.flat()),
+      { ...swrOptions, keepPreviousData: true }
+    );
+
+    const labelContent = (stop: MapStop): LabelContent => {
+      const stopDepartures = departures?.[stop.atcoCode];
+      return { name: stop.name, rows: stopDepartures && nextByDestination(stopDepartures) };
+    };
+
     const selected = stops.find(({ stopId }) => stopId === selectedStop);
+
+    const labelPlacements = useMemo(() => {
+      if (!labelsEnabled) {
+        return new Map<string, LabelPlacement>();
+      }
+      // The selected stop's label takes priority
+      const candidates = selected ? [selected, ...visibleStops.filter((stop) => stop !== selected)] : visibleStops;
+      return placeLabels(view.map, candidates, (stop) => labelTextLines(labelContent(stop)));
+      // `view` is a dependency because label positions depend on where the map is
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [labelsEnabled, visibleStops, departures, selected, view]);
 
     // The stop the pointer has settled on. Departures follow this rather than `selected`, so sweeping the mouse across
     // several stops only fetches the one it lands on
@@ -293,6 +452,22 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
                 ))}
               </ul>
             </section>
+
+            <label className="flex items-center space-x-2 text-sm">
+              <input
+                type="checkbox"
+                checked={showLiveTimes}
+                onChange={(e) => {
+                  setShowLiveTimes(e.target.checked);
+                }}
+              />
+              <span>
+                Label stops with live times
+                {showLiveTimes && view && view.zoom < LABEL_MIN_ZOOM && (
+                  <span className="text-gray-600 dark:text-gray-300"> (zoom in to see them)</span>
+                )}
+              </span>
+            </label>
 
             <footer className="flex justify-center space-x-2 text-sm">
               <p>
@@ -421,41 +596,66 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
             />
           </FeatureGroup>
 
+          <ViewTracker onChange={setView} />
           <FeatureGroup ref={markersRef}>
-            {stops.map((stop) => (
-              <CircleMarker
-                /* Larger invisible touch-target */
-                key={stop.stopId}
-                center={[stop.lat, stop.lon]}
-                radius={24}
-                pane="markerPane"
-                eventHandlers={{
-                  click: () => {
-                    setSelectedStop(stop.stopId);
-                  },
-                  mouseover: () => {
-                    setSelectedStop(stop.stopId);
-                  },
-                }}
-                pathOptions={{
-                  opacity: 0,
-                  fillOpacity: 0,
-                }}
-              >
+            {stops.map((stop) => {
+              const placement = labelPlacements.get(stop.stopId);
+              const content = labelContent(stop);
+              return (
                 <CircleMarker
+                  /* Larger invisible touch-target */
+                  key={stop.stopId}
                   center={[stop.lat, stop.lon]}
-                  pathOptions={{
-                    color: "black",
-                    fillOpacity: prefersDark ? 0.8 : 1,
-                    fillColor: selectedStop == stop.stopId ? "yellow" : "white",
-                    weight: 1,
-                  }}
-                  radius={selectedStop == stop.stopId ? 5 : 3}
+                  radius={24}
                   pane="markerPane"
-                />
-                <Tooltip>{stop.name}</Tooltip>
-              </CircleMarker>
-            ))}
+                  eventHandlers={{
+                    click: () => {
+                      setSelectedStop(stop.stopId);
+                    },
+                    mouseover: () => {
+                      setSelectedStop(stop.stopId);
+                    },
+                  }}
+                  pathOptions={{
+                    opacity: 0,
+                    fillOpacity: 0,
+                  }}
+                >
+                  <CircleMarker
+                    center={[stop.lat, stop.lon]}
+                    pathOptions={{
+                      color: "black",
+                      fillOpacity: prefersDark ? 0.8 : 1,
+                      fillColor: selectedStop == stop.stopId ? "yellow" : "white",
+                      weight: 1,
+                    }}
+                    radius={selectedStop == stop.stopId ? 5 : 3}
+                    pane="markerPane"
+                  />
+                  <Tooltip
+                    /* Leaflet doesn't update tooltip options in place, so remount when the placement changes */
+                    key={placement ?? "hover"}
+                    permanent={placement !== undefined}
+                    direction={placement ?? "auto"}
+                    offset={placement === "left" ? [-6, 0] : placement === "right" ? [6, 0] : [0, 0]}
+                    className="stop-label"
+                  >
+                    <span className="stop-label-name">{content.name}</span>
+                    {content.rows?.length === 0 && <span className="stop-label-muted">No trams due</span>}
+                    {content.rows && content.rows.length > 0 && (
+                      <span className="stop-label-rows">
+                        {content.rows.map(({ destination, time }) => (
+                          <Fragment key={destination}>
+                            <span>{destination}</span>
+                            <span className="stop-label-time">{time}</span>
+                          </Fragment>
+                        ))}
+                      </span>
+                    )}
+                  </Tooltip>
+                </CircleMarker>
+              );
+            })}
           </FeatureGroup>
         </MapContainer>
         <style>
@@ -466,6 +666,51 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
               flex: 1;
             }
 
+            .leaflet-tooltip.stop-label {
+              padding: 2px 6px;
+              font-size: 12px;
+              line-height: 16px;
+              box-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+            }
+            .stop-label-name {
+              display: block;
+              font-weight: 600;
+            }
+            .stop-label-rows {
+              display: grid;
+              grid-template-columns: auto auto;
+              column-gap: 10px;
+            }
+            .stop-label-time {
+              text-align: right;
+              font-variant-numeric: tabular-nums;
+              color: ${colors.gray[600]};
+            }
+            .stop-label-muted {
+              display: block;
+              color: ${colors.gray[600]};
+            }
+            .dark .leaflet-tooltip.stop-label {
+              background-color: ${colors.gray[800]};
+              border-color: ${colors.gray[700]};
+              color: ${colors.gray[50]};
+            }
+            .dark .stop-label-time,
+            .dark .stop-label-muted {
+              color: ${colors.gray[300]};
+            }
+            .dark .leaflet-tooltip-right.stop-label::before {
+              border-right-color: ${colors.gray[800]};
+            }
+            .dark .leaflet-tooltip-left.stop-label::before {
+              border-left-color: ${colors.gray[800]};
+            }
+            .dark .leaflet-tooltip-top.stop-label::before {
+              border-top-color: ${colors.gray[800]};
+            }
+            .dark .leaflet-tooltip-bottom.stop-label::before {
+              border-bottom-color: ${colors.gray[800]};
+            }
           `}
         </style>
       </div>
