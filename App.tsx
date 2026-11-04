@@ -11,7 +11,7 @@ import NotFound from "./pages/not-found";
 import { findStopBySlug, stops } from "./lib/stops";
 
 // Loaded on demand, to keep the map libraries and debug tooling out of the main bundle
-const TravelTimeMap = lazy(() => import("./pages/time"));
+const MetrolinkMap = lazy(() => import("./pages/map"));
 const Debug = lazy(() => import("./pages/debug"));
 
 function StopRoute() {
@@ -61,17 +61,17 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
           <Route
-            path="time"
+            path="map"
             element={
               <MapLayout>
                 <Suspense>
-                  <TravelTimeMap />
+                  <MetrolinkMap />
                 </Suspense>
               </MapLayout>
             }
           />
-          <Route path="map" element={<Navigate to="/time" replace />} />
-          <Route path="travel" element={<Navigate to="/time" replace />} />
+          <Route path="time" element={<Navigate to="/map" replace />} />
+          <Route path="travel" element={<Navigate to="/map" replace />} />
           <Route path="en-GB/*" element={<StripLocalePrefix />} />
         </Routes>
       </div>

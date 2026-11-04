@@ -1,4 +1,5 @@
 import AppLink from "../components/AppLink";
+import HomeTabs from "../components/HomeTabs";
 import { ChangeEvent, useState } from "react";
 import { useSearchParams } from "react-router";
 import Fuse from "fuse.js";
@@ -37,6 +38,8 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
+      <HomeTabs className="mx-auto max-w-sm" />
+
       {recentStops.length > 0 && (
         <Section aria-labelledby="recently-visited" className="space-y-4">
           <div className="flex justify-between space-x-2">
@@ -65,12 +68,6 @@ export default function Home() {
         </H3>
 
         <Panel className="space-y-5">
-          <nav>
-            <p>
-              <AppLink to={`/time`}>Travel time map</AppLink> &ndash; see how far you can travel from each stop
-            </p>
-          </nav>
-
           <form
             role="search"
             className="grid gap-3 sm:grid-cols-2"

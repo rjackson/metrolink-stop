@@ -32,7 +32,7 @@ The site has been around a while, so a few things are deliberately kept stable:
 - **Stop URLs** (e.g. `/st-peter's-square`) are slugs of stop names, and the same names are stored in visitors' local
   storage as "recently visited". The names are frozen in `data/stop-names.json`; never change an existing entry. New
   stops fall back to their GTFS name; add them to the file once they're live.
-- **Old URLs** redirect: `/map` and `/travel` to `/time`, and the `/en-GB/...` prefixed URLs the old Next.js build
+- **Old URLs** redirect: `/time` and `/travel` to `/map`, and the `/en-GB/...` prefixed URLs the old Next.js build
   served to their unprefixed equivalents.
 - **Old service workers** are retired by `public/sw.js` (see below).
 

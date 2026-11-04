@@ -1,4 +1,5 @@
 import AppLink from "../components/AppLink";
+import HomeTabs from "../components/HomeTabs";
 import { Anchor, Panel, usePrefersDark } from "@rjackson/rjds";
 import "leaflet/dist/leaflet.css";
 import { FeatureGroup, LatLngTuple } from "leaflet";
@@ -179,13 +180,13 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
       <div ref={containerRef} className="relative h-full w-full">
         <main className="absolute bottom-0 left-0 right-0 z-800 mx-4 mb-4 lg:bottom-auto lg:top-0 lg:mt-4 lg:w-full lg:max-w-sm">
           <Panel className="space-y-4 py-3 lg:py-4">
+            <header className="space-y-3">
+              <AppLink to="/" className="block text-center">
+                <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
+              </AppLink>
+              <HomeTabs />
+            </header>
             <div className="space-y-2">
-              <header className="flex items-center justify-center space-x-2 md:flex-col md:items-start md:space-x-0 md:space-y-1">
-                <AppLink to="/">
-                    <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
-                  </AppLink>
-                <h2 className="text-xl font-semibold text-gray-600 dark:text-gray-300 md:text-2xl">Travel Time Map</h2>
-              </header>
               <p>Hover over a stop to see how far you can travel in:</p>
               <ul className="px-3">
                 {Object.entries(durationColors).map(([duration, color]) => (
@@ -196,11 +197,6 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
                 ))}
               </ul>
             </div>
-            <nav className="text-sm text-center">
-                <AppLink to="/">
-                    <p>Check live departure times for your stop</p>
-                  </AppLink>
-            </nav>
             <footer className="flex justify-center space-x-2 text-sm">
               <p>
                 <span aria-hidden>💛</span>{" "}
@@ -350,7 +346,6 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
                 }}
               >
                 <CircleMarker
-                  key={stop.stop_code}
                   center={[stop.stop_lat, stop.stop_lon]}
                   pathOptions={{
                     color: "black",
@@ -373,6 +368,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
               height: 100%;
               flex: 1;
             }
+
           `}
         </style>
       </div>
@@ -385,8 +381,8 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
 // Leaflet and friends are imported dynamically within, so they're only loaded alongside the map
 const IsochroneMap = lazy(async () => ({ default: await initClientOnlyMap() }));
 
-export default function TravelTimeMap() {
-  useDocumentTitle("Travel Time Map");
+export default function MetrolinkMap() {
+  useDocumentTitle("Metrolink map");
 
   return (
     <Suspense>
