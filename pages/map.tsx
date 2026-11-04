@@ -16,7 +16,7 @@ import slugify from "../utils/slugify";
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
 import { metrolinkLinesGeoJSON as lines } from "../lib/tfgm-open-data/gm-metrolink-network/loadMetrolinkLines";
 import useDocumentTitle from "../components/hooks/useDocumentTitle";
-import type { GeoJsonObject } from "geojson";
+import type { Feature, GeoJsonObject } from "geojson";
 import { useMediaQuery } from "@react-hook/media-query";
 
 /** A GTFS stop on the map, joined to the stop-level identity the rest of the site (and the TfGM API) uses */
@@ -98,6 +98,8 @@ const labelTextLines = ({ name, rows }: LabelContent) =>
       : [name, ...rows.map(({ destination, time }) => `${destination}   ${time}`)];
 
 type LabelPlacement = "right" | "left";
+
+type Isochrone = { stopId: string; data: GeoJsonObject };
 
 /**
  * Decide which stops get a permanent label, and on which side, so that labels don't overlap each other or other
@@ -206,6 +208,27 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
     return null;
   };
 
+  /**
+   * A map pane whose contents fade in and out. Leaflet gives each pane its own canvas, so fading the pane's element
+   * fades everything drawn in it
+   */
+  const FadingPane = ({ name, visible, children }: { name: string; visible: boolean; children: React.ReactNode }) => {
+    const map = useMap();
+
+    useEffect(() => {
+      const pane = map.getPane(name);
+      if (pane) {
+        pane.style.opacity = visible ? "1" : "0";
+      }
+    }, [map, name, visible]);
+
+    return (
+      <Pane name={name} className="isochrone-pane" style={{ zIndex: 290, opacity: 0 }}>
+        {children}
+      </Pane>
+    );
+  };
+
   type MapView = { map: LeafletMap; zoom: number; bounds: LatLngBounds };
 
   /** Reports the map's view whenever it settles after panning or zooming */
@@ -236,6 +259,12 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
       "30": prefersDark ? colors.fuchsia[700] : colors.indigo[400],
       "40": prefersDark ? colors.fuchsia[900] : colors.indigo[200],
     };
+
+    const isochroneStyle = (feature?: Feature) => ({
+      fillColor: durationColors[feature?.properties?.duration as keyof typeof durationColors],
+      fillOpacity: 0.66,
+      weight: 0,
+    });
 
     // We need to separate vector maps into 2 layers so we can display part of it as the basemap, and more detailed
     // parts above our isochrone (higher zIndex). We could do custom vector tiles in ArcGIS but then we double our API
@@ -326,29 +355,6 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
     };
 
     const [selectedStop, setSelectedStop] = useState<string | undefined>();
-    const [activeIsochrone, setActiveIsochrone] = useState<{ stopId: string; data: GeoJsonObject } | undefined>();
-
-    // Keep showing the previous isochrone until the newly selected one has loaded
-    useEffect(() => {
-      if (!selectedStop) {
-        return;
-      }
-
-      let cancelled = false;
-      loadIsochrone(selectedStop)
-        .then((data) => {
-          if (!cancelled) {
-            setActiveIsochrone(data ? { stopId: selectedStop, data } : undefined);
-          }
-        })
-        .catch((err: unknown) => {
-          console.error(`Failed to load isochrone for ${selectedStop}`, err);
-        });
-
-      return () => {
-        cancelled = true;
-      };
-    }, [selectedStop]);
 
     useResizeObserver(containerRef, () => {
       mapRef.current?.invalidateSize();
@@ -395,8 +401,8 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [labelsEnabled, visibleStops, departures, selected, view]);
 
-    // The stop the pointer has settled on. Departures follow this rather than `selected`, so sweeping the mouse across
-    // several stops only fetches the one it lands on
+    // The stop the pointer has settled on. Departures and isochrones follow this rather than `selected`, so sweeping the
+    // mouse across several stops only fetches (and draws) the one it lands on
     const [settledStop, setSettledStop] = useState<MapStop | undefined>();
     useEffect(() => {
       const timeout = setTimeout(() => {
@@ -406,6 +412,47 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
         clearTimeout(timeout);
       };
     }, [selected]);
+
+    // Travel time isochrones are opt-in: they're a big visual change, which is distracting when you just want times.
+    // Two panes take turns showing the current isochrone, so a new one can fade in while the previous fades out
+    const [showTravelTimes, setShowTravelTimes] = useState(false);
+    const [isochrones, setIsochrones] = useState<{
+      slots: [Isochrone | undefined, Isochrone | undefined];
+      front: 0 | 1;
+    }>({ slots: [undefined, undefined], front: 0 });
+
+    useEffect(() => {
+      if (!showTravelTimes || !settledStop) {
+        return;
+      }
+      const { stopId } = settledStop;
+
+      let cancelled = false;
+      loadIsochrone(stopId)
+        .then((data) => {
+          if (cancelled || !data) {
+            return;
+          }
+          setIsochrones((current) => {
+            if (current.slots[current.front]?.stopId === stopId) {
+              return current;
+            }
+            const back = current.front === 0 ? 1 : 0;
+            const slots: [Isochrone | undefined, Isochrone | undefined] = [...current.slots];
+            slots[back] = { stopId, data };
+            return { slots, front: back };
+          });
+        })
+        .catch((err: unknown) => {
+          console.error(`Failed to load isochrone for ${stopId}`, err);
+        });
+
+      return () => {
+        cancelled = true;
+      };
+    }, [showTravelTimes, settledStop]);
+
+    const isochroneStop = stops.find(({ stopId }) => stopId === isochrones.slots[isochrones.front]?.stopId);
 
     // Same key as useMetrolinkStop, so the stop page can reuse what's fetched here
     const { data: stopInfo, error: stopInfoError } = useSWR<StopInfo, unknown>(
@@ -437,20 +484,35 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
                   />
                 </>
               ) : (
-                <p id="selected-stop">Hover over or tap a stop to see its next trams, and how far you can travel.</p>
+                <p id="selected-stop">Hover over or tap a stop to see its next trams.</p>
               )}
             </section>
 
-            <section aria-label="Travel time key" className="space-y-1 text-sm">
-              <p>{selected ? `Travel time from ${selected.name}:` : "Travel time:"}</p>
-              <ul className="flex flex-wrap gap-x-3 gap-y-1">
-                {Object.entries(durationColors).map(([duration, color]) => (
-                  <li key={duration} className="flex items-center space-x-1">
-                    <span className="inline-block h-4 w-4 rounded" style={{ backgroundColor: color }} />
-                    <span>{duration} min</span>
-                  </li>
-                ))}
-              </ul>
+            <section aria-label="Travel times" className="space-y-1 text-sm">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={showTravelTimes}
+                  onChange={(e) => {
+                    setShowTravelTimes(e.target.checked);
+                  }}
+                />
+                <span>
+                  Show how far you can travel
+                  {showTravelTimes && isochroneStop && ` from ${isochroneStop.name}`}
+                  {showTravelTimes && !isochroneStop && " (pick a stop)"}
+                </span>
+              </label>
+              {showTravelTimes && (
+                <ul className="flex flex-wrap gap-x-3 gap-y-1 pl-6">
+                  {Object.entries(durationColors).map(([duration, color]) => (
+                    <li key={duration} className="flex items-center space-x-1">
+                      <span className="inline-block h-4 w-4 rounded" style={{ backgroundColor: color }} />
+                      <span>{duration} min</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </section>
 
             <label className="flex items-center space-x-2 text-sm">
@@ -556,25 +618,16 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
               };
             }}
           />
-          <Pane name="isochronePane" style={{ zIndex: 290 }} />
-          {activeIsochrone && (
-            <GeoJSON
-              key={activeIsochrone.stopId}
-              data={activeIsochrone.data}
-              pane="isochronePane"
-              style={(feature) => {
-                return {
-                  // TODO: make typescript happy again
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-expect-error
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                  fillColor: durationColors[feature.properties.duration],
-                  fillOpacity: 0.66,
-                  weight: 0,
-                };
-              }}
-            />
-          )}
+          {isochrones.slots.map((isochrone, slot) => {
+            const pane = `isochronePane${slot}`;
+            return (
+              <FadingPane key={pane} name={pane} visible={showTravelTimes && slot === isochrones.front}>
+                {isochrone && (
+                  <GeoJSON key={isochrone.stopId} data={isochrone.data} pane={pane} style={isochroneStyle} />
+                )}
+              </FadingPane>
+            );
+          })}
           <FeatureGroup ref={linesRef}>
             {!prefersDark && (
               <GeoJSON
@@ -664,6 +717,15 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
               // min-height: 36rem;
               height: 100%;
               flex: 1;
+            }
+
+            .isochrone-pane {
+              transition: opacity 150ms ease-out;
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .isochrone-pane {
+                transition: none;
+              }
             }
 
             .leaflet-tooltip.stop-label {
