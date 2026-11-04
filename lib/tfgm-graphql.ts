@@ -13,15 +13,23 @@ type GraphQLResponse<T> = {
   errors?: { message: string; path?: (string | number)[]; extensions?: { code?: string } }[];
 };
 
+/** Extra request options. Browsers ignore some headers, such as user-agent */
+export type TfgmRequestOptions = {
+  headers?: Record<string, string>;
+  signal?: AbortSignal;
+};
+
 export async function tfgmQuery<T>(
   document: string,
   variables: Record<string, unknown> = {},
-  endpoint = DEFAULT_TFGM_GRAPHQL_ENDPOINT
+  endpoint = DEFAULT_TFGM_GRAPHQL_ENDPOINT,
+  { headers = {}, signal }: TfgmRequestOptions = {}
 ): Promise<T> {
   const response = await fetch(endpoint, {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { ...headers, "content-type": "application/json" },
     body: JSON.stringify({ query: document, variables }),
+    signal,
   });
 
   // Errors come back as JSON even with non-2xx statuses (e.g. 500 with code TOO_COMPLEX for oversized queries)

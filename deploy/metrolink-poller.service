@@ -1,0 +1,23 @@
+# Installed verbatim by deploy/release.sh. Run every minute by
+# metrolink-poller.timer; see poller/poll.ts.
+[Unit]
+Description=Record a snapshot of Metrolink departures
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=metrolink-poller
+Group=metrolink-poller
+WorkingDirectory=/opt/metrolink-stop
+ExecStart=/opt/metrolink-stop/node_modules/.bin/tsx poller/poll.ts
+Environment=POLLER_DATA_DIR=/var/lib/metrolink-stop/snapshots
+# Created and owned by the service user; everything else is read-only
+StateDirectory=metrolink-stop/snapshots
+# Well within the timer's one minute interval
+TimeoutStartSec=50
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true

@@ -94,6 +94,18 @@ mv -T "${SITE_DIR}/current.next" "$CURRENT"
 # changed Caddyfile -- but it's cheap and keeps this to one code path.
 systemctl reload-or-restart caddy
 
+# ----------------------------------------------------------------- poller ----
+
+# Records a snapshot of departures every minute (poller/poll.ts), into
+# /var/lib/metrolink-stop/snapshots. Runs from the checkout, using its
+# node_modules, so a poll that coincides with `npm ci` above can fail; the
+# next one, a minute later, picks up again.
+id -u metrolink-poller >/dev/null 2>&1 \
+  || useradd --system --no-create-home --shell /usr/sbin/nologin metrolink-poller
+install -m 644 deploy/metrolink-poller.service deploy/metrolink-poller.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable -q --now metrolink-poller.timer
+
 # ------------------------------------------------------------------ prune ----
 
 # Release names start with a UTC timestamp, so they sort chronologically.

@@ -21,6 +21,7 @@ It's a fully static single page app (Vite, React, React Router). There is no bac
 | `lib/tfgm-metrolink.ts` | Departures and alerts for a stop |
 | `public/sw.js` | Retires old service workers (see below) |
 | `scripts/` | Data regeneration and staleness check |
+| `poller/` | Records departure snapshots every minute (see below) |
 | `data/` | Generated data, committed |
 | `deploy/` | Proxmox install script, release script, Caddy config |
 
@@ -81,6 +82,46 @@ Metrolink stops and their positions, and lines per stop) rather than the raw fee
 runs weekly on GitHub Actions (`.github/workflows/check-data.yml`) and fails when a manual update is needed. GitHub
 disables scheduled workflows after 60 days without repository activity; that's fine, it's not critical.
 
+### Departure snapshots
+
+In production, `poller/poll.ts` records the departures at every stop once a minute, so the data can be replayed later:
+for statistics such as service reliability and countdown accuracy, or to develop features against real data. It's
+run by a systemd timer (`deploy/metrolink-poller.service` and `.timer`, installed by `deploy/release.sh`) as its own
+unprivileged user. Each poll makes five requests to TfGM's API, one batch of stops at a time, however many people use
+the site. To run it locally:
+
+```sh
+POLLER_DATA_DIR=./snapshots npx tsx poller/poll.ts
+```
+
+Snapshots are written as JSON Lines, one file per UTC day, gzipped once the day is over (a whole day compresses to a
+few MB):
+
+- `departures/YYYY-MM-DD.jsonl[.gz]`: one line per poll:
+
+  ```jsonc
+  {
+    "v": 1,                                  // format version
+    "fetchedAt": "2026-11-04T08:12:00.081Z", // when the poll started
+    "durationMs": 1690,
+    "stops": {
+      // keyed by stop-level ATCO code. lastUpdated is TfGM's newest timestamp for the stop
+      "9400ZZMAABM": {
+        "lastUpdated": "2026-11-04T08:11:54.000Z",
+        // [destination, carriages, status, wait in minutes], soonest first, as the departure boards show them
+        "departures": [["Bury", "Double", "Due", 3], ["Crumpsall", "Single", "Due", 5]],
+      },
+    },
+    "missing": [], // stops whose request failed in this poll
+    "errors": [],
+  }
+  ```
+
+- `alerts/YYYY-MM-DD.jsonl[.gz]`: the network's alerts (`{ "v", "fetchedAt", "alerts": [...] }`), written only when
+  they've changed since the last line written.
+
+Departures carry no tram or trip identity: TfGM's API doesn't provide one.
+
 ## Deploying
 
 ### Proxmox (LXC + Caddy)
@@ -100,7 +141,7 @@ updates an existing container in place, leaving its config alone.
 | --- | --- | --- |
 | `CTID` | existing, else next free | Container id |
 | `CT_HOSTNAME` | `metrolink-stop` | Also how the script finds an existing container |
-| `CT_CPU` / `CT_RAM` / `CT_DISK` | `2` / `1024` MB / `4` GB | The RAM is for builds; serving needs very little |
+| `CT_CPU` / `CT_RAM` / `CT_DISK` | `2` / `1024` MB / `8` GB | The RAM is for builds; serving needs very little. Departure snapshots grow the disk by a few MB a day |
 | `CT_BRIDGE` / `CT_STORAGE` | `vmbr0` / `local-lvm` | |
 | `REPO_URL` / `REPO_BRANCH` | this repo / `main` | |
 
@@ -113,12 +154,14 @@ Inside the container:
 | `/srv/metrolink-stop/current` | Symlink to the live release, which Caddy serves |
 | `/etc/metrolink-stop.env` | Build settings (`VITE_*`) |
 | `/etc/caddy/Caddyfile` | Installed from `deploy/Caddyfile` on every release |
+| `/var/lib/metrolink-stop/snapshots/` | Departure snapshots, recorded every minute |
 
 Day to day:
 
 ```sh
 pct exec <CTID> -- update                  # pull, build and release the latest code
 pct exec <CTID> -- journalctl -u caddy -f  # Caddy logs
+pct exec <CTID> -- journalctl -u metrolink-poller -f  # Snapshot poller logs
 pct enter <CTID>
 ```
 

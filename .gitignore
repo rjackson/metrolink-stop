@@ -30,3 +30,6 @@ yarn-error.log*
 # typescript
 tsconfig.tsbuildinfo
 
+
+# departure snapshots from running the poller locally
+/snapshots

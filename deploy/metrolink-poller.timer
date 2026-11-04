@@ -1,0 +1,10 @@
+# Installed verbatim by deploy/release.sh.
+[Unit]
+Description=Record a snapshot of Metrolink departures every minute
+
+[Timer]
+OnCalendar=*:*:00
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

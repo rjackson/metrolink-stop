@@ -33,7 +33,7 @@ NODE_MIN_MAJOR="20"
 CT_HOSTNAME="${CT_HOSTNAME:-metrolink-stop}"
 CT_CPU="${CT_CPU:-2}"
 CT_RAM="${CT_RAM:-1024}"         # MB. Builds need it; serving needs very little
-CT_DISK="${CT_DISK:-4}"          # GB
+CT_DISK="${CT_DISK:-8}"          # GB. Departure snapshots grow by a few MB a day
 CT_BRIDGE="${CT_BRIDGE:-vmbr0}"
 CT_STORAGE="${CT_STORAGE:-local-lvm}"
 TEMPLATE_STORAGE="${TEMPLATE_STORAGE:-local}"
@@ -379,6 +379,9 @@ check "Hashed assets cached long-term" \
    curl -fsS -o /dev/null -D - --max-time 10 \"http://127.0.0.1/assets/\${asset}\" | grep -qi 'immutable'"
 check "Missing assets 404 (not the app)" \
   "test \"\$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://127.0.0.1/assets/does-not-exist.js)\" = 404"
+check "Poller records a snapshot" \
+  "systemctl start metrolink-poller.service
+   ls /var/lib/metrolink-stop/snapshots/departures/*.jsonl >/dev/null"
 
 trap 'msg_error "Failed at line $LINENO. The container was left as-is for inspection."' ERR
 
@@ -400,10 +403,12 @@ cat <<EOF
   Code        ${APP_DIR} @ ${HEAD_SHA} (${REPO_BRANCH})
   Releases    ${SITE_DIR}/releases (live: ${SITE_DIR}/current)
   Config      ${ENV_FILE}
+  Snapshots   /var/lib/metrolink-stop/snapshots (recorded every minute)
 
   Shell in         Proxmox "Console" button, or pct enter ${CTID}
   Update           pct exec ${CTID} -- update
   Caddy logs       pct exec ${CTID} -- journalctl -u caddy -f
+  Poller logs      pct exec ${CTID} -- journalctl -u metrolink-poller -f
 
   Re-running this script updates an existing container in place.
 
