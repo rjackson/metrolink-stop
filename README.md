@@ -67,7 +67,6 @@ rarely: only when stops open, close or move, or lines change.
 | `data/lines/isochrones/geojson/`, `data/lines/stops.json` | TfGM GTFS (needs R) | `npm run regenerate-gtfs` |
 | `data/line-stops.json` | TfGM GTFS, for stops on each line from `data/stop-lines.json` | `npm run gtfs-line-stops` (after `gtfs-prepare`) |
 | `data/link-shapes.json` | TfGM GTFS, for the neighbouring stops in `data/line-stops.json` | `npm run gtfs-link-shapes` (after `gtfs-line-stops`) |
-| `data/tfgm-open-data/` | TfGM open data | Downloaded by hand |
 | `data/stop-names.json` | Frozen (see above) | Edited by hand |
 
 `npm run regenerate-gtfs` downloads the feed, calculates travel times between stops (R), builds the isochrones,

@@ -14,7 +14,10 @@ import { getDepartures, getStopInfo, type Departure, type StopInfo } from "../li
 import slugify from "../utils/slugify";
 
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
-import { metrolinkLinesGeoJSON as lines } from "../lib/tfgm-open-data/gm-metrolink-network/loadMetrolinkLines";
+import LineSwatch from "../components/LineSwatch";
+import { lines, linesAtStop, type Line } from "../lib/lines";
+import { orientedMapLinks } from "../lib/map-links";
+import { offsetPath } from "../lib/offset-path";
 import useDocumentTitle from "../components/hooks/useDocumentTitle";
 import type { Feature, GeoJsonObject } from "geojson";
 import { useMediaQuery } from "@react-hook/media-query";
@@ -153,6 +156,28 @@ function placeLabels(map: LeafletMap, candidates: MapStop[], labelText: (stop: M
   return placements;
 }
 
+/**
+ * A line's colour as a value canvas can draw with. Lines' colours are CSS custom properties (see index.css), which
+ * canvas doesn't understand
+ */
+function canvasColour(line: Line): string {
+  const match = /^var\((--[\w-]+)\)$/.exec(line.colour);
+  const value = match ? getComputedStyle(document.documentElement).getPropertyValue(match[1]).trim() : "";
+  return value || colors.gray[500];
+}
+
+/** Lines with their colours. Named as well as coloured, as several of TfGM's colours are hard to tell apart */
+const LineList = ({ lines, label }: { lines: Line[]; label: (line: Line) => string }) => (
+  <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+    {lines.map((line) => (
+      <li key={line.id} className="flex items-center space-x-1.5">
+        <LineSwatch line={line} />
+        <span>{label(line)}</span>
+      </li>
+    ))}
+  </ul>
+);
+
 const SelectedStopDepartures = ({ stopInfo, isError }: { stopInfo?: StopInfo; isError: boolean }) => {
   if (isError) {
     return <p className="text-sm">Couldn&rsquo;t load live departures.</p>;
@@ -180,8 +205,18 @@ const SelectedStopDepartures = ({ stopInfo, isError }: { stopInfo?: StopInfo; is
 };
 
 const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
-  const { MapContainer, GeoJSON, CircleMarker, useMap, useMapEvents, FeatureGroup, Pane, ZoomControl, Tooltip } =
-    await import("react-leaflet");
+  const {
+    MapContainer,
+    GeoJSON,
+    CircleMarker,
+    Polyline,
+    useMap,
+    useMapEvents,
+    FeatureGroup,
+    Pane,
+    ZoomControl,
+    Tooltip,
+  } = await import("react-leaflet");
   const { VectorBasemapLayer } = await import("../components/leaflet/VectorBasemapLayer");
 
   const center: LatLngTuple = [53.4781, -2.2433]; // St Peters Square
@@ -206,6 +241,71 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
     }, [map, linesRef, breakpointLg]);
 
     return null;
+  };
+
+  /**
+   * Each line in its own colour, side by side where lines share track. Offsets are in screen pixels, so they're
+   * recalculated for each zoom level
+   */
+  const ColouredLines = ({ casingColour }: { casingColour: string }) => {
+    const map = useMap();
+    const [zoom, setZoom] = useState(() => map.getZoom());
+    useMapEvents({
+      zoomend: () => {
+        setZoom(map.getZoom());
+      },
+    });
+
+    const width = zoom >= 14 ? 4 : zoom >= 12 ? 3 : 2;
+
+    const links = useMemo(
+      () =>
+        orientedMapLinks.map((link) => {
+          const projected = link.coordinates.map(([lon, lat]) => map.project([lat, lon], zoom));
+          const centre = (link.lines.length - 1) / 2;
+          return {
+            key: `${link.from}-${link.to}`,
+            positions: link.coordinates.map(([lon, lat]): LatLngTuple => [lat, lon]),
+            count: link.lines.length,
+            lines: link.lines.map((line, i) => ({
+              line,
+              positions: offsetPath(projected, (i - centre) * width).map(({ x, y }): LatLngTuple => {
+                const { lat, lng } = map.unproject([x, y], zoom);
+                return [lat, lng];
+              }),
+            })),
+          };
+        }),
+      [map, zoom, width]
+    );
+
+    return (
+      <>
+        {/* A casing behind each bundle of lines, drawn first so it never covers a neighbouring link's lines */}
+        {links.map(({ key, positions, count }) => (
+          <Polyline
+            key={`casing-${key}`}
+            positions={positions}
+            interactive={false}
+            pathOptions={{ color: casingColour, weight: count * width + 2, opacity: 1, lineCap: "round" }}
+          />
+        ))}
+        {links.flatMap(({ key, lines }) =>
+          lines.map(({ line, positions }) => (
+            <Polyline
+              key={`${key}-${line.id}`}
+              positions={positions}
+              pathOptions={{ color: canvasColour(line), weight: width, opacity: 1, lineCap: "butt" }}
+            >
+              <Tooltip sticky className="stop-label">
+                <span className="stop-label-name">{line.name}</span>
+                <span className="stop-label-muted">{line.id}</span>
+              </Tooltip>
+            </Polyline>
+          ))
+        )}
+      </>
+    );
   };
 
   /**
@@ -478,6 +578,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
                   <h2 id="selected-stop" className="font-semibold">
                     <AppLink to={`/${slugify(selected.name)}`}>{selected.name}</AppLink>
                   </h2>
+                  <LineList lines={linesAtStop(selected.atcoCode)} label={({ name }) => name} />
                   <SelectedStopDepartures
                     stopInfo={stopInfo?.name === selected.name ? stopInfo : undefined}
                     isError={stopInfoError !== undefined && settledStop === selected}
@@ -486,6 +587,11 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
               ) : (
                 <p id="selected-stop">Hover over or tap a stop to see its next trams.</p>
               )}
+            </section>
+
+            <section aria-labelledby="line-key" className="space-y-1 text-sm">
+              <h2 id="line-key">Lines:</h2>
+              <LineList lines={lines} label={({ colourName }) => colourName} />
             </section>
 
             <section aria-label="Travel times" className="space-y-1 text-sm">
@@ -629,24 +735,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
             );
           })}
           <FeatureGroup ref={linesRef}>
-            {!prefersDark && (
-              <GeoJSON
-                data={lines}
-                pathOptions={{
-                  color: colors.yellow[500],
-                  opacity: 1,
-                  weight: 5,
-                }}
-              />
-            )}
-            <GeoJSON
-              data={lines}
-              pathOptions={{
-                color: prefersDark ? colors.yellow[300] : colors.yellow[300],
-                opacity: 1,
-                weight: 3,
-              }}
-            />
+            <ColouredLines casingColour={prefersDark ? colors.gray[900] : "white"} />
           </FeatureGroup>
 
           <ViewTracker onChange={setView} />
