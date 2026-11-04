@@ -231,6 +231,27 @@ function plausibleLastUpdated(departures: TfgmDeparture[]): string {
   return new Date(timestamps.length > 0 ? Math.max(...timestamps) : now).toISOString();
 }
 
+/** Usable departures from the API's raw departures, soonest first */
+function toDepartures(departures: TfgmDeparture[]): Departure[] {
+  return departures
+    .flatMap(({ trip, timings }): Departure[] => {
+      if (!trip.destinationDisplay || !trip.carriages || !timings.status || timings.wait === null) {
+        return [];
+      }
+
+      return [
+        {
+          destination: trip.destinationDisplay,
+          type: trip.carriages,
+          status: timings.status,
+          wait: timings.wait,
+          ...(timings.expectedDepartureTime ? { departureTime: timings.expectedDepartureTime } : {}),
+        },
+      ];
+    })
+    .sort((a, b) => a.wait - b.wait);
+}
+
 /**
  * Fetch information on a particular stop
  *
@@ -250,23 +271,7 @@ export async function getStopInfo(stopLocation: string): Promise<StopInfo> {
     throw new Error(`No metrolink found matching ${stopLocation}`);
   }
 
-  const departures = (stop.departures ?? [])
-    .flatMap(({ trip, timings }): Departure[] => {
-      if (!trip.destinationDisplay || !trip.carriages || !timings.status || timings.wait === null) {
-        return [];
-      }
-
-      return [
-        {
-          destination: trip.destinationDisplay,
-          type: trip.carriages,
-          status: timings.status,
-          wait: timings.wait,
-          ...(timings.expectedDepartureTime ? { departureTime: timings.expectedDepartureTime } : {}),
-        },
-      ];
-    })
-    .sort((a, b) => a.wait - b.wait);
+  const departures = toDepartures(stop.departures ?? []);
 
   const alerts = relevantAlerts(stop, lineAlerts[0]?.alerts ?? []).map(
     ({ id, title, description, effect, link }): Alert => ({
