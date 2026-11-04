@@ -5,6 +5,10 @@ import { PropsWithChildren } from "react";
 const MainLayout = ({ children }: PropsWithChildren) => {
   return (
     <SingleColumnLayout
+      // The layout scrolls itself, rather than the page. Without a positioned ancestor, absolutely positioned content
+      // (e.g. sr-only headings) is placed against the page instead, making it taller than the window, so it scrolls on
+      // past the footer into blank space
+      className="relative"
       header={
         <Header className="items-center">
           <AppLink to="/">
