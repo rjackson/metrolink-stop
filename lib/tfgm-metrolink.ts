@@ -290,3 +290,61 @@ export async function getStopInfo(stopLocation: string): Promise<StopInfo> {
     lastUpdated: plausibleLastUpdated(stop.departures ?? []),
   };
 }
+
+/* -------------------------------------------------------------------------------------------------------------------
+ * Departures for many stops at once (e.g. for the map)
+ * -----------------------------------------------------------------------------------------------------------------*/
+
+const DEPARTURES_QUERY = `
+  query GetTramStopDepartures($atcoCodes: [String!]!, $limit: Int!) {
+    tramStops: locationByAtco(atcoCodes: $atcoCodes) {
+      atcoCode
+      ... on MassTransportLocation {
+        departures(limit: $limit) {
+          trip {
+            __typename
+            mode
+            ... on TramTrip {
+              carriages
+              destinationDisplay
+            }
+          }
+          timings {
+            scheduledDepartureTime
+            expectedDepartureTime
+            lastUpdated
+            status
+            wait
+          }
+        }
+      }
+    }
+  }
+`;
+
+type DeparturesData = {
+  tramStops: ({ atcoCode: string; departures?: TfgmDeparture[] } | null)[];
+};
+
+// The API rejects queries over a complexity limit (TOO_COMPLEX). A departures-only query for 20 stops fits
+const DEPARTURES_BATCH_SIZE = 20;
+
+/**
+ * Departures for several stops, keyed by stop-level ATCO code. Lighter than getStopInfo: no alerts or line info
+ */
+export async function getDepartures(atcoCodes: string[]): Promise<Record<string, Departure[]>> {
+  const batches = [];
+  for (let i = 0; i < atcoCodes.length; i += DEPARTURES_BATCH_SIZE) {
+    batches.push(atcoCodes.slice(i, i + DEPARTURES_BATCH_SIZE));
+  }
+
+  const results = await Promise.all(
+    batches.map((batch) => query<DeparturesData>(DEPARTURES_QUERY, { atcoCodes: batch, limit: 10 }))
+  );
+
+  return Object.fromEntries(
+    results
+      .flatMap(({ tramStops }) => tramStops)
+      .flatMap((stop) => (stop ? [[stop.atcoCode, toDepartures(stop.departures ?? [])] as const] : []))
+  );
+}
