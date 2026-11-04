@@ -53,3 +53,7 @@ export function findStopByName(stopLocation: string): StopsEntry | undefined {
 export function findStopBySlug(slug: string): StopsEntry | undefined {
   return stops.find(({ StationLocation }) => slugify(StationLocation) === slug);
 }
+
+export function findStopByAtco(atcoCode: string): StopsEntry | undefined {
+  return stops.find((stop) => stop.atcoCode === atcoCode);
+}

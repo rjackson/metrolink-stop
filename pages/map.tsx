@@ -7,13 +7,71 @@ import { loadIsochrone } from "../lib/isochrones";
 import { lazy, RefObject, Suspense, useEffect, useRef, useState, type JSX } from "react";
 import colors from "tailwindcss/colors";
 import useResizeObserver from "@react-hook/resize-observer";
-import stops from "../lib/gtfs-stops";
+import useSWR from "swr";
+import gtfsStops from "../lib/gtfs-stops";
+import { findStopByAtco } from "../lib/stops";
+import { getStopInfo, type StopInfo } from "../lib/tfgm-metrolink";
+import slugify from "../utils/slugify";
 
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
 import { metrolinkLinesGeoJSON as lines } from "../lib/tfgm-open-data/gm-metrolink-network/loadMetrolinkLines";
 import useDocumentTitle from "../components/hooks/useDocumentTitle";
 import type { GeoJsonObject } from "geojson";
 import { useMediaQuery } from "@react-hook/media-query";
+
+/** A GTFS stop on the map, joined to the stop-level identity the rest of the site (and the TfGM API) uses */
+type MapStop = {
+  /** GTFS stop ID, which isochrones are keyed by (e.g. 9400ZZMAABM1) */
+  stopId: string;
+  /** Stop-level ATCO code (e.g. 9400ZZMAABM) */
+  atcoCode: string;
+  name: string;
+  lat: number;
+  lon: number;
+};
+
+const stops: MapStop[] = gtfsStops.map(({ stop_id, stop_name, stop_lat, stop_lon }) => {
+  const atcoCode = stop_id.replace(/\d+$/, "");
+  return {
+    stopId: stop_id,
+    atcoCode,
+    name: findStopByAtco(atcoCode)?.StationLocation ?? stop_name.replace(/ \(Manchester Metrolink\)$/, ""),
+    lat: stop_lat,
+    lon: stop_lon,
+  };
+});
+
+const swrOptions = {
+  // Data has minute granularity, so refresh every minute and don't revalidate on focus more than every 30s
+  refreshInterval: 60 * 1000,
+  focusThrottleInterval: 30 * 1000,
+};
+
+const SelectedStopDepartures = ({ stopInfo, isError }: { stopInfo?: StopInfo; isError: boolean }) => {
+  if (isError) {
+    return <p className="text-sm">Couldn&rsquo;t load live departures.</p>;
+  }
+  if (!stopInfo) {
+    return <p className="text-sm text-gray-600 dark:text-gray-300">Loading departures&hellip;</p>;
+  }
+  if (stopInfo.departures.length === 0) {
+    return <p className="text-sm">No trams due.</p>;
+  }
+
+  return (
+    <ul className="space-y-1 text-sm">
+      {stopInfo.departures.slice(0, 4).map(({ destination, wait, type }, i) => (
+        <li key={`${destination}-${wait}-${i}`} className="flex justify-between space-x-2">
+          <span>
+            {destination}
+            {type === "Double" && <span className="text-gray-600 dark:text-gray-300"> (double)</span>}
+          </span>
+          <span className="tabular-nums">{wait === 0 ? "due" : `${wait} min`}</span>
+        </li>
+      ))}
+    </ul>
+  );
+};
 
 const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
   const { MapContainer, GeoJSON, CircleMarker, useMap, FeatureGroup, Pane, ZoomControl, Tooltip } = await import(
@@ -176,27 +234,66 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
       mapRef.current?.invalidateSize();
     });
 
+    const selected = stops.find(({ stopId }) => stopId === selectedStop);
+
+    // The stop the pointer has settled on. Departures follow this rather than `selected`, so sweeping the mouse across
+    // several stops only fetches the one it lands on
+    const [settledStop, setSettledStop] = useState<MapStop | undefined>();
+    useEffect(() => {
+      const timeout = setTimeout(() => {
+        setSettledStop(selected);
+      }, 300);
+      return () => {
+        clearTimeout(timeout);
+      };
+    }, [selected]);
+
+    // Same key as useMetrolinkStop, so the stop page can reuse what's fetched here
+    const { data: stopInfo, error: stopInfoError } = useSWR<StopInfo, unknown>(
+      settledStop ? ["stop", settledStop.name] : null,
+      () => getStopInfo(settledStop?.name ?? ""),
+      swrOptions
+    );
+
     return (
       <div ref={containerRef} className="relative h-full w-full">
         <main className="absolute bottom-0 left-0 right-0 z-800 mx-4 mb-4 lg:bottom-auto lg:top-0 lg:mt-4 lg:w-full lg:max-w-sm">
-          <Panel className="space-y-4 py-3 lg:py-4">
+          <Panel className="max-h-[50dvh] space-y-4 overflow-y-auto py-3 lg:max-h-[calc(100dvh-2rem)] lg:py-4">
             <header className="space-y-3">
               <AppLink to="/" className="block text-center">
                 <h1 className="text-xl font-semibold">{`metrolink stops`}</h1>
               </AppLink>
               <HomeTabs />
             </header>
-            <div className="space-y-2">
-              <p>Hover over a stop to see how far you can travel in:</p>
-              <ul className="px-3">
+
+            <section aria-labelledby="selected-stop" className="space-y-2">
+              {selected ? (
+                <>
+                  <h2 id="selected-stop" className="font-semibold">
+                    <AppLink to={`/${slugify(selected.name)}`}>{selected.name}</AppLink>
+                  </h2>
+                  <SelectedStopDepartures
+                    stopInfo={stopInfo?.name === selected.name ? stopInfo : undefined}
+                    isError={stopInfoError !== undefined && settledStop === selected}
+                  />
+                </>
+              ) : (
+                <p id="selected-stop">Hover over or tap a stop to see its next trams, and how far you can travel.</p>
+              )}
+            </section>
+
+            <section aria-label="Travel time key" className="space-y-1 text-sm">
+              <p>{selected ? `Travel time from ${selected.name}:` : "Travel time:"}</p>
+              <ul className="flex flex-wrap gap-x-3 gap-y-1">
                 {Object.entries(durationColors).map(([duration, color]) => (
-                  <li key={duration} className="flex space-x-2">
-                    <span className="inline-block h-6 w-6 rounded-md" style={{ backgroundColor: color }} />{" "}
-                    <span>{duration} minutes</span>
+                  <li key={duration} className="flex items-center space-x-1">
+                    <span className="inline-block h-4 w-4 rounded" style={{ backgroundColor: color }} />
+                    <span>{duration} min</span>
                   </li>
                 ))}
               </ul>
-            </div>
+            </section>
+
             <footer className="flex justify-center space-x-2 text-sm">
               <p>
                 <span aria-hidden>💛</span>{" "}
@@ -328,16 +425,16 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
             {stops.map((stop) => (
               <CircleMarker
                 /* Larger invisible touch-target */
-                key={stop.stop_code}
-                center={[stop.stop_lat, stop.stop_lon]}
+                key={stop.stopId}
+                center={[stop.lat, stop.lon]}
                 radius={24}
                 pane="markerPane"
                 eventHandlers={{
                   click: () => {
-                    setSelectedStop(stop.stop_id);
+                    setSelectedStop(stop.stopId);
                   },
                   mouseover: () => {
-                    setSelectedStop(stop.stop_id);
+                    setSelectedStop(stop.stopId);
                   },
                 }}
                 pathOptions={{
@@ -346,17 +443,17 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
                 }}
               >
                 <CircleMarker
-                  center={[stop.stop_lat, stop.stop_lon]}
+                  center={[stop.lat, stop.lon]}
                   pathOptions={{
                     color: "black",
                     fillOpacity: prefersDark ? 0.8 : 1,
-                    fillColor: selectedStop == stop.stop_id ? "yellow" : "white",
+                    fillColor: selectedStop == stop.stopId ? "yellow" : "white",
                     weight: 1,
                   }}
-                  radius={selectedStop == stop.stop_id ? 5 : 3}
+                  radius={selectedStop == stop.stopId ? 5 : 3}
                   pane="markerPane"
                 />
-                <Tooltip>{stop.stop_name.replace(" (Manchester Metrolink)", "")}</Tooltip>
+                <Tooltip>{stop.name}</Tooltip>
               </CircleMarker>
             ))}
           </FeatureGroup>
