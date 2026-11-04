@@ -8,7 +8,7 @@ import globals from "globals";
 
 export default tseslint.config(
   {
-    ignores: ["dist/", "data/", "public/", "node_modules/", "eslint.config.mjs"],
+    ignores: ["dist/", "data/", "public/", "node_modules/", "eslint.config.mjs", ".claude/"],
   },
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
