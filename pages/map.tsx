@@ -16,8 +16,8 @@ import slugify from "../utils/slugify";
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
 import LineSwatch from "../components/LineSwatch";
 import { lines, linesAtStop, type Line } from "../lib/lines";
-import { orientedMapLinks } from "../lib/map-links";
-import { offsetPath } from "../lib/offset-path";
+import { interchangeStops, orientedMapLinks } from "../lib/map-links";
+import { offsetPath, pointAlong, type Point } from "../lib/offset-path";
 import useDocumentTitle from "../components/hooks/useDocumentTitle";
 import type { Feature, GeoJsonObject } from "geojson";
 import { useMediaQuery } from "@react-hook/media-query";
@@ -100,7 +100,16 @@ const labelTextLines = ({ name, rows }: LabelContent) =>
       ? [name, "No trams due"]
       : [name, ...rows.map(({ destination, time }) => `${destination}   ${time}`)];
 
-type LabelPlacement = "right" | "left";
+type LabelPlacement = "right" | "left" | "top" | "bottom";
+
+/** Nudges each label off its stop, by placement */
+const labelOffsets: Record<LabelPlacement | "auto", [number, number]> = {
+  right: [6, 0],
+  left: [-6, 0],
+  top: [0, -6],
+  bottom: [0, 6],
+  auto: [0, 0],
+};
 
 type Isochrone = { stopId: string; data: GeoJsonObject };
 
@@ -144,6 +153,9 @@ function placeLabels(map: LeafletMap, candidates: MapStop[], labelText: (stop: M
     const options: [LabelPlacement, Rect][] = [
       ["right", { left: point.x + GAP, right: point.x + GAP + width, top, bottom }],
       ["left", { left: point.x - GAP - width, right: point.x - GAP, top, bottom }],
+      // Above or below suits stops along horizontal lines, where neighbours' labels would otherwise collide
+      ["top", { left: point.x - width / 2, right: point.x + width / 2, top: point.y - GAP - height, bottom: point.y - GAP }],
+      ["bottom", { left: point.x - width / 2, right: point.x + width / 2, top: point.y + GAP, bottom: point.y + GAP + height }],
     ];
 
     const fit = options.find(([, rect]) => !placed.some((other) => overlaps(rect, other)));
@@ -234,7 +246,10 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
         const bounds = linesRef.current?.getBounds();
         if (bounds?.isValid()) {
           map.fitBounds(bounds, {
-            paddingBottomRight: [0, breakpointLg ? 0 : 288], // px
+            // Leave room for the panel (beside the map on large screens, below it otherwise), and a margin all round
+            // for the stops' symbols and labels at the very ends of the lines
+            paddingTopLeft: [(breakpointLg ? 416 : 0) + 24, 24], // px
+            paddingBottomRight: [24, (breakpointLg ? 0 : 288) + 24], // px
           });
         }
       }, 300);
@@ -247,7 +262,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
    * Each line in its own colour, side by side where lines share track. Offsets are in screen pixels, so they're
    * recalculated for each zoom level
    */
-  const ColouredLines = ({ casingColour }: { casingColour: string }) => {
+  const ColouredLines = ({ dark }: { dark: boolean }) => {
     const map = useMap();
     const [zoom, setZoom] = useState(() => map.getZoom());
     useMapEvents({
@@ -256,12 +271,39 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
       },
     });
 
-    const width = zoom >= 14 ? 4 : zoom >= 12 ? 3 : 2;
+    // Lines sharing track are separated by a gap of a little under half their width, inside a casing of the same
+    const width = zoom >= 14 ? 5 : zoom >= 12 ? 3 : 2;
+    const gap = Math.max(1, Math.round(width * 0.4));
+    const pitch = width + gap;
+    const casingColour = dark ? colors.gray[900] : "white";
 
-    const links = useMemo(
-      () =>
-        orientedMapLinks.map((link) => {
-          const projected = link.coordinates.map(([lon, lat]) => map.project([lat, lon], zoom));
+    const toLatLng = ({ x, y }: { x: number; y: number }): LatLngTuple => {
+      const { lat, lng } = map.unproject([x, y], zoom);
+      return [lat, lng];
+    };
+
+    const { links, stops } = useMemo(() => {
+      const projectedLinks = orientedMapLinks.map((link) => ({
+        link,
+        projected: link.coordinates.map(([lon, lat]) => map.project([lat, lon], zoom)),
+      }));
+
+      // Where each link leaves each of its stops: the stop, and a point a little way along the link. Symbols are
+      // aligned with the track over that distance rather than its last few metres, which can wiggle
+      const DIRECTION_SAMPLE = 30; // px
+      const ends = new Map<string, { count: number; point: Point; far: Point; outwards: boolean }[]>();
+      projectedLinks.forEach(({ link, projected }) => {
+        const reversed = [...projected].reverse();
+        [
+          { stop: link.from, point: projected[0], far: pointAlong(projected, DIRECTION_SAMPLE), outwards: false },
+          { stop: link.to, point: reversed[0], far: pointAlong(reversed, DIRECTION_SAMPLE), outwards: true },
+        ].forEach(({ stop, ...end }) => {
+          ends.set(stop, [...(ends.get(stop) ?? []), { ...end, count: link.lines.length }]);
+        });
+      });
+
+      return {
+        links: projectedLinks.map(({ link, projected }) => {
           const centre = (link.lines.length - 1) / 2;
           return {
             key: `${link.from}-${link.to}`,
@@ -269,15 +311,47 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
             count: link.lines.length,
             lines: link.lines.map((line, i) => ({
               line,
-              positions: offsetPath(projected, (i - centre) * width).map(({ x, y }): LatLngTuple => {
-                const { lat, lng } = map.unproject([x, y], zoom);
-                return [lat, lng];
-              }),
+              positions: offsetPath(projected, (i - centre) * pitch).map(toLatLng),
             })),
           };
         }),
-      [map, zoom, width]
-    );
+        stops: [...ends].map(([stop, stopEnds]) => {
+          // The direction of travel through the stop, pointing away from the city centre: along the widest bundle,
+          // and on to whichever other link carries on furthest from it
+          const widest = stopEnds.reduce((a, b) => (b.count > a.count ? b : a));
+          const onwards = stopEnds
+            .filter((end) => end !== widest)
+            .reduce<(typeof stopEnds)[number] | undefined>(
+              (a, b) =>
+                !a ||
+                Math.hypot(b.far.x - widest.far.x, b.far.y - widest.far.y) >
+                  Math.hypot(a.far.x - widest.far.x, a.far.y - widest.far.y)
+                  ? b
+                  : a,
+              undefined
+            );
+          const [behind, ahead] = onwards ? [widest.far, onwards.far] : [widest.far, widest.point];
+          const forwards = widest.outwards ? 1 : -1;
+          const along = { x: (ahead.x - behind.x) * forwards, y: (ahead.y - behind.y) * forwards };
+          const length = Math.hypot(along.x, along.y) || 1;
+          const normal = { x: -along.y / length, y: along.x / length };
+          // Pips point up from the line, or to the right where it runs (nearly) vertically
+          const flip = Math.abs(normal.y) > 0.2 ? normal.y > 0 : normal.x < 0;
+          const across = flip ? { x: -normal.x, y: -normal.y } : normal;
+          const { point, count } = widest;
+          const at = (distance: number) => toLatLng({ x: point.x + across.x * distance, y: point.y + across.y * distance });
+
+          // Interchanges get a capsule across the lines; other stops a pip off the side of them
+          const half = ((count - 1) / 2) * pitch;
+          const edge = (count * pitch) / 2;
+          return interchangeStops.has(stop)
+            ? { stop, interchange: true, positions: [at(-half), at(half)] }
+            : { stop, interchange: false, positions: [at(edge - gap), at(edge + width * 1.2)] };
+        }),
+      };
+      // toLatLng only depends on map and zoom
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [map, zoom, pitch]);
 
     return (
       <>
@@ -287,7 +361,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
             key={`casing-${key}`}
             positions={positions}
             interactive={false}
-            pathOptions={{ color: casingColour, weight: count * width + 2, opacity: 1, lineCap: "round" }}
+            pathOptions={{ color: casingColour, weight: count * pitch + gap, opacity: 1, lineCap: "round" }}
           />
         ))}
         {links.flatMap(({ key, lines }) =>
@@ -304,6 +378,37 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
             </Polyline>
           ))
         )}
+        {/* Stops: a capsule across the lines at interchanges, or a pip off their side elsewhere */}
+        {/* ...but not at the thinnest lines, when zoomed so far out that they'd clutter the middle */}
+        {width > 2 &&
+          stops.flatMap(({ stop, interchange, positions }) => {
+            const ink = dark ? colors.gray[100] : colors.gray[900];
+            if (!interchange) {
+              return [
+                <Polyline
+                  key={`${stop}-pip`}
+                  positions={positions}
+                  interactive={false}
+                  pathOptions={{ color: ink, weight: Math.max(2, width * 0.8), opacity: 1, lineCap: "butt" }}
+                />,
+              ];
+            }
+            const outer = width * 2 + 3;
+            return [
+              <Polyline
+                key={`${stop}-outline`}
+                positions={positions}
+                interactive={false}
+                pathOptions={{ color: ink, weight: outer, opacity: 1, lineCap: "round" }}
+              />,
+              <Polyline
+                key={`${stop}-fill`}
+                positions={positions}
+                interactive={false}
+                pathOptions={{ color: dark ? colors.gray[800] : "white", weight: outer - 4, opacity: 1, lineCap: "round" }}
+              />,
+            ];
+          })}
       </>
     );
   };
@@ -735,7 +840,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
             );
           })}
           <FeatureGroup ref={linesRef}>
-            <ColouredLines casingColour={prefersDark ? colors.gray[900] : "white"} />
+            <ColouredLines dark={prefersDark} />
           </FeatureGroup>
 
           <ViewTracker onChange={setView} />
@@ -763,23 +868,21 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
                     fillOpacity: 0,
                   }}
                 >
-                  <CircleMarker
-                    center={[stop.lat, stop.lon]}
-                    pathOptions={{
-                      color: "black",
-                      fillOpacity: prefersDark ? 0.8 : 1,
-                      fillColor: selectedStop == stop.stopId ? "yellow" : "white",
-                      weight: 1,
-                    }}
-                    radius={selectedStop == stop.stopId ? 5 : 3}
-                    pane="markerPane"
-                  />
+                  {/* Stops are drawn with the lines; this just highlights the selected one */}
+                  {selectedStop == stop.stopId && (
+                    <CircleMarker
+                      center={[stop.lat, stop.lon]}
+                      pathOptions={{ color: "black", fillOpacity: 1, fillColor: "yellow", weight: 1.5 }}
+                      radius={5}
+                      pane="markerPane"
+                    />
+                  )}
                   <Tooltip
                     /* Leaflet doesn't update tooltip options in place, so remount when the placement changes */
                     key={placement ?? "hover"}
                     permanent={placement !== undefined}
                     direction={placement ?? "auto"}
-                    offset={placement === "left" ? [-6, 0] : placement === "right" ? [6, 0] : [0, 0]}
+                    offset={labelOffsets[placement ?? "auto"]}
                     className="stop-label"
                   >
                     <span className="stop-label-name">{content.name}</span>

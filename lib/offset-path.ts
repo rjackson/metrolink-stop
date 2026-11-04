@@ -1,5 +1,20 @@
 export type Point = { x: number; y: number };
 
+/** The point a given distance along a path, or its end if it's shorter than that */
+export function pointAlong(points: Point[], distance: number): Point {
+  let remaining = distance;
+  for (let i = 1; i < points.length; i++) {
+    const [a, b] = [points[i - 1], points[i]];
+    const length = Math.hypot(b.x - a.x, b.y - a.y);
+    if (length >= remaining && length > 0) {
+      const t = remaining / length;
+      return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+    }
+    remaining -= length;
+  }
+  return points[points.length - 1];
+}
+
 /**
  * A path shifted sideways by `offset` (to the right of its direction of travel, in screen coordinates where y points
  * down), keeping its corners mitred. Used to draw lines that share track side by side.

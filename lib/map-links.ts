@@ -47,6 +47,27 @@ const mapLinks: MapLink[] = (linkShapesJson as { from: string; to: string; coord
   .filter(({ lines }) => lines.length > 0);
 
 /**
+ * Stops drawn as interchanges, following tfgm.com's network map: where more than one line calls and you might change,
+ * because it's a junction or some line starts or ends there (such as Crumpsall, the end of the Red Line). Stops that
+ * lines simply pass through are not, apart from a few TfGM treat as interchanges for other reasons
+ */
+export const interchangeStops: Set<string> = (() => {
+  const ALSO = ["9400ZZMAGMX"]; // Deansgate - Castlefield, for Deansgate rail station
+  const EXCEPT = ["9400ZZMAECS"]; // Etihad Campus, where some Purple Line trams terminate, but isn't one on TfGM's map
+
+  const byStop = new Map<string, MapLink[]>();
+  mapLinks.forEach((link) => {
+    [link.from, link.to].forEach((stop) => byStop.set(stop, [...(byStop.get(stop) ?? []), link]));
+  });
+  const lineIds = (link: MapLink) => link.lines.map(({ id }) => id).join();
+  const generated = [...byStop]
+    .filter(([, links]) => new Set(links.flatMap(({ lines }) => lines)).size > 1)
+    .filter(([, links]) => links.length >= 3 || (links.length === 2 && lineIds(links[0]) !== lineIds(links[1])))
+    .map(([stop]) => stop);
+  return new Set([...generated, ...ALSO].filter((stop) => !EXCEPT.includes(stop)));
+})();
+
+/**
  * Links pointing away from the city centre (St Peter's Square). Lines are drawn offset to one side of a link's
  * direction, so links along a branch need to point the same way for each line to stay on the same side
  */
