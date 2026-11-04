@@ -5,3 +5,18 @@
 
 /* Dark mode via the .dark class App sets from the visitor's colour scheme preference, as rjds expects */
 @custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Line colours (see lib/lines.ts): TfGM's own, from the key on tfgm.com/ways-to-travel/tram/network-map. Navy and
+ * Purple are too dark to show on the dark mode panels, so get a white outline there (see `outlineOnDark`).
+ */
+:root {
+  --line-blue: #4fc0e9;
+  --line-green: #00a651;
+  --line-navy: #0066af;
+  --line-pink: #f287b7;
+  --line-purple: #60327c;
+  --line-red: #ed1c24;
+  --line-yellow: #ffc40c;
+}
+
