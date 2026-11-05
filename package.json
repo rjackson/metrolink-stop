@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint --max-warnings 0 .",
     "regenerate-stop-lines": "tsx scripts/regenerate-stop-lines.ts",
@@ -17,7 +17,7 @@
     "gtfs-isochrones": "(cd ./data/lines; node process-isochrones.mjs)",
     "gtfs-line-stops": "(cd ./data/lines; node process-line-stops.mjs)",
     "gtfs-link-shapes": "(cd ./data/lines; node process-link-shapes.mjs)",
-    "type-check": "tsc --pretty --noEmit",
+    "type-check": "tsc -b --pretty",
     "prepare": "simple-git-hooks"
   },
   "dependencies": {

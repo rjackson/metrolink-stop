@@ -1,0 +1,20 @@
+{
+  // The site, which runs in the browser
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+    "strict": true,
+    "target": "es2022",
+    "lib": ["dom", "dom.iterable", "es2022"],
+    "types": ["vite/client"],
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "jsx": "react-jsx"
+  },
+  "include": ["*.tsx", "vite-env.d.ts", "pages", "components", "lib", "utils"]
+}

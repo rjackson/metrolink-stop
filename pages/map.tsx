@@ -238,7 +238,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
   const MapZoomer = ({ linesRef }: { linesRef: RefObject<FeatureGroup | null> }) => {
     const map = useMap();
     const breakpointLg = useMediaQuery("(min-width: 1024px)"); // tailwind lg breakpoint
-    const debounceTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
+    const debounceTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
     useEffect(() => {
       clearTimeout(debounceTimeout.current);
