@@ -6,7 +6,3 @@ interface ImportMetaEnv {
   readonly VITE_FATHOM_CUSTOM_DOMAIN?: string;
   readonly VITE_FATHOM_TRACKING_CODE?: string;
 }
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv;
-}

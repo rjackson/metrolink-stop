@@ -2,6 +2,7 @@
   "name": "metrolink-stop",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

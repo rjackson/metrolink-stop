@@ -6,7 +6,7 @@ import { writeFile } from "fs/promises";
 import path from "path";
 import { fetchStopLines } from "./stop-lines";
 
-const OUTPUT_PATH = path.join(__dirname, "../data/stop-lines.json");
+const OUTPUT_PATH = path.join(import.meta.dirname, "../data/stop-lines.json");
 
 async function main() {
   const stopLines = await fetchStopLines();

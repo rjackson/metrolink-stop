@@ -17,7 +17,7 @@ import { parse } from "csv-parse/sync";
 import { fetchStopLines } from "./stop-lines";
 
 const GTFS_URL = "https://odata.tfgm.com/opendata/downloads/TfGMgtfsnew.zip";
-const DATA_DIR = path.join(__dirname, "../data");
+const DATA_DIR = path.join(import.meta.dirname, "../data");
 
 // ~50m. Small enough to catch a stop being rebuilt, big enough to ignore coordinate rounding
 const MOVED_THRESHOLD_DEGREES = 0.0005;
