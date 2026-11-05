@@ -15,7 +15,7 @@ import slugify from "../utils/slugify";
 
 import type { LayerSpecification, StyleSpecification } from "maplibre-gl";
 import LineSwatch from "../components/LineSwatch";
-import { lines, linesAtStop, type Line } from "../lib/lines";
+import { linesAtStop, type Line } from "../lib/lines";
 import { interchangeStops, orientedMapLinks } from "../lib/map-links";
 import { offsetPath, pointAlong, type Point } from "../lib/offset-path";
 import useDocumentTitle from "../components/hooks/useDocumentTitle";
@@ -178,13 +178,14 @@ function canvasColour(line: Line): string {
   return value || colors.gray[500];
 }
 
-/** Lines with their colours. Named as well as coloured, as several of TfGM's colours are hard to tell apart */
-const LineList = ({ lines, label }: { lines: Line[]; label: (line: Line) => string }) => (
-  <ul className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
+/** The lines serving a stop, as colour badges. Named on hover (and to screen readers), as several of TfGM's colours are
+ * hard to tell apart */
+const LineBadges = ({ lines }: { lines: Line[] }) => (
+  <ul className="flex flex-wrap gap-1.5">
     {lines.map((line) => (
-      <li key={line.id} className="flex items-center space-x-1.5">
+      <li key={line.id} title={line.name} className="flex">
         <LineSwatch line={line} />
-        <span>{label(line)}</span>
+        <span className="sr-only">{line.name}</span>
       </li>
     ))}
   </ul>
@@ -683,7 +684,7 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
                   <h2 id="selected-stop" className="font-semibold">
                     <AppLink to={`/${slugify(selected.name)}`}>{selected.name}</AppLink>
                   </h2>
-                  <LineList lines={linesAtStop(selected.atcoCode)} label={({ name }) => name} />
+                  <LineBadges lines={linesAtStop(selected.atcoCode)} />
                   <SelectedStopDepartures
                     stopInfo={stopInfo?.name === selected.name ? stopInfo : undefined}
                     isError={stopInfoError !== undefined && settledStop === selected}
@@ -692,11 +693,6 @@ const initClientOnlyMap = async (): Promise<() => JSX.Element> => {
               ) : (
                 <p id="selected-stop">Hover over or tap a stop to see its next trams.</p>
               )}
-            </section>
-
-            <section aria-labelledby="line-key" className="space-y-1 text-sm">
-              <h2 id="line-key">Lines:</h2>
-              <LineList lines={lines} label={({ colourName }) => colourName} />
             </section>
 
             <section aria-label="Travel times" className="space-y-1 text-sm">
